@@ -15,10 +15,13 @@ Implement complete CRUD operations for Customer management with nested data hand
 ## User Review Required
 
 > [!IMPORTANT]
-> **Breaking Changes**
+> **API Design Decisions**
 >
-> - NID validation will enforce Dominican Republic format (11 digits, no dashes)
-> - Customer creation requires ALL nested data in a single transaction
+> - **Two endpoints**: `/customers/` (full) and `/customers/simple` (minimal)
+> - **Full version** requires: NID, detail, phones, **addresses** (at least 1)
+> - **Simple version** requires: NID, detail, phones (addresses optional)
+> - **Portfolio/Promoter assignment**: Done separately after customer creation
+> - NID validation enforces Dominican Republic format (11 digits, no dashes)
 
 > [!WARNING]
 > **Data Migration Consideration**
@@ -45,10 +48,36 @@ async def create_customer_with_nested_data(
     customer_data: CustomerCreateSchema
 ) -> Customer:
     """
+    FULL customer creation.
     - Validate NID uniqueness
     - Create customer + detail + financial + job info
-    - Handle polymorphic phones and addresses
+    - Handle polymorphic phones and addresses (REQUIRED)
     - All in single DB transaction
+    """
+
+async def create_customer_simple(
+    session: Session,
+    customer_data: CustomerSimpleCreateSchema
+) -> Customer:
+    """
+    SIMPLE customer creation.
+    - Validate NID uniqueness
+    - Create customer + detail + phones
+    - Addresses and references optional
+    - All in single DB transaction
+    """
+
+async def assign_customer_to_portfolio(
+    session: Session,
+    customer_id: int,
+    portfolio_id: int | None,
+    promoter_id: int | None
+) -> Customer:
+    """
+    Assign customer to portfolio/promoter after creation.
+    - Validate portfolio/promoter exist
+    - Update customer assignment
+    - Set assigned_at timestamp
     """
 
 async def get_customer_with_relations(
@@ -135,24 +164,40 @@ class CustomerJobInfoCreate(BaseModel):
     # ... other fields
 
 class CustomerCreateSchema(BaseModel):
+    """Full customer creation - requires all core data including addresses."""
     # Main customer
     nid: str = Field(pattern=r"^\d{11}$", description="11-digit National ID")
     is_referred: bool = False
     referred_by: int | None = None
-    portfolio_id: int
-    promoter_id: int | None = None
+    # NOTE: portfolio_id and promoter_id assigned later via separate endpoint
 
-    # Nested data
+    # Nested data (REQUIRED)
     detail: CustomerDetailCreate
-    phones: list[PhoneCreate] = []
-    addresses: list[AddressCreate] = []
+    phones: list[PhoneCreate] = Field(min_length=1)  # At least 1 phone
+    addresses: list[AddressCreate] = Field(min_length=1)  # At least 1 address
+
+    # Optional nested data
     financial_info: CustomerFinancialInfoCreate | None = None
     job_info: CustomerJobInfoCreate | None = None
+    references: list[CustomerReferenceCreate] = []
+    company: CompanyCreate | None = None
+    vehicle: CustomerVehicleCreate | None = None
+
+class CustomerSimpleCreateSchema(BaseModel):
+    """Simple customer creation - minimal required data."""
+    nid: str = Field(pattern=r"^\d{11}$", description="11-digit National ID")
+
+    # Required nested data
+    detail: CustomerDetailCreate
+    phones: list[PhoneCreate] = Field(min_length=1)
+
+    # Optional in simple version
+    addresses: list[AddressCreate] = []
+    references: list[CustomerReferenceCreate] = []
 
 class CustomerUpdateSchema(BaseModel):
     """Partial update - all fields optional"""
     is_referred: bool | None = None
-    portfolio_id: int | None = None
     # ... other fields (all optional)
 
     detail: CustomerDetailCreate | None = None
@@ -235,10 +280,25 @@ async def create_customer(
     session: Session = Depends(get_session)
 ):
     """
-    Create customer with all nested data.
-    Requires authentication.
+    Create customer with all required data (FULL version).
+    Requires: NID, detail, phones (min 1), addresses (min 1).
+    Portfolio/Promoter assignment done via PATCH /{customer_id}/assign.
     """
     customer = await create_customer_with_nested_data(session, customer_data)
+    return customer
+
+@router.post("/simple", response_model=CustomerReadSchema, status_code=201)
+async def create_customer_simple(
+    customer_data: CustomerSimpleCreateSchema,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session)
+):
+    """
+    Create customer with minimal data (SIMPLE version).
+    Requires: NID, detail, phones (min 1).
+    Addresses and references are optional.
+    """
+    customer = await create_customer_simple(session, customer_data)
     return customer
 
 @router.get("/", response_model=PaginatedResponse[CustomerListItem])
@@ -282,6 +342,22 @@ async def update_customer_endpoint(
 ):
     """Update customer (partial updates supported)."""
     customer = await update_customer(session, customer_id, customer_data)
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    return customer
+
+@router.patch("/{customer_id}/assign", response_model=CustomerReadSchema)
+async def assign_customer(
+    customer_id: int,
+    portfolio_id: int | None = None,
+    promoter_id: int | None = None,
+    current_user: User = Depends(get_current_user),
+    session: Session = Depends(get_session)
+):
+    """Assign customer to portfolio and/or promoter (admin only)."""
+    customer = await assign_customer_to_portfolio(
+        session, customer_id, portfolio_id, promoter_id
+    )
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
     return customer
@@ -378,11 +454,10 @@ class CustomerDetailFactory(factory.Factory):
 **Unit Tests**:
 
 ```python
-def test_create_customer_success(client, auth_headers):
-    """Test successful customer creation with all data."""
+def test_create_customer_full_success(client, auth_headers):
+    """Test successful FULL customer creation with all required data."""
     payload = {
         "nid": "12345678901",
-        "portfolio_id": 1,
         "detail": {
             "first_name": "John",
             "last_name": "Doe",
@@ -394,7 +469,7 @@ def test_create_customer_success(client, auth_headers):
         "phones": [
             {"number": "8091234567", "type": "mobile"}
         ],
-        "addresses": [
+        "addresses": [  # REQUIRED in full version
             {"street": "Calle Test", "city": "Santo Domingo", "province": "DN"}
         ]
     }
@@ -402,6 +477,28 @@ def test_create_customer_success(client, auth_headers):
     assert response.status_code == 201
     data = response.json()
     assert data["nid"] == "12345678901"
+
+def test_create_customer_simple_success(client, auth_headers):
+    """Test successful SIMPLE customer creation (addresses optional)."""
+    payload = {
+        "nid": "98765432109",
+        "detail": {
+            "first_name": "Jane",
+            "last_name": "Smith",
+            "email": "jane@example.com",
+            "birthday": "1992-05-15",
+            "gender": "F",
+            "marital_status": "single"
+        },
+        "phones": [
+            {"number": "8297654321", "type": "mobile"}
+        ]
+        # No addresses - valid for simple version
+    }
+    response = client.post("/api/v1/customers/simple", json=payload, headers=auth_headers)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["nid"] == "98765432109"
     assert data["detail"]["first_name"] == "John"
 
 def test_create_customer_invalid_nid(client, auth_headers):
@@ -439,6 +536,19 @@ def test_update_customer(client, auth_headers, existing_customer):
     assert response.status_code == 200
     data = response.json()
     assert data["detail"]["first_name"] == "Jane"
+
+def test_assign_customer_to_portfolio(client, auth_headers, existing_customer):
+    """Test assigning customer to portfolio after creation."""
+    payload = {"portfolio_id": 1, "promoter_id": 2}
+    response = client.patch(
+        f"/api/v1/customers/{existing_customer.id}/assign",
+        json=payload,
+        headers=auth_headers
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["portfolio_id"] == 1
+    assert data["promoter_id"] == 2
 
 def test_validate_nid_endpoint(client):
     """Test NID validation endpoint (public)."""
