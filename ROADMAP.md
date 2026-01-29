@@ -1,0 +1,150 @@
+# LAMaS Migration Roadmap
+
+## Project Overview
+
+Migration of LAMaS (Loan Applications Management System) from Laravel to:
+
+- **Backend**: FastAPI + SQLModel + Pydantic
+- **Frontend**: Next.js 16 + Tailwind 4 + shadcn/ui + TypeScript
+- **CI/CD**: GitHub Actions
+- **Deployment**: Docker on VPS
+
+---
+
+## Quick Links
+
+| Document                                                                           | Description                   |
+| ---------------------------------------------------------------------------------- | ----------------------------- |
+| [Migration PRD](./docs/planning/migration-prd.md)                                  | Product Requirements Document |
+| [Phase 1: Backend Foundation](./docs/implementation/phase-1-backend-foundation.md) | FastAPI + SQLModel setup      |
+
+---
+
+## Technology Stack
+
+| Layer      | Technology                                  |
+| ---------- | ------------------------------------------- |
+| Backend    | Python 3.11, FastAPI, SQLModel, Pydantic v2 |
+| Frontend   | Next.js 16, React 19, Tailwind 4, shadcn/ui |
+| Database   | PostgreSQL 15                               |
+| Auth       | JWT (python-jose)                           |
+| Testing    | pytest, factory_boy, Postman                |
+| CI/CD      | GitHub Actions                              |
+| Deployment | Docker, Docker Compose                      |
+
+---
+
+## Phase Status
+
+| Phase | Name                  | Status            | Duration |
+| ----- | --------------------- | ----------------- | -------- |
+| 1     | Backend Foundation    | 🟡 Ready to Start | 2 weeks  |
+| 2     | Customer APIs         | ⚪ Not Started    | 2 weeks  |
+| 3     | Loan Application APIs | ⚪ Not Started    | 2 weeks  |
+| 4     | Frontend Foundation   | ⚪ Not Started    | 1 week   |
+| 5     | Frontend - Customers  | ⚪ Not Started    | 2 weeks  |
+| 6     | Frontend - Loans      | ⚪ Not Started    | 2 weeks  |
+| 7     | CI/CD & Deployment    | ⚪ Not Started    | 1 week   |
+
+**Legend:** ✅ Complete | 🟡 In Progress | ⚪ Not Started
+
+---
+
+## Phase 1: Backend Foundation
+
+### Steps
+
+- [ ] **Step 1.1**: Move Laravel files to `/legacy` folder
+- [ ] **Step 1.2**: Create backend project structure
+- [ ] **Step 1.3**: Core configuration (config.py, database.py, security.py)
+- [ ] **Step 1.4**: SQLModel models (19 models from Laravel)
+- [ ] **Step 1.5**: Docker configuration
+- [ ] **Step 1.6**: GitHub Actions CI workflow
+
+### Deliverables
+
+- Working FastAPI server at `http://localhost:8000`
+- SQLModel models connected to existing PostgreSQL
+- Health check endpoint
+- OpenAPI docs at `/api/v1/docs`
+
+---
+
+## Phase 2: Customer APIs
+
+### Steps
+
+- [ ] **Step 2.1**: Customer CRUD endpoints
+- [ ] **Step 2.2**: Nested data creation (details, phones, addresses)
+- [ ] **Step 2.3**: NID validation endpoint
+- [ ] **Step 2.4**: Search and filtering
+- [ ] **Step 2.5**: Unit tests with pytest + factory_boy
+
+---
+
+## Phase 3: Loan Application APIs
+
+### Steps
+
+- [ ] **Step 3.1**: LoanApplication CRUD
+- [ ] **Step 3.2**: Status workflow management
+- [ ] **Step 3.3**: Credit risk association
+- [ ] **Step 3.4**: AI evaluation placeholder endpoint
+- [ ] **Step 3.5**: Integration tests
+
+---
+
+## Phase 4: Frontend Foundation
+
+### Steps
+
+- [ ] **Step 4.1**: Next.js 16 project with App Router
+- [ ] **Step 4.2**: Tailwind CSS 4 + shadcn/ui setup
+- [ ] **Step 4.3**: NextAuth.js (JWT authentication)
+- [ ] **Step 4.4**: API client (React Query/TanStack Query)
+- [ ] **Step 4.5**: Layout, navigation, and theme
+
+---
+
+## Phase 5: Frontend - Customer Management
+
+### Steps
+
+- [ ] **Step 5.1**: Customer list (DataTable with search/filter)
+- [ ] **Step 5.2**: Customer detail page
+- [ ] **Step 5.3**: Customer creation form
+- [ ] **Step 5.4**: Customer edit form
+- [ ] **Step 5.5**: Form validation with Zod
+
+---
+
+## Phase 6: Frontend - Loan Applications
+
+### Steps
+
+- [ ] **Step 6.1**: Loan application list
+- [ ] **Step 6.2**: Loan detail page
+- [ ] **Step 6.3**: New loan application form
+- [ ] **Step 6.4**: Status management UI
+- [ ] **Step 6.5**: Evaluation trigger button (placeholder)
+
+---
+
+## Phase 7: CI/CD & Deployment
+
+### Steps
+
+- [ ] **Step 7.1**: Production Docker configuration
+- [ ] **Step 7.2**: Environment variables and secrets
+- [ ] **Step 7.3**: VPS deployment scripts
+- [ ] **Step 7.4**: Domain and SSL setup
+- [ ] **Step 7.5**: Monitoring and logging
+
+---
+
+## Notes
+
+- **AI Evaluation Service**: Out of scope. Backend includes placeholder endpoint at `POST /api/v1/loan-applications/{id}/evaluate`
+- **No Teams/Multi-tenant**: Simplified user model with basic RBAC
+- **Database**: Using existing PostgreSQL schema - no migrations needed
+- **Legacy**: Laravel files preserved in `/legacy` folder for reference

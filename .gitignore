@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+venv/
+.venv/
+ENV/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+coverage.xml
+*.cover
+.hypothesis/
+htmlcov/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Environment
+.env
+.env.local
+*.local
+
+# Docker
+postgres_data/
+
+# Legacy Laravel
+legacy/
+
+# Brain artifacts (conversation-specific)
+.gemini/
+
+# Node (future Next.js frontend)
+node_modules/
+.next/
+out/
+.turbo/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

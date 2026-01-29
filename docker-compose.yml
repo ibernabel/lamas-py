@@ -1,0 +1,42 @@
+# LAMaS Docker Compose Configuration
+# Use: docker compose up --build
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lamas-api
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://lamas:lamas@db:5432/lamas
+      - SECRET_KEY=${SECRET_KEY:-development-secret-key-change-in-production}
+      - DEBUG=true
+      - ALLOWED_ORIGINS=["http://localhost:3000","http://localhost:3001"]
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  db:
+    image: postgres:15
+    container_name: lamas-db
+    environment:
+      - POSTGRES_USER=lamas
+      - POSTGRES_PASSWORD=lamas
+      - POSTGRES_DB=lamas
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lamas"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
