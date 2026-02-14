@@ -191,7 +191,7 @@ lamas-py/
 | **5** | Frontend - Customers     | Customer management UI    | 2 weeks  |
 | **6** | Frontend - Loans         | Loan management UI        | 2 weeks  |
 | **7** | CI/CD & Deployment       | GitHub Actions, Docker    | 1 week   |
-| **8** | CrediFlow AI Integration | AI credit risk analysis   | 2 weeks  |
+| **8** | CreditGraph AI Integration | AI credit risk analysis   | 2 weeks  |
 
 ---
 
@@ -261,24 +261,24 @@ jobs:
 
 ---
 
-## 10. Phase 8: CrediFlow AI Integration
+## 10. Phase 8: CreditGraph AI Integration
 
 **Detailed requirements**: [LAMAS Integration Requirements](./lamas-integration-requirements.md)
 
 ### Overview
 
-Integration of CrediFlow AI as a stateless headless credit risk analysis service. LAMAS will trigger analysis, store results, and display insights through an interactive dashboard.
+Integration of CreditGraph AI as a stateless headless credit risk analysis service. LAMAS will trigger analysis, store results, and display insights through an interactive dashboard.
 
 ### Backend Components (FastAPI)
 
 | Component            | Description                                              |
 | -------------------- | -------------------------------------------------------- |
-| Database Table       | `creditflow_analyses` - Store full AI analysis responses |
-| SQLModel Model       | `CreditFlowAnalysis` - ORM model for analysis data       |
-| API Client           | `CreditFlowClient` - HTTP client for CrediFlow API       |
+| Database Table       | `creditgraph_analyses` - Store full AI analysis responses |
+| SQLModel Model       | `CreditGraphAnalysis` - ORM model for analysis data       |
+| API Client           | `CreditGraphClient` - HTTP client for CreditGraph API       |
 | Integration Endpoint | `POST /api/v1/loans/{id}/analyze` - Trigger analysis     |
 | Pydantic Schemas     | Response models for API and dashboard data               |
-| Configuration        | Environment variables for CrediFlow API credentials      |
+| Configuration        | Environment variables for CreditGraph API credentials      |
 
 ### Frontend Components (Next.js)
 
@@ -294,7 +294,7 @@ Integration of CrediFlow AI as a stateless headless credit risk analysis service
 
 ### Key Features
 
-- **Headless AI Integration**: CrediFlow as stateless backend service
+- **Headless AI Integration**: CreditGraph as stateless backend service
 - **Full Audit Trail**: Complete response storage in PostgreSQL
 - **Interactive Dashboard**: Charts and visualizations powered by Recharts
 - **Decision Workflow**: Auto-approval, rejection, or manual review routing
@@ -305,7 +305,7 @@ Integration of CrediFlow AI as a stateless headless credit risk analysis service
 ### Data Flow
 
 ```
-Loan Application → Trigger Analysis → CrediFlow API → Store Response → Display Dashboard → Analyst Decision
+Loan Application → Trigger Analysis → CreditGraph API → Store Response → Display Dashboard → Analyst Decision
 ```
 
 ---

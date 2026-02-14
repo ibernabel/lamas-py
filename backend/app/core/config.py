@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     # CORS
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:3001"]
 
+    # CreditGraph AI (External Risk Engine)
+    CREDITGRAPH_API_URL: str = "https://api.creditgraph.ai"
+    CREDITGRAPH_API_KEY: str = "placeholder_key"
+
 
 @lru_cache
 def get_settings() -> Settings:

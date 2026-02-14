@@ -1,10 +1,10 @@
-# LAMAS Integration with CreditFlow AI - Requirements
+# LAMAS Integration with CreditGraph AI - Requirements
 
 ## Overview
 
-This document outlines the **LAMAS-side** requirements for integrating with CreditFlow AI. CreditFlow is a stateless headless backend service that provides credit risk analysis via API. LAMAS is responsible for:
+This document outlines the **LAMAS-side** requirements for integrating with CreditGraph AI. CreditGraph is a stateless headless backend service that provides credit risk analysis via API. LAMAS is responsible for:
 
-1. Triggering CreditFlow analysis
+1. Triggering CreditGraph analysis
 2. Storing the full analysis response
 3. Displaying results to analysts
 4. Managing decision workflow (approval, rejection, manual review)
@@ -23,13 +23,13 @@ sequenceDiagram
     participant User as Loan Officer
     participant LAMAS as LAMAS (FastAPI)
     participant DB as LAMAS Database
-    participant CreditFlow as CreditFlow AI
+    participant CreditGraph as CreditGraph AI
 
     User->>LAMAS: Submit loan application
     LAMAS->>DB: Store application data
-    LAMAS->>CreditFlow: POST /api/v1/analyze
-    CreditFlow-->>LAMAS: Analysis result (JSON)
-    LAMAS->>DB: Store full CreditFlow response
+    LAMAS->>CreditGraph: POST /api/v1/analyze
+    CreditGraph-->>LAMAS: Analysis result (JSON)
+    LAMAS->>DB: Store full CreditGraph response
     LAMAS->>User: Display decision + dashboard
     User->>LAMAS: Approve/Reject/Review
     LAMAS->>DB: Update loan status
@@ -41,23 +41,23 @@ sequenceDiagram
 
 ### 1.1 Database Schema
 
-**New Table: `creditflow_analyses`**
+**New Table: `creditgraph_analyses`**
 
-Store the full CreditFlow response for audit trail and dashboard display.
+Store the full CreditGraph response for audit trail and dashboard display.
 
 ```python
-# lamas-py/app/models/creditflow.py
+# lamas-py/app/models/creditgraph.py
 from sqlalchemy import Column, Integer, String, Float, JSON, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
-class CreditFlowAnalysis(Base):
-    __tablename__ = "creditflow_analyses"
+class CreditGraphAnalysis(Base):
+    __tablename__ = "creditgraph_analyses"
 
     id = Column(Integer, primary_key=True, index=True)
     loan_application_id = Column(Integer, ForeignKey("loan_applications.id"), nullable=False, unique=True)
 
-    # CreditFlow response fields
+    # CreditGraph response fields
     case_id = Column(String(50), nullable=False, unique=True, index=True)
     decision = Column(String(50), nullable=False)  # APPROVED, REJECTED, MANUAL_REVIEW, APPROVED_PENDING_REVIEW
     irs_score = Column(Integer, nullable=False)
@@ -75,7 +75,7 @@ class CreditFlowAnalysis(Base):
     processing_time_ms = Column(Integer, nullable=True)  # Track API response time
 
     # Relationships
-    loan_application = relationship("LoanApplication", back_populates="creditflow_analysis")
+    loan_application = relationship("LoanApplication", back_populates="creditgraph_analysis")
 
     # Indexes
     __table_args__ = (
@@ -95,8 +95,8 @@ class LoanApplication(Base):
     # ... existing fields ...
 
     # Add relationship
-    creditflow_analysis = relationship(
-        "CreditFlowAnalysis",
+    creditgraph_analysis = relationship(
+        "CreditGraphAnalysis",
         back_populates="loan_application",
         uselist=False  # One-to-one
     )
@@ -104,22 +104,22 @@ class LoanApplication(Base):
 
 ---
 
-### 1.2 CreditFlow API Client
+### 1.2 CreditGraph API Client
 
-**Service Layer: `creditflow_client.py`**
+**Service Layer: `creditgraph_client.py`**
 
 ```python
-# lamas-py/app/services/creditflow_client.py
+# lamas-py/app/services/creditgraph_client.py
 import httpx
 from typing import Optional
 from datetime import datetime
 from app.core.config import settings
 
-class CreditFlowClient:
-    """Client for CreditFlow AI API."""
+class CreditGraphClient:
+    """Client for CreditGraph AI API."""
 
     def __init__(self):
-        self.base_url = settings.CREDITFLOW_API_URL  # e.g., https://creditflow-api.example.com
+        self.base_url = settings.CREDITFLOW_API_URL  # e.g., https://creditgraph-api.example.com
         self.api_key = settings.CREDITFLOW_API_KEY
         self.timeout = 60.0  # 60 seconds for full analysis
 
@@ -131,7 +131,7 @@ class CreditFlowClient:
         config: Optional[dict] = None
     ) -> dict:
         """
-        Send loan application to CreditFlow for analysis.
+        Send loan application to CreditGraph for analysis.
 
         Args:
             applicant: Applicant personal data
@@ -140,7 +140,7 @@ class CreditFlowClient:
             config: Optional config (e.g., skip_osint, narrative_language)
 
         Returns:
-            Full CreditFlow response as dict
+            Full CreditGraph response as dict
 
         Raises:
             httpx.HTTPError: If API call fails
@@ -165,7 +165,7 @@ class CreditFlowClient:
             return response.json()
 
     async def health_check(self) -> bool:
-        """Check if CreditFlow API is healthy."""
+        """Check if CreditGraph API is healthy."""
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 response = await client.get(f"{self.base_url}/health")
@@ -185,29 +185,29 @@ class CreditFlowClient:
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.services.creditflow_client import CreditFlowClient
+from app.services.creditgraph_client import CreditGraphClient
 from app.models.loan_application import LoanApplication
-from app.models.creditflow import CreditFlowAnalysis
-from app.schemas.creditflow import CreditFlowAnalysisResponse
+from app.models.creditgraph import CreditGraphAnalysis
+from app.schemas.creditgraph import CreditGraphAnalysisResponse
 from datetime import datetime
 
 router = APIRouter()
 
-@router.post("/{loan_id}/analyze", response_model=CreditFlowAnalysisResponse)
-async def analyze_loan_with_creditflow(
+@router.post("/{loan_id}/analyze", response_model=CreditGraphAnalysisResponse)
+async def analyze_loan_with_creditgraph(
     loan_id: int,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)  # Your auth dependency
 ):
     """
-    Trigger CreditFlow AI analysis for a loan application.
+    Trigger CreditGraph AI analysis for a loan application.
 
     Process:
     1. Retrieve loan application from database
     2. Check if analysis already exists (avoid duplicate calls)
-    3. Prepare payload for CreditFlow
-    4. Call CreditFlow API
+    3. Prepare payload for CreditGraph
+    4. Call CreditGraph API
     5. Store full response in database
     6. Update loan application status
     7. Return analysis result
@@ -218,13 +218,13 @@ async def analyze_loan_with_creditflow(
         raise HTTPException(status_code=404, detail="Loan application not found")
 
     # 2. Check if analysis already exists
-    existing_analysis = db.query(CreditFlowAnalysis).filter(
-        CreditFlowAnalysis.loan_application_id == loan_id
+    existing_analysis = db.query(CreditGraphAnalysis).filter(
+        CreditGraphAnalysis.loan_application_id == loan_id
     ).first()
 
     if existing_analysis:
         # Return cached result
-        return CreditFlowAnalysisResponse.from_orm(existing_analysis)
+        return CreditGraphAnalysisResponse.from_orm(existing_analysis)
 
     # 3. Prepare payload
     applicant_data = {
@@ -255,12 +255,12 @@ async def analyze_loan_with_creditflow(
         for doc in loan_app.documents
     ]
 
-    # 4. Call CreditFlow API
-    creditflow_client = CreditFlowClient()
+    # 4. Call CreditGraph API
+    creditgraph_client = CreditGraphClient()
     start_time = datetime.utcnow()
 
     try:
-        result = await creditflow_client.analyze_loan_application(
+        result = await creditgraph_client.analyze_loan_application(
             applicant=applicant_data,
             loan=loan_data,
             documents=documents_data,
@@ -272,11 +272,11 @@ async def analyze_loan_with_creditflow(
     except httpx.HTTPError as e:
         raise HTTPException(
             status_code=502,
-            detail=f"CreditFlow API error: {str(e)}"
+            detail=f"CreditGraph API error: {str(e)}"
         )
 
     # 5. Store full response
-    analysis = CreditFlowAnalysis(
+    analysis = CreditGraphAnalysis(
         loan_application_id=loan_id,
         case_id=result["case_id"],
         decision=result["decision"],
@@ -317,7 +317,7 @@ async def analyze_loan_with_creditflow(
         decision=result["decision"]
     )
 
-    return CreditFlowAnalysisResponse.from_orm(analysis)
+    return CreditGraphAnalysisResponse.from_orm(analysis)
 
 
 async def notify_analyst_if_needed(loan_id: int, decision: str):
@@ -335,13 +335,13 @@ async def notify_analyst_if_needed(loan_id: int, decision: str):
 **Response Schema:**
 
 ```python
-# lamas-py/app/schemas/creditflow.py
+# lamas-py/app/schemas/creditgraph.py
 from pydantic import BaseModel, Field
 from typing import Optional, Literal
 from datetime import datetime
 
-class CreditFlowAnalysisResponse(BaseModel):
-    """Response schema for CreditFlow analysis."""
+class CreditGraphAnalysisResponse(BaseModel):
+    """Response schema for CreditGraph analysis."""
 
     id: int
     loan_application_id: int
@@ -368,7 +368,7 @@ class CreditFlowAnalysisResponse(BaseModel):
         orm_mode = True
 
 
-class CreditFlowDashboardData(BaseModel):
+class CreditGraphDashboardData(BaseModel):
     """Extracted data for dashboard display."""
 
     # Summary
@@ -398,8 +398,8 @@ class CreditFlowDashboardData(BaseModel):
     suggested_term: Optional[int] = None
 
     @classmethod
-    def from_full_response(cls, full_response: dict) -> "CreditFlowDashboardData":
-        """Extract dashboard data from full CreditFlow response."""
+    def from_full_response(cls, full_response: dict) -> "CreditGraphDashboardData":
+        """Extract dashboard data from full CreditGraph response."""
         return cls(
             decision=full_response["decision"],
             irs_score=full_response["irs_score"],
@@ -428,7 +428,7 @@ class CreditFlowDashboardData(BaseModel):
 
 ```bash
 # lamas-py/.env
-CREDITFLOW_API_URL=https://creditflow-api.example.com
+CREDITFLOW_API_URL=https://creditgraph-api.example.com
 CREDITFLOW_API_KEY=your-api-key-here
 CREDITFLOW_TIMEOUT=60  # seconds
 ```
@@ -440,7 +440,7 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     # ... existing settings ...
 
-    # CreditFlow Integration
+    # CreditGraph Integration
     CREDITFLOW_API_URL: str
     CREDITFLOW_API_KEY: str
     CREDITFLOW_TIMEOUT: int = 60
@@ -461,7 +461,7 @@ class Settings(BaseSettings):
 // lamas-frontend/pages/loans/[id]/analysis.tsx
 import { useRouter } from 'next/router';
 import { useQuery } from '@tanstack/react-query';
-import { CreditFlowDashboard } from '@/components/CreditFlow/Dashboard';
+import { CreditGraphDashboard } from '@/components/CreditGraph/Dashboard';
 import { fetchLoanAnalysis } from '@/lib/api/loans';
 
 export default function LoanAnalysisPage() {
@@ -480,7 +480,7 @@ export default function LoanAnalysisPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <CreditFlowDashboard analysis={analysis} />
+      <CreditGraphDashboard analysis={analysis} />
     </div>
   );
 }
@@ -493,7 +493,7 @@ export default function LoanAnalysisPage() {
 **Main Dashboard Component:**
 
 ```typescript
-// lamas-frontend/components/CreditFlow/Dashboard.tsx
+// lamas-frontend/components/CreditGraph/Dashboard.tsx
 import { DecisionSummaryCard } from './DecisionSummaryCard';
 import { IRSBreakdownChart } from './IRSBreakdownChart';
 import { ConfidenceFactorsChart } from './ConfidenceFactorsChart';
@@ -502,11 +502,11 @@ import { OSINTValidationSection } from './OSINTValidationSection';
 import { SuggestedChangesCard } from './SuggestedChangesCard';
 import { ReasoningNarrative } from './ReasoningNarrative';
 
-interface CreditFlowDashboardProps {
-  analysis: CreditFlowAnalysisResponse;
+interface CreditGraphDashboardProps {
+  analysis: CreditGraphAnalysisResponse;
 }
 
-export function CreditFlowDashboard({ analysis }: CreditFlowDashboardProps) {
+export function CreditGraphDashboard({ analysis }: CreditGraphDashboardProps) {
   const dashboardData = extractDashboardData(analysis.full_response);
 
   return (
@@ -574,7 +574,7 @@ export function CreditFlowDashboard({ analysis }: CreditFlowDashboardProps) {
 **Decision Summary Card:**
 
 ```typescript
-// lamas-frontend/components/CreditFlow/DecisionSummaryCard.tsx
+// lamas-frontend/components/CreditGraph/DecisionSummaryCard.tsx
 import { CheckCircle, XCircle, AlertCircle, Clock } from 'lucide-react';
 
 const DECISION_CONFIG = {
@@ -644,7 +644,7 @@ export function DecisionSummaryCard({ decision, irsScore, confidence, riskLevel 
 **IRS Breakdown Chart:**
 
 ```typescript
-// lamas-frontend/components/CreditFlow/IRSBreakdownChart.tsx
+// lamas-frontend/components/CreditGraph/IRSBreakdownChart.tsx
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 export function IRSBreakdownChart({ breakdown }) {
@@ -692,7 +692,7 @@ export async function fetchLoanAnalysis(loanId: number) {
   return data;
 }
 
-export async function triggerCreditFlowAnalysis(loanId: number) {
+export async function triggerCreditGraphAnalysis(loanId: number) {
   const { data } = await apiClient.post(`/api/v1/loans/${loanId}/analyze`);
   return data;
 }
@@ -705,7 +705,7 @@ export async function triggerCreditFlowAnalysis(loanId: number) {
 ### 3.1 Database Migration
 
 ```php
-// lamas-php/database/migrations/2026_02_13_000000_create_creditflow_analyses_table.php
+// lamas-php/database/migrations/2026_02_13_000000_create_creditgraph_analyses_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -716,7 +716,7 @@ class CreateCreditflowAnalysesTable extends Migration
 {
     public function up()
     {
-        Schema::create('creditflow_analyses', function (Blueprint $table) {
+        Schema::create('creditgraph_analyses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('loan_application_id')->unique()->constrained()->onDelete('cascade');
 
@@ -742,7 +742,7 @@ class CreateCreditflowAnalysesTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('creditflow_analyses');
+        Schema::dropIfExists('creditgraph_analyses');
     }
 }
 ```
@@ -752,16 +752,16 @@ class CreateCreditflowAnalysesTable extends Migration
 ### 3.2 Eloquent Model
 
 ```php
-// lamas-php/app/Models/CreditFlowAnalysis.php
+// lamas-php/app/Models/CreditGraphAnalysis.php
 <?php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CreditFlowAnalysis extends Model
+class CreditGraphAnalysis extends Model
 {
-    protected $table = 'creditflow_analyses';
+    protected $table = 'creditgraph_analyses';
 
     protected $fillable = [
         'loan_application_id',
@@ -796,19 +796,19 @@ class CreditFlowAnalysis extends Model
 
 ---
 
-### 3.3 CreditFlow Service
+### 3.3 CreditGraph Service
 
 ```php
-// lamas-php/app/Services/CreditFlowService.php
+// lamas-php/app/Services/CreditGraphService.php
 <?php
 
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
-use App\Models\CreditFlowAnalysis;
+use App\Models\CreditGraphAnalysis;
 use App\Models\LoanApplication;
 
-class CreditFlowService
+class CreditGraphService
 {
     protected $baseUrl;
     protected $apiKey;
@@ -816,16 +816,16 @@ class CreditFlowService
 
     public function __construct()
     {
-        $this->baseUrl = config('services.creditflow.api_url');
-        $this->apiKey = config('services.creditflow.api_key');
-        $this->timeout = config('services.creditflow.timeout', 60);
+        $this->baseUrl = config('services.creditgraph.api_url');
+        $this->apiKey = config('services.creditgraph.api_key');
+        $this->timeout = config('services.creditgraph.timeout', 60);
     }
 
-    public function analyzeLoanApplication(LoanApplication $loanApp): CreditFlowAnalysis
+    public function analyzeLoanApplication(LoanApplication $loanApp): CreditGraphAnalysis
     {
         // Check if analysis already exists
-        if ($loanApp->creditflowAnalysis) {
-            return $loanApp->creditflowAnalysis;
+        if ($loanApp->creditgraphAnalysis) {
+            return $loanApp->creditgraphAnalysis;
         }
 
         // Prepare payload
@@ -856,7 +856,7 @@ class CreditFlowService
             ],
         ];
 
-        // Call CreditFlow API
+        // Call CreditGraph API
         $startTime = microtime(true);
 
         $response = Http::timeout($this->timeout)
@@ -868,13 +868,13 @@ class CreditFlowService
         $processingTime = (int) ((microtime(true) - $startTime) * 1000);
 
         if (!$response->successful()) {
-            throw new \Exception("CreditFlow API error: " . $response->body());
+            throw new \Exception("CreditGraph API error: " . $response->body());
         }
 
         $result = $response->json();
 
         // Store analysis
-        $analysis = CreditFlowAnalysis::create([
+        $analysis = CreditGraphAnalysis::create([
             'loan_application_id' => $loanApp->id,
             'case_id' => $result['case_id'],
             'decision' => $result['decision'],
@@ -929,14 +929,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\LoanApplication;
-use App\Services\CreditFlowService;
-use App\Http\Resources\CreditFlowAnalysisResource;
+use App\Services\CreditGraphService;
+use App\Http\Resources\CreditGraphAnalysisResource;
 
 class LoanAnalysisController extends Controller
 {
     protected $creditFlowService;
 
-    public function __construct(CreditFlowService $creditFlowService)
+    public function __construct(CreditGraphService $creditFlowService)
     {
         $this->creditFlowService = $creditFlowService;
     }
@@ -947,10 +947,10 @@ class LoanAnalysisController extends Controller
 
         try {
             $analysis = $this->creditFlowService->analyzeLoanApplication($loanApp);
-            return new CreditFlowAnalysisResource($analysis);
+            return new CreditGraphAnalysisResource($analysis);
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'CreditFlow API error',
+                'error' => 'CreditGraph API error',
                 'message' => $e->getMessage()
             ], 502);
         }
@@ -965,12 +965,12 @@ class LoanAnalysisController extends Controller
 ### Phase 1: Backend (FastAPI)
 
 - [ ] **Database Setup**
-  - [ ] Create `creditflow_analyses` table migration
+  - [ ] Create `creditgraph_analyses` table migration
   - [ ] Update `LoanApplication` model with relationship
   - [ ] Run migrations
 
-- [ ] **CreditFlow Client**
-  - [ ] Implement `CreditFlowClient` service
+- [ ] **CreditGraph Client**
+  - [ ] Implement `CreditGraphClient` service
   - [ ] Add configuration (`.env` variables)
   - [ ] Add health check endpoint
 
@@ -982,8 +982,8 @@ class LoanAnalysisController extends Controller
   - [ ] Add error handling
 
 - [ ] **Pydantic Schemas**
-  - [ ] Create `CreditFlowAnalysisResponse` schema
-  - [ ] Create `CreditFlowDashboardData` schema
+  - [ ] Create `CreditGraphAnalysisResponse` schema
+  - [ ] Create `CreditGraphDashboardData` schema
   - [ ] Add validation
 
 ---
@@ -1006,7 +1006,7 @@ class LoanAnalysisController extends Controller
 
 - [ ] **API Client**
   - [ ] Add `fetchLoanAnalysis()` function
-  - [ ] Add `triggerCreditFlowAnalysis()` function
+  - [ ] Add `triggerCreditGraphAnalysis()` function
 
 ---
 
@@ -1014,10 +1014,10 @@ class LoanAnalysisController extends Controller
 
 - [ ] **Database**
   - [ ] Create migration (copy from FastAPI schema)
-  - [ ] Create `CreditFlowAnalysis` Eloquent model
+  - [ ] Create `CreditGraphAnalysis` Eloquent model
 
 - [ ] **Service Layer**
-  - [ ] Port `CreditFlowService` from Python
+  - [ ] Port `CreditGraphService` from Python
   - [ ] Add config in `config/services.php`
 
 - [ ] **API Controller**
@@ -1030,7 +1030,7 @@ class LoanAnalysisController extends Controller
 ### Phase 4: Testing
 
 - [ ] **Unit Tests**
-  - [ ] Test `CreditFlowClient.analyze_loan_application()`
+  - [ ] Test `CreditGraphClient.analyze_loan_application()`
   - [ ] Test status updates based on decision
 
 - [ ] **Integration Tests**
@@ -1047,18 +1047,18 @@ class LoanAnalysisController extends Controller
 
 ### 5.1 Analyst Override
 
-**Allow analysts to override CreditFlow decision:**
+**Allow analysts to override CreditGraph decision:**
 
 ```python
 # lamas-py/app/api/v1/endpoints/loans.py
 @router.post("/{loan_id}/override-decision")
-async def override_creditflow_decision(
+async def override_creditgraph_decision(
     loan_id: int,
     override_data: OverrideDecisionRequest,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_senior_analyst)  # Restrict to senior analysts
 ):
-    """Override CreditFlow decision with analyst judgment."""
+    """Override CreditGraph decision with analyst judgment."""
     # Store override reason in audit log
     # Update loan application status
     pass
@@ -1077,16 +1077,16 @@ async def re_analyze_loan(
     force: bool = False,  # Force re-analysis even if analysis exists
     db: Session = Depends(get_db),
 ):
-    """Re-trigger CreditFlow analysis."""
+    """Re-trigger CreditGraph analysis."""
     if force:
         # Delete existing analysis
-        db.query(CreditFlowAnalysis).filter(
-            CreditFlowAnalysis.loan_application_id == loan_id
+        db.query(CreditGraphAnalysis).filter(
+            CreditGraphAnalysis.loan_application_id == loan_id
         ).delete()
         db.commit()
 
     # Call analyze endpoint
-    return await analyze_loan_with_creditflow(loan_id, db)
+    return await analyze_loan_with_creditgraph(loan_id, db)
 ```
 
 ---
@@ -1102,7 +1102,7 @@ async def bulk_analyze_loans(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
-    """Trigger CreditFlow analysis for multiple loans (async)."""
+    """Trigger CreditGraph analysis for multiple loans (async)."""
     for loan_id in loan_ids:
         background_tasks.add_task(
             analyze_single_loan,
@@ -1116,8 +1116,8 @@ async def bulk_analyze_loans(
 
 ## Success Criteria
 
-- ✅ LAMAS can trigger CreditFlow analysis via API
-- ✅ Full CreditFlow response stored in LAMAS database
+- ✅ LAMAS can trigger CreditGraph analysis via API
+- ✅ Full CreditGraph response stored in LAMAS database
 - ✅ Dashboard displays all key metrics (IRS, confidence, risk, breakdown)
 - ✅ Loan application status auto-updated based on decision
 - ✅ Analysts can view detailed reasoning narrative
@@ -1131,7 +1131,7 @@ async def bulk_analyze_loans(
 | Task                     | Python (FastAPI) | Laravel (PHP) | Frontend (Next.js) |
 | ------------------------ | ---------------- | ------------- | ------------------ |
 | Database schema          | 1 hour           | 1 hour        | -                  |
-| CreditFlow client        | 3 hours          | 3 hours       | -                  |
+| CreditGraph client        | 3 hours          | 3 hours       | -                  |
 | API integration endpoint | 4 hours          | 4 hours       | -                  |
 | Dashboard components     | -                | -             | 8 hours            |
 | Testing                  | 4 hours          | 4 hours       | 4 hours            |

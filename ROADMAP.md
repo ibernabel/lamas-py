@@ -17,7 +17,7 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 | ----------------------------------------------------------------------------------- | ---------------------------------- |
 | [Migration PRD](./docs/planning/migration-prd.md)                                   | Product Requirements Document      |
 | [Phase 1: Backend Foundation](./docs/implementation/phase-1-backend-foundation.md)  | FastAPI + SQLModel setup           |
-| [LAMAS Integration Requirements](./docs/planning/lamas-integration-requirements.md) | CrediFlow AI Integration (Phase 8) |
+| [LAMAS Integration Requirements](./docs/planning/lamas-integration-requirements.md) | CreditGraph AI Integration (Phase 8) |
 
 ---
 
@@ -46,7 +46,7 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 | 5     | Frontend - Customers     | ⚪ Not Started | -          | 2 weeks  |
 | 6     | Frontend - Loans         | ⚪ Not Started | -          | 2 weeks  |
 | 7     | CI/CD & Deployment       | ⚪ Not Started | -          | 1 week   |
-| 8     | CrediFlow AI Integration | ⚪ Not Started | -          | 2 weeks  |
+| 8     | CreditGraph AI Integration | ⚪ Not Started | -          | 2 weeks  |
 
 **Legend:** ✅ Complete | 🟡 In Progress | ⚪ Not Started
 
@@ -162,30 +162,27 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ---
 
-## Phase 8: CrediFlow AI Integration
+## Phase 8: CreditGraph AI Integration
 
 **Reference**: [LAMAS Integration Requirements](./docs/planning/lamas-integration-requirements.md)
 
 ### Backend Integration (FastAPI)
 
-- [ ] **Step 8.1**: Database schema - Create `creditflow_analyses` table
-- [ ] **Step 8.2**: SQLModel model for CreditFlow analysis storage
-- [ ] **Step 8.3**: CreditFlow API client service
-- [ ] **Step 8.4**: Integration endpoint `POST /api/v1/loans/{id}/analyze`
-- [ ] **Step 8.5**: Pydantic schemas for CreditFlow responses
-- [ ] **Step 8.6**: Environment configuration for CreditFlow API
-- [ ] **Step 8.7**: Unit tests for CreditFlow client and endpoints
-
-### Frontend Dashboard (Next.js)
-
-- [ ] **Step 8.8**: Dashboard page `/loans/[id]/analysis`
-- [ ] **Step 8.9**: Main dashboard component structure
-- [ ] **Step 8.10**: Decision summary card component
-- [ ] **Step 8.11**: IRS breakdown chart component
-- [ ] **Step 8.12**: Financial analysis section component
-- [ ] **Step 8.13**: OSINT validation section component
-- [ ] **Step 8.14**: Reasoning narrative component
-- [ ] **Step 8.15**: API client functions for CreditFlow integration
+- [ ] **Step 8.1**: Database schema - Create `creditgraph_analyses` table
+- [ ] **Step 8.2**: SQLModel model for CreditGraph analysis storage
+- [ ] **Step 8.3**: CreditGraph API client service
+- [ ] **Step 8.4**: Background task for triggering analysis
+- [ ] **Step 8.5**: Pydantic schemas for CreditGraph responses
+- [ ] **Step 8.6**: Environment configuration for CreditGraph API
+- [ ] **Step 8.7**: Unit tests for CreditGraph client and endpoints
+- [ ] **Step 8.8**: Integration of CreditGraph results in Loan Application model
+- [ ] **Step 8.9**: Frontend components for decision dashboard
+- [ ] **Step 8.10**: Visual cards for Decision, IRS Score, and Confidence
+- [ ] **Step 8.11**: Recharts integration for IRS breakdown
+- [ ] **Step 8.12**: Decision reasoning narrative display
+- [ ] **Step 8.13**: Financial analysis summary (detected income, flags)
+- [ ] **Step 8.14**: OSINT findings display
+- [ ] **Step 8.15**: API client functions for CreditGraph integration
 
 ### Key Features
 
@@ -201,7 +198,7 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 ## Notes
 
 - **AI Evaluation Service**: Out of scope. Backend includes placeholder endpoint at `POST /api/v1/loan-applications/{id}/evaluate`
-- **CreditFlow AI**: Integrated in Phase 8 as stateless headless service
+- **CreditGraph AI**: Integrated in Phase 8 as stateless headless service
 - **No Teams/Multi-tenant**: Simplified user model with basic RBAC
 - **Database**: Using existing PostgreSQL schema - no migrations needed
 - **Legacy**: Laravel files preserved in `/legacy` folder for reference
