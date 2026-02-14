@@ -32,8 +32,8 @@ class User(UserBase, table=True):
     updated_at: datetime | None = Field(default_factory=datetime.utcnow)
 
     # Relationships
-    broker: "Broker | None" = Relationship(back_populates="user")
-    promoter: "Promoter | None" = Relationship(back_populates="user")
+    broker: "Broker" = Relationship(back_populates="user")
+    promoter: "Promoter" = Relationship(back_populates="user")
 
 
 class UserCreate(SQLModel):

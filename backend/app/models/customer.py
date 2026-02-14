@@ -18,7 +18,8 @@ class Customer(SQLModel, table=True):
     __tablename__ = "customers"
 
     id: int | None = Field(default=None, primary_key=True)
-    NID: str = Field(unique=True, index=True, max_length=11, sa_column_kwargs={"name": "NID"})
+    nid: str = Field(unique=True, index=True, max_length=11,
+                     sa_column_kwargs={"name": "NID"})
     lead_channel: str | None = Field(default=None, max_length=255)
     is_referred: bool = Field(default=False)
     referred_by: str | None = Field(default=None, max_length=11)
@@ -31,14 +32,18 @@ class Customer(SQLModel, table=True):
     updated_at: datetime | None = Field(default_factory=datetime.utcnow)
 
     # Relationships (will be populated once all models exist)
-    details: "CustomerDetail | None" = Relationship(back_populates="customer")
-    financial_info: "CustomerFinancialInfo | None" = Relationship(back_populates="customer")
-    job_info: "CustomerJobInfo | None" = Relationship(back_populates="customer")
-    references: list["CustomerReference"] = Relationship(back_populates="customer")
-    vehicle: "CustomerVehicle | None" = Relationship(back_populates="customer")
-    company: "Company | None" = Relationship(back_populates="customer")
-    accounts: list["CustomersAccount"] = Relationship(back_populates="customer")
-    loan_applications: list["LoanApplication"] = Relationship(back_populates="customer")
+    detail: "CustomerDetail" = Relationship(back_populates="customer")
+    financial_info: "CustomerFinancialInfo" = Relationship(
+        back_populates="customer")
+    job_info: "CustomerJobInfo" = Relationship(back_populates="customer")
+    references: list["CustomerReference"] = Relationship(
+        back_populates="customer")
+    vehicle: "CustomerVehicle" = Relationship(back_populates="customer")
+    company: "Company" = Relationship(back_populates="customer")
+    accounts: list["CustomersAccount"] = Relationship(
+        back_populates="customer")
+    loan_applications: list["LoanApplication"] = Relationship(
+        back_populates="customer")
 
 
 class CustomerDetail(SQLModel, table=True):
@@ -65,7 +70,7 @@ class CustomerDetail(SQLModel, table=True):
     updated_at: datetime | None = Field(default_factory=datetime.utcnow)
 
     # Relationships
-    customer: Customer = Relationship(back_populates="details")
+    customer: Customer = Relationship(back_populates="detail")
 
 
 class CustomerFinancialInfo(SQLModel, table=True):
@@ -196,7 +201,8 @@ class Company(SQLModel, table=True):
     type: str | None = Field(default=None, max_length=100)
     website: str | None = Field(default=None, max_length=255)
     rnc: str | None = Field(default=None, max_length=50)
-    department: str | None = Field(default=None, max_length=255, sa_column_kwargs={"name": "departmet"})  # Note: typo in Laravel DB
+    department: str | None = Field(default=None, max_length=255, sa_column_kwargs={
+                                   "name": "departmet"})  # Note: typo in Laravel DB
     branch: str | None = Field(default=None, max_length=255)
     created_at: datetime | None = Field(default_factory=datetime.utcnow)
     updated_at: datetime | None = Field(default_factory=datetime.utcnow)

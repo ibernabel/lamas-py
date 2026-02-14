@@ -40,7 +40,7 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 | Phase | Name                     | Status         | Completed  | Duration |
 | ----- | ------------------------ | -------------- | ---------- | -------- |
 | 1     | Backend Foundation       | ✅ Complete    | 2026-01-28 | 1 day    |
-| 2     | Customer APIs            | ✅ Complete    | -          | 2 weeks  |
+| 2     | Customer APIs            | ✅ Complete    | 2026-02-14 | 2 weeks  |
 | 3     | Loan Application APIs    | ⚪ Not Started | -          | 2 weeks  |
 | 4     | Frontend Foundation      | ⚪ Not Started | -          | 1 week   |
 | 5     | Frontend - Customers     | ⚪ Not Started | -          | 2 weeks  |
@@ -94,11 +94,11 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ### Steps
 
-- [ ] **Step 2.1**: Customer CRUD endpoints
-- [ ] **Step 2.2**: Nested data creation (details, phones, addresses)
-- [ ] **Step 2.3**: NID validation endpoint
-- [ ] **Step 2.4**: Search and filtering
-- [ ] **Step 2.5**: Unit tests with pytest + factory_boy
+- [x] **Step 2.1**: Customer CRUD endpoints
+- [x] **Step 2.2**: Nested data creation (details, phones, addresses)
+- [x] **Step 2.3**: NID validation endpoint
+- [x] **Step 2.4**: Search and filtering
+- [x] **Step 2.5**: Unit tests with pytest + factory_boy
 
 ---
 

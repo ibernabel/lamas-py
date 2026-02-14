@@ -10,7 +10,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Generic, Literal, TypeVar
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
 # ============================================================================
@@ -67,8 +67,8 @@ class AddressCreate(BaseModel):
     country: str = Field(default="Dominican Republic", max_length=100)
     references: str | None = None
 
-    class Config:
-        populate_by_name = True  # Allow both 'state' and 'province'
+    # Allow both 'state' and 'province'
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CustomerFinancialInfoCreate(BaseModel):
@@ -210,8 +210,8 @@ class CustomerCreateSchema(BaseModel):
             raise ValueError("NID must be exactly 11 digits")
         return v
 
-    class Config:
-        populate_by_name = True  # Allow both 'nid' and 'NID'
+    # Allow both 'nid' and 'NID'
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CustomerSimpleCreateSchema(BaseModel):

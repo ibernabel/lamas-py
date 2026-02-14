@@ -31,7 +31,8 @@ class LoanApplication(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     customer_id: int | None = Field(default=None, foreign_key="customers.id")
     user_id: int | None = Field(default=None, foreign_key="users.id")
-    status: str = Field(default="received", max_length=50)  # Stored as string in DB
+    # Stored as string in DB
+    status: str = Field(default="received", max_length=50)
     changed_status_at: datetime | None = Field(default=None)
     is_answered: bool = Field(default=False)
     is_approved: bool = Field(default=False)
@@ -47,9 +48,11 @@ class LoanApplication(SQLModel, table=True):
     updated_at: datetime | None = Field(default_factory=datetime.utcnow)
 
     # Relationships
-    customer: "Customer | None" = Relationship(back_populates="loan_applications")
-    details: "LoanApplicationDetail | None" = Relationship(back_populates="loan_application")
-    notes: list["LoanApplicationNote"] = Relationship(back_populates="loan_application")
+    customer: "Customer" = Relationship(back_populates="loan_applications")
+    details: "LoanApplicationDetail" = Relationship(
+        back_populates="loan_application")
+    notes: list["LoanApplicationNote"] = Relationship(
+        back_populates="loan_application")
 
 
 class LoanApplicationDetail(SQLModel, table=True):

@@ -179,8 +179,8 @@ async def test_assign_customer_valid_portfolio_and_promoter(session: Session):
     # Create user for portfolio/promoter
     user = User(
         email="admin@example.com",
-        full_name="Admin User",
-        hashed_password="hashed",
+        name="Admin User",
+        password="hashed",
         is_approved=True,
     )
     session.add(user)
@@ -193,7 +193,7 @@ async def test_assign_customer_valid_portfolio_and_promoter(session: Session):
 
     # Create promoter
     promoter = Promoter(
-        NID="55555555555",
+        nid="55555555555",
         user_id=user.id
     )
     session.add(promoter)

@@ -23,7 +23,7 @@ class Portfolio(SQLModel, table=True):
     updated_at: datetime | None = Field(default_factory=datetime.utcnow)
 
     # Relationships
-    broker: "Broker | None" = Relationship(back_populates="portfolio")
+    broker: "Broker" = Relationship(back_populates="portfolio")
 
 
 class Broker(SQLModel, table=True):
@@ -39,7 +39,7 @@ class Broker(SQLModel, table=True):
 
     # Relationships
     user: "User" = Relationship(back_populates="broker")
-    portfolio: "Portfolio | None" = Relationship(back_populates="broker")
+    portfolio: "Portfolio" = Relationship(back_populates="broker")
 
 
 class Promoter(SQLModel, table=True):
@@ -48,7 +48,8 @@ class Promoter(SQLModel, table=True):
     __tablename__ = "promoters"
 
     id: int | None = Field(default=None, primary_key=True)
-    NID: str = Field(unique=True, max_length=11, sa_column_kwargs={"name": "NID"})
+    nid: str = Field(unique=True, max_length=11,
+                     sa_column_kwargs={"name": "NID"})
     bonus_type: str | None = Field(default=None, max_length=50)
     bonus_value: float | None = Field(default=None)
     bank_name: str | None = Field(default=None, max_length=255)

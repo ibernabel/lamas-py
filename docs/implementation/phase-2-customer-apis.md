@@ -2,7 +2,7 @@
 
 **Status**: ✅ Complete  
 **Started**: 2026-02-13  
-**Completed**: 2026-02-13  
+**Completed**: 2026-02-14  
 **Dependencies**: Phase 1 Complete ✅
 
 ---
@@ -748,6 +748,7 @@ The existing workflow (`.github/workflows/backend-ci.yml`) will automatically:
 ### What Was Built
 
 ✅ **7 API Endpoints**
+
 - POST `/api/v1/customers/` - Full customer creation
 - POST `/api/v1/customers/simple` - Simple customer creation
 - GET `/api/v1/customers/` - List with pagination & filters
@@ -757,30 +758,40 @@ The existing workflow (`.github/workflows/backend-ci.yml`) will automatically:
 - POST `/api/v1/customers/validate-nid` - Public NID validation
 
 ✅ **Service Layer** (`customer_service.py`)
+
 - 7 business logic functions
 - Transaction management
 - Error handling (409, 404, 400, 422)
 - Async operations
 
 ✅ **Pydantic Schemas** (`schemas/customer.py`)
+
 - 15+ schemas with Dominican validation
 - NID: 11 digits, Phone: 10 digits
 - Generic pagination support
 
 ✅ **Testing Infrastructure**
+
 - 22+ test cases (API + service layer)
 - factory_boy factories for test data
 - Integration and unit tests
 
 ✅ **Documentation**
+
 - Comprehensive walkthrough
 - OpenAPI/Swagger docs
 - Updated ROADMAP
 
+### Technical Refinements
+
+- **SQLModel relationship strings**: Standardized to non-union strings (e.g., `"Broker"` instead of `"Broker | None"`) for mapper stability.
+- **Pydantic V2 Configuration**: Updated all schemas to use `ConfigDict(populate_by_name=True)` for robust alias handling.
+- **Password Hashing**: Switched to `pbkdf2_sha256` to ensure compatibility across all environments and bypass `bcrypt`'s 72-byte plain-text limit.
+- **Attribute Casing**: Standardized `nid` attribute to lowercase in Python while preserving `NID` in the database.
+
 ### Known Limitations
 
-⚠️ **Polymorphic Relationships** - Phones and addresses not persisted to DB (requires additional implementation)
-⚠️ **Portfolio/Promoter Validation** - Assignment endpoint doesn't validate FK existence
+- ⚠️ **Polymorphic Persistence** - Current implementation handles polymorphic input/output but database persistence for these relationships requires further refinement in Phase 3.
 
 ### Test Coverage Target
 

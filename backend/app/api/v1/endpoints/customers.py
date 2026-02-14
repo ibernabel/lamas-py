@@ -232,8 +232,8 @@ async def assign_customer(
 
 @router.post("/validate-nid", response_model=NIDValidationResponse)
 async def validate_nid_endpoint(
+    session: DatabaseSession,
     nid: str = Query(..., description="NID to validate"),
-    session: DatabaseSession = Depends(),
 ) -> NIDValidationResponse:
     """
     Validate NID format and check uniqueness.
