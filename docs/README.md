@@ -7,6 +7,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 ### Planning
 
 - [Migration PRD](./planning/migration-prd.md) - Product Requirements Document
+- [Status Report (Feb 2026)](./status-report.md) - Current projects health and progress
 
 ### Implementation Phases
 

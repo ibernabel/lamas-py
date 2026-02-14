@@ -112,18 +112,18 @@ Migration of LAMaS (Loan Applications Management System) from Laravel monolith t
 
 ```json
 {
-    "id": 1,
-    "status": "received",
-    "customer_id": 123,
-    "customer_summary": {
-        "nid": "12345678901",
-        "full_name": "John Doe"
-    },
-    "details": {
-        "amount": 50000,
-        "term": 12,
-        "rate": 2.5
-    }
+  "id": 1,
+  "status": "received",
+  "customer_id": 123,
+  "customer_summary": {
+    "nid": "12345678901",
+    "full_name": "John Doe"
+  },
+  "details": {
+    "amount": 50000,
+    "term": 12,
+    "rate": 2.5
+  }
 }
 ```
 
@@ -182,15 +182,16 @@ lamas-py/
 
 ## 6. Phase Overview
 
-| Phase | Name                  | Focus                     | Duration |
-| ----- | --------------------- | ------------------------- | -------- |
-| **1** | Backend Foundation    | FastAPI + SQLModel setup  | 2 weeks  |
-| **2** | Customer APIs         | Full Customer CRUD        | 2 weeks  |
-| **3** | Loan Application APIs | Loan CRUD + status        | 2 weeks  |
-| **4** | Frontend Foundation   | Next.js 16 + shadcn setup | 1 week   |
-| **5** | Frontend - Customers  | Customer management UI    | 2 weeks  |
-| **6** | Frontend - Loans      | Loan management UI        | 2 weeks  |
-| **7** | CI/CD & Deployment    | GitHub Actions, Docker    | 1 week   |
+| Phase | Name                     | Focus                     | Duration |
+| ----- | ------------------------ | ------------------------- | -------- |
+| **1** | Backend Foundation       | FastAPI + SQLModel setup  | 2 weeks  |
+| **2** | Customer APIs            | Full Customer CRUD        | 2 weeks  |
+| **3** | Loan Application APIs    | Loan CRUD + status        | 2 weeks  |
+| **4** | Frontend Foundation      | Next.js 16 + shadcn setup | 1 week   |
+| **5** | Frontend - Customers     | Customer management UI    | 2 weeks  |
+| **6** | Frontend - Loans         | Loan management UI        | 2 weeks  |
+| **7** | CI/CD & Deployment       | GitHub Actions, Docker    | 1 week   |
+| **8** | CrediFlow AI Integration | AI credit risk analysis   | 2 weeks  |
 
 ---
 
@@ -247,20 +248,69 @@ Benefits:
 name: Backend CI
 on: [push, pull_request]
 jobs:
-    test:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-python@v5
-              with:
-                  python-version: "3.11"
-            - run: pip install -e ".[dev]"
-            - run: pytest --cov=app
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      - run: pytest --cov=app
 ```
 
 ---
 
-## 10. Next Steps
+## 10. Phase 8: CrediFlow AI Integration
+
+**Detailed requirements**: [LAMAS Integration Requirements](./lamas-integration-requirements.md)
+
+### Overview
+
+Integration of CrediFlow AI as a stateless headless credit risk analysis service. LAMAS will trigger analysis, store results, and display insights through an interactive dashboard.
+
+### Backend Components (FastAPI)
+
+| Component            | Description                                              |
+| -------------------- | -------------------------------------------------------- |
+| Database Table       | `creditflow_analyses` - Store full AI analysis responses |
+| SQLModel Model       | `CreditFlowAnalysis` - ORM model for analysis data       |
+| API Client           | `CreditFlowClient` - HTTP client for CrediFlow API       |
+| Integration Endpoint | `POST /api/v1/loans/{id}/analyze` - Trigger analysis     |
+| Pydantic Schemas     | Response models for API and dashboard data               |
+| Configuration        | Environment variables for CrediFlow API credentials      |
+
+### Frontend Components (Next.js)
+
+| Component                  | Description                                         |
+| -------------------------- | --------------------------------------------------- |
+| Dashboard Page             | `/loans/[id]/analysis` - Analysis results route     |
+| Decision Summary Card      | Display decision, IRS score, confidence, risk level |
+| IRS Breakdown Chart        | Bar chart showing credit score components           |
+| Financial Analysis Section | Detected salary, credit score, risk flags           |
+| OSINT Validation Section   | Business verification, digital veracity score       |
+| Reasoning Narrative        | AI-generated Spanish explanation                    |
+| API Client Functions       | React Query integration for data fetching           |
+
+### Key Features
+
+- **Headless AI Integration**: CrediFlow as stateless backend service
+- **Full Audit Trail**: Complete response storage in PostgreSQL
+- **Interactive Dashboard**: Charts and visualizations powered by Recharts
+- **Decision Workflow**: Auto-approval, rejection, or manual review routing
+- **IRS Score System**: Credit risk quantification with detailed breakdown
+- **Multilingual Support**: Spanish narrative generation for analysts
+- **Real-time Analysis**: Async API calls with progress tracking
+
+### Data Flow
+
+```
+Loan Application → Trigger Analysis → CrediFlow API → Store Response → Display Dashboard → Analyst Decision
+```
+
+---
+
+## 11. Next Steps
 
 1. ✅ PRD approved
 2. → **Phase 1 Implementation Plan** (detailed step-by-step)

@@ -73,3 +73,7 @@ session_track.*
 
 # Agent
 # .agent/
+
+# Commit messages
+COMMIT_MSG*.md
+COMMIT_MESSAGE*.md

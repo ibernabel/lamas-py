@@ -13,10 +13,11 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ## Quick Links
 
-| Document                                                                           | Description                   |
-| ---------------------------------------------------------------------------------- | ----------------------------- |
-| [Migration PRD](./docs/planning/migration-prd.md)                                  | Product Requirements Document |
-| [Phase 1: Backend Foundation](./docs/implementation/phase-1-backend-foundation.md) | FastAPI + SQLModel setup      |
+| Document                                                                            | Description                        |
+| ----------------------------------------------------------------------------------- | ---------------------------------- |
+| [Migration PRD](./docs/planning/migration-prd.md)                                   | Product Requirements Document      |
+| [Phase 1: Backend Foundation](./docs/implementation/phase-1-backend-foundation.md)  | FastAPI + SQLModel setup           |
+| [LAMAS Integration Requirements](./docs/planning/lamas-integration-requirements.md) | CrediFlow AI Integration (Phase 8) |
 
 ---
 
@@ -36,15 +37,16 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ## Phase Status
 
-| Phase | Name                  | Status         | Completed  | Duration |
-| ----- | --------------------- | -------------- | ---------- | -------- |
-| 1     | Backend Foundation    | ✅ Complete    | 2026-01-28 | 1 day    |
-| 2     | Customer APIs         | ⚪ Not Started | -          | 2 weeks  |
-| 3     | Loan Application APIs | ⚪ Not Started | -          | 2 weeks  |
-| 4     | Frontend Foundation   | ⚪ Not Started | -          | 1 week   |
-| 5     | Frontend - Customers  | ⚪ Not Started | -          | 2 weeks  |
-| 6     | Frontend - Loans      | ⚪ Not Started | -          | 2 weeks  |
-| 7     | CI/CD & Deployment    | ⚪ Not Started | -          | 1 week   |
+| Phase | Name                     | Status         | Completed  | Duration |
+| ----- | ------------------------ | -------------- | ---------- | -------- |
+| 1     | Backend Foundation       | ✅ Complete    | 2026-01-28 | 1 day    |
+| 2     | Customer APIs            | ✅ Complete    | -          | 2 weeks  |
+| 3     | Loan Application APIs    | ⚪ Not Started | -          | 2 weeks  |
+| 4     | Frontend Foundation      | ⚪ Not Started | -          | 1 week   |
+| 5     | Frontend - Customers     | ⚪ Not Started | -          | 2 weeks  |
+| 6     | Frontend - Loans         | ⚪ Not Started | -          | 2 weeks  |
+| 7     | CI/CD & Deployment       | ⚪ Not Started | -          | 1 week   |
+| 8     | CrediFlow AI Integration | ⚪ Not Started | -          | 2 weeks  |
 
 **Legend:** ✅ Complete | 🟡 In Progress | ⚪ Not Started
 
@@ -160,9 +162,46 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ---
 
+## Phase 8: CrediFlow AI Integration
+
+**Reference**: [LAMAS Integration Requirements](./docs/planning/lamas-integration-requirements.md)
+
+### Backend Integration (FastAPI)
+
+- [ ] **Step 8.1**: Database schema - Create `creditflow_analyses` table
+- [ ] **Step 8.2**: SQLModel model for CreditFlow analysis storage
+- [ ] **Step 8.3**: CreditFlow API client service
+- [ ] **Step 8.4**: Integration endpoint `POST /api/v1/loans/{id}/analyze`
+- [ ] **Step 8.5**: Pydantic schemas for CreditFlow responses
+- [ ] **Step 8.6**: Environment configuration for CreditFlow API
+- [ ] **Step 8.7**: Unit tests for CreditFlow client and endpoints
+
+### Frontend Dashboard (Next.js)
+
+- [ ] **Step 8.8**: Dashboard page `/loans/[id]/analysis`
+- [ ] **Step 8.9**: Main dashboard component structure
+- [ ] **Step 8.10**: Decision summary card component
+- [ ] **Step 8.11**: IRS breakdown chart component
+- [ ] **Step 8.12**: Financial analysis section component
+- [ ] **Step 8.13**: OSINT validation section component
+- [ ] **Step 8.14**: Reasoning narrative component
+- [ ] **Step 8.15**: API client functions for CreditFlow integration
+
+### Key Features
+
+- Headless AI credit risk analysis
+- Full response storage for audit trail
+- Interactive dashboard with charts
+- Decision workflow management (APPROVED, REJECTED, MANUAL_REVIEW)
+- IRS score breakdown visualization
+- Spanish narrative generation
+
+---
+
 ## Notes
 
 - **AI Evaluation Service**: Out of scope. Backend includes placeholder endpoint at `POST /api/v1/loan-applications/{id}/evaluate`
+- **CreditFlow AI**: Integrated in Phase 8 as stateless headless service
 - **No Teams/Multi-tenant**: Simplified user model with basic RBAC
 - **Database**: Using existing PostgreSQL schema - no migrations needed
 - **Legacy**: Laravel files preserved in `/legacy` folder for reference
