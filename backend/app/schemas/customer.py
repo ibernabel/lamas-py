@@ -40,8 +40,10 @@ class CustomerDetailCreate(BaseModel):
 class PhoneCreate(BaseModel):
     """Phone number schema with Dominican format validation."""
 
+    country_area: str | None = Field(None, max_length=10)
     number: str = Field(
         pattern=r"^\d{10}$", description="10-digit Dominican phone number")
+    extension: str | None = Field(None, max_length=10)
     type: Literal["mobile", "home", "work"] = "mobile"
 
     @field_validator("number")
@@ -57,10 +59,16 @@ class AddressCreate(BaseModel):
     """Address schema."""
 
     street: str = Field(max_length=500)
+    street2: str | None = Field(None, max_length=255)
     city: str = Field(max_length=100)
-    province: str = Field(max_length=100)
+    state: str | None = Field(None, max_length=100, alias="province")
+    type: str | None = Field(None, max_length=50)
     postal_code: str | None = Field(None, max_length=20)
     country: str = Field(default="Dominican Republic", max_length=100)
+    references: str | None = None
+
+    class Config:
+        populate_by_name = True  # Allow both 'state' and 'province'
 
 
 class CustomerFinancialInfoCreate(BaseModel):

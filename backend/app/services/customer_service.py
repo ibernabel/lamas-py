@@ -25,6 +25,9 @@ from app.models.customer import (
     Company,
     CustomersAccount,
 )
+from app.models.phone import Phone
+from app.models.address import Address, Addressable
+from app.models.portfolio import Portfolio, Promoter
 from app.schemas.customer import (
     CustomerCreateSchema,
     CustomerSimpleCreateSchema,
@@ -184,9 +187,40 @@ async def create_customer_with_nested_data(
             )
             session.add(account)
 
-        # TODO: Create phones and addresses (polymorphic relationships)
-        # These require handling the polymorphic phoneable_type/phoneable_id
-        # and addressables pivot table. Will implement in separate function.
+        # Create phones (polymorphic relationship)
+        for phone_data in customer_data.phones:
+            phone = Phone(
+                number=phone_data.number,
+                type=phone_data.type,
+                country_area=phone_data.country_area,
+                extension=phone_data.extension,
+                phoneable_type="Customer",  # Laravel-style polymorphic
+                phoneable_id=customer.id
+            )
+            session.add(phone)
+
+        # Create addresses (polymorphic via pivot table)
+        for address_data in customer_data.addresses:
+            address = Address(
+                street=address_data.street,
+                street2=address_data.street2,
+                city=address_data.city,
+                state=address_data.state,
+                type=address_data.type,
+                postal_code=address_data.postal_code,
+                country=address_data.country,
+                references=address_data.references,
+            )
+            session.add(address)
+            session.flush()  # Get address.id for pivot table
+
+            # Create pivot record
+            addressable = Addressable(
+                address_id=address.id,
+                addressable_type="Customer",  # Laravel-style polymorphic
+                addressable_id=customer.id
+            )
+            session.add(addressable)
 
         session.commit()
         session.refresh(customer)
@@ -264,7 +298,39 @@ async def create_customer_simple(
             )
             session.add(reference)
 
-        # TODO: Create phones and addresses (polymorphic)
+        # Create phones (polymorphic relationship)
+        for phone_data in customer_data.phones:
+            phone = Phone(
+                number=phone_data.number,
+                type=phone_data.type,
+                country_area=phone_data.country_area,
+                extension=phone_data.extension,
+                phoneable_type="Customer",
+                phoneable_id=customer.id
+            )
+            session.add(phone)
+
+        # Create addresses if provided (polymorphic via pivot table)
+        for address_data in customer_data.addresses:
+            address = Address(
+                street=address_data.street,
+                street2=address_data.street2,
+                city=address_data.city,
+                state=address_data.state,
+                type=address_data.type,
+                postal_code=address_data.postal_code,
+                country=address_data.country,
+                references=address_data.references,
+            )
+            session.add(address)
+            session.flush()
+
+            addressable = Addressable(
+                address_id=address.id,
+                addressable_type="Customer",
+                addressable_id=customer.id
+            )
+            session.add(addressable)
 
         session.commit()
         session.refresh(customer)
@@ -505,12 +571,34 @@ async def assign_customer_to_portfolio(
         Updated Customer instance or None if not found
 
     Raises:
-        HTTPException: 400 for validation errors
+        HTTPException: 404 if portfolio or promoter not found
+        HTTPException: 400 for other validation errors
 
     Note:
         Sets is_assigned=True and assigned_at timestamp.
-        Should validate that portfolio/promoter exist before calling this.
+        Validates that portfolio/promoter exist before assignment.
     """
+    # Validate Portfolio exists
+    if portfolio_id is not None:
+        portfolio_statement = select(Portfolio).where(
+            Portfolio.id == portfolio_id)
+        portfolio = session.exec(portfolio_statement).first()
+        if not portfolio:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Portfolio with ID {portfolio_id} not found"
+            )
+
+    # Validate Promoter exists
+    if promoter_id is not None:
+        promoter_statement = select(Promoter).where(Promoter.id == promoter_id)
+        promoter = session.exec(promoter_statement).first()
+        if not promoter:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Promoter with ID {promoter_id} not found"
+            )
+
     customer = await get_customer_with_relations(session, customer_id)
 
     if not customer:
