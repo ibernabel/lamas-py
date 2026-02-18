@@ -13,10 +13,10 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ## Quick Links
 
-| Document                                                                            | Description                        |
-| ----------------------------------------------------------------------------------- | ---------------------------------- |
-| [Migration PRD](./docs/planning/migration-prd.md)                                   | Product Requirements Document      |
-| [Phase 1: Backend Foundation](./docs/implementation/phase-1-backend-foundation.md)  | FastAPI + SQLModel setup           |
+| Document                                                                            | Description                          |
+| ----------------------------------------------------------------------------------- | ------------------------------------ |
+| [Migration PRD](./docs/planning/migration-prd.md)                                   | Product Requirements Document        |
+| [Phase 1: Backend Foundation](./docs/implementation/phase-1-backend-foundation.md)  | FastAPI + SQLModel setup             |
 | [LAMAS Integration Requirements](./docs/planning/lamas-integration-requirements.md) | CreditGraph AI Integration (Phase 8) |
 
 ---
@@ -37,15 +37,15 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ## Phase Status
 
-| Phase | Name                     | Status         | Completed  | Duration |
-| ----- | ------------------------ | -------------- | ---------- | -------- |
-| 1     | Backend Foundation       | ✅ Complete    | 2026-01-28 | 1 day    |
-| 2     | Customer APIs            | ✅ Complete    | 2026-02-14 | 2 weeks  |
-| 3     | Loan Application APIs    | ⚪ Not Started | -          | 2 weeks  |
-| 4     | Frontend Foundation      | ⚪ Not Started | -          | 1 week   |
-| 5     | Frontend - Customers     | ⚪ Not Started | -          | 2 weeks  |
-| 6     | Frontend - Loans         | ⚪ Not Started | -          | 2 weeks  |
-| 7     | CI/CD & Deployment       | ⚪ Not Started | -          | 1 week   |
+| Phase | Name                       | Status         | Completed  | Duration |
+| ----- | -------------------------- | -------------- | ---------- | -------- |
+| 1     | Backend Foundation         | ✅ Complete    | 2026-01-28 | 1 day    |
+| 2     | Customer APIs              | ✅ Complete    | 2026-02-14 | 2 weeks  |
+| 3     | Loan Application APIs      | ✅ Complete    | 2026-02-18 | 1 day    |
+| 4     | Frontend Foundation        | ⚪ Not Started | -          | 1 week   |
+| 5     | Frontend - Customers       | ⚪ Not Started | -          | 2 weeks  |
+| 6     | Frontend - Loans           | ⚪ Not Started | -          | 2 weeks  |
+| 7     | CI/CD & Deployment         | ⚪ Not Started | -          | 1 week   |
 | 8     | CreditGraph AI Integration | ⚪ Not Started | -          | 2 weeks  |
 
 **Legend:** ✅ Complete | 🟡 In Progress | ⚪ Not Started
@@ -102,15 +102,34 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ---
 
-## Phase 3: Loan Application APIs
+## Phase 3: Loan Application APIs ✅
+
+**Status**: Complete  
+**Completed**: 2026-02-18  
+**Duration**: 1 day
 
 ### Steps
 
-- [ ] **Step 3.1**: LoanApplication CRUD
-- [ ] **Step 3.2**: Status workflow management
-- [ ] **Step 3.3**: Credit risk association
-- [ ] **Step 3.4**: AI evaluation placeholder endpoint
-- [ ] **Step 3.5**: Integration tests
+- [x] **Step 3.1**: LoanApplication CRUD
+- [x] **Step 3.2**: Status workflow management
+- [x] **Step 3.3**: Credit risk association
+- [x] **Step 3.4**: AI evaluation placeholder endpoint
+- [x] **Step 3.5**: Integration tests
+
+### Deliverables ✅
+
+- ✅ `POST /api/v1/loan-applications/` — Create with nested detail
+- ✅ `GET /api/v1/loan-applications/` — Paginated list with filters
+- ✅ `GET /api/v1/loan-applications/{id}` — Full detail with relations
+- ✅ `PUT /api/v1/loan-applications/{id}` — Partial update
+- ✅ `DELETE /api/v1/loan-applications/{id}` — Soft delete
+- ✅ `PATCH /api/v1/loan-applications/{id}/status` — Status state machine
+- ✅ `PATCH /api/v1/loan-applications/{id}/credit-risk` — Credit risk association
+- ✅ `POST /api/v1/loan-applications/{id}/notes` — Add notes
+- ✅ `POST /api/v1/loan-applications/{id}/evaluate` — AI placeholder
+- ✅ `GET /api/v1/credit-risks/` — Credit risk categories catalog
+- ✅ `GET /api/v1/credit-risks/risks` — Credit risks list
+- ✅ 22 integration tests (all passing)
 
 ---
 
