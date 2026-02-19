@@ -129,3 +129,24 @@ The frontend foundation was verified using a browser agent with the following re
 - **Stats Cards**: Dashboard stats grid is visible with data placeholders ready for Phase 5/6.
 
 **Test Report**: [Frontend Verification Report](../testing/frontend-verification.md)
+
+---
+
+### 📂 Public Assets Migration (2026-02-18)
+
+Consolidated visual identity elements from the legacy structure to the new frontend:
+
+- **Images**: Migrated `legacy/public/img/` → `frontend/public/img/`.
+- **Favicons**: Migrated `legacy/public/favicons/` → `frontend/public/favicons/`.
+- **Next.js Integration**: Updated `frontend/app/layout.tsx` metadata to reference migrated favicons.
+- **Relative Links**: Updated root `README.md` to point to the new image paths.
+
+Migrated files include:
+
+- `lamas-id-mini.png` (used in README)
+- `logo.png`
+- `favicon.ico`
+- `coins-solid.ico`
+- SVG assets (`coins-solid.svg`, `dollar-sign-solid.svg`)
+
+This migration ensures that branding assets are centralized in the active frontend package while maintaining compatibility with top-level documentation.

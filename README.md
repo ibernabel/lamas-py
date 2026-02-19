@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./legacy/public/img/lamas-id-mini.png" alt="LAMaS Visual Identity" width="300" height="200">
+  <img src="./frontend/public/img/lamas-id-mini.png" alt="LAMaS Visual Identity" width="300" height="200">
 </p>
 
 <p align="center">

@@ -17,6 +17,13 @@ export const metadata: Metadata = {
   },
   description:
     "LAMaS is a modern loan applications management system for financial institutions.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicons/coins-solid.ico", sizes: "32x32" },
+    ],
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
