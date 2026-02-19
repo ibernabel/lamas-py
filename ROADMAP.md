@@ -17,6 +17,7 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 | ----------------------------------------------------------------------------------- | ------------------------------------ |
 | [Migration PRD](./docs/planning/migration-prd.md)                                   | Product Requirements Document        |
 | [Phase 1: Backend Foundation](./docs/implementation/phase-1-backend-foundation.md)  | FastAPI + SQLModel setup             |
+| [Phase 5: Frontend Customers](./docs/implementation/phase-5-frontend-customers.md)  | Customer management UI               |
 | [LAMAS Integration Requirements](./docs/planning/lamas-integration-requirements.md) | CreditGraph AI Integration (Phase 8) |
 
 ---
@@ -43,7 +44,7 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 | 2     | Customer APIs              | ✅ Complete    | 2026-02-14 | 2 weeks  |
 | 3     | Loan Application APIs      | ✅ Complete    | 2026-02-18 | 1 day    |
 | 4     | Frontend Foundation        | ✅ Complete    | 2026-02-18 | 1 day    |
-| 5     | Frontend - Customers       | ⚪ Not Started | -          | 2 weeks  |
+| 5     | Frontend - Customers       | 🟡 In Progress | 2026-02-19 | 2 weeks  |
 | 6     | Frontend - Loans           | ⚪ Not Started | -          | 2 weeks  |
 | 7     | CI/CD & Deployment         | ⚪ Not Started | -          | 1 week   |
 | 8     | CreditGraph AI Integration | ⚪ Not Started | -          | 2 weeks  |
@@ -161,15 +162,23 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ---
 
-## Phase 5: Frontend - Customer Management
+## Phase 5: Frontend - Customer Management 🟡
+
+**Status**: In Progress  
+**Started**: 2026-02-19
+
+**Reference**: [Phase 5 Implementation Doc](./docs/implementation/phase-5-frontend-customers.md)
 
 ### Steps
 
-- [ ] **Step 5.1**: Customer list (DataTable with search/filter)
-- [ ] **Step 5.2**: Customer detail page
-- [ ] **Step 5.3**: Customer creation form
-- [ ] **Step 5.4**: Customer edit form
-- [ ] **Step 5.5**: Form validation with Zod
+- [x] **Step 5.1**: Customer API layer (`lib/api/customers.ts`, `lib/api/types.ts`)
+- [x] **Step 5.2**: Zod validation schemas (`lib/validations/customer.schema.ts`)
+- [x] **Step 5.3**: TanStack Query hooks (`hooks/use-customers.ts`)
+- [x] **Step 5.4**: Customer UI components (`CustomerTable`, `CustomerFilters`, `CustomerListClient`, `CustomerForm`)
+- [x] **Step 5.5**: Route pages (`/customers`, `/customers/new`, `/customers/[id]`, `/customers/[id]/edit`)
+- [x] **Step 5.6**: TypeScript errors resolved (react-hook-form v7.71 TTransformedValues fix)
+- [ ] **Step 5.7**: Unit tests (schemas, table, form)
+- [ ] **Step 5.8**: Customer detail page polish + a11y audit
 
 ---
 
