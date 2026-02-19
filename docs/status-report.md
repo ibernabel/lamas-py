@@ -20,7 +20,7 @@ El proyecto de migración de **LAMaS (Laravel → Python/FastAPI + Next.js)** se
   - Infraestructura de pruebas con **pytest** y CI/CD mediante **GitHub Actions**.
   - Servidor operativo con endpoints de salud (`/health`) y documentación OpenAPI activa.
 
-### B. Motor de IA CreditFlow (`aisa`)
+### B. Motor de IA en CreditGraph AI (`aisa`)
 
 **Estado**: ✅ Fase 7 Completada (Underwriter & Integration)
 
@@ -30,6 +30,17 @@ El proyecto de migración de **LAMaS (Laravel → Python/FastAPI + Next.js)** se
   - **Lógica de Escalamiento (HITL)**: Derivación automática a revisión humana para préstamos >50,000 DOP o baja confianza.
   - **Narrativas Bilingües**: Generación de informes de decisión en Español e Inglés.
   - **Pruebas**: 35/35 tests unitarios e integrales aprobados (100% cobertura).
+
+### C. Frontend Foundation (`lamas-py/frontend`)
+
+**Estado**: ✅ Fase 4 Completada (2026-02-18)
+
+- **Logros**:
+  - Configuración de **Next.js 16.1 (App Router)** con **Tailwind 4** y **shadcn/ui**.
+  - Sistema de autenticación **NextAuth.js v5** integrado con el backend FastAPI.
+  - Implementación de **Middleware** para protección de rutas y redirección automática.
+  - Diseño del shell del Dashboard (Sidebar + Header) funcional.
+  - **Verificación**: Pruebas en navegador confirmaron el flujo completo de Login → Dashboard.
 
 ---
 

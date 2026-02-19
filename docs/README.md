@@ -11,14 +11,14 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 
 ### Implementation Phases
 
-- [Phase 1: Backend Foundation](./implementation/phase-1-backend-foundation.md)
-- [Maintenance & Environment](./implementation/maintenance.md)
-- Phase 2: Customer APIs _(Coming Soon)_
-- Phase 3: Loan Application APIs _(Coming Soon)_
-- Phase 4: Frontend Foundation _(Coming Soon)_
-- Phase 5: Frontend - Customer Management _(Coming Soon)_
-- Phase 6: Frontend - Loan Applications _(Coming Soon)_
-- Phase 7: Integration & Deployment _(Coming Soon)_
+- [Phase 1: Backend Foundation](./implementation/phase-1-backend-foundation.md) - ✅
+- [Phase 2: Customer APIs](./implementation/phase-2-customer-apis.md) - ✅
+- [Phase 3: Loan Application APIs](./implementation/phase-3-loan-application-apis.md) - ✅
+- [Phase 4: Frontend Foundation](./implementation/phase-4-frontend-foundation.md) - ✅
+- [Maintenance & Environment](./implementation/maintenance.md) - 🔧
+- Phase 5: Frontend - Customer Management - ⚪ (Next)
+- Phase 6: Frontend - Loan Applications - ⚪
+- Phase 7: Integration & Deployment - ⚪
 
 ### Testing
 

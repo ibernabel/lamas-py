@@ -109,3 +109,23 @@ Route (app)
 
 ƒ Proxy (Middleware)
 ```
+
+### 🔄 Local Fixes & Adjustments
+
+During initial browser verification, the following adjustments were made to ensure the local environment matched the expected architecture:
+
+1.  **Middleware Renaming**: Renamed `frontend/proxy.ts` to `frontend/middleware.ts`. In Next.js 16/App Router, custom middleware must be named `middleware.ts` at the root/src level to be recognized by the framework.
+2.  **Boilerplate Cleanup**: Moved the default `frontend/app/page.tsx` (Next.js starter template) to `page.tsx.bak` to allow the dashboard route in `(dashboard)/page.tsx` to handle the root URL.
+3.  **Database Seeding**: Created `backend/scripts/init_db.py` to initialize SQLModel tables in the PostgreSQL container and seed a default administrative user.
+
+### ✅ Initial Browser Verification (2026-02-18)
+
+The frontend foundation was verified using a browser agent with the following results:
+
+- **Login Page**: Successfully rendered at `/login`.
+- **Authentication**: Verified login with `test@example.com` / `testpass`.
+- **Dashboard Shell**: Successfully redirected to `/` after login, displaying the Sidebar and Header components.
+- **Components**: Navigation sidebar links (Dashboard, Customers, Loan Applications) are visible and functional.
+- **Stats Cards**: Dashboard stats grid is visible with data placeholders ready for Phase 5/6.
+
+**Test Report**: [Frontend Verification Report](../testing/frontend-verification.md)
