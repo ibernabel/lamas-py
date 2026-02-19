@@ -99,7 +99,7 @@ export function Sidebar() {
       {/* Footer */}
       <div className="border-t border-border p-3">
         <p className="px-3 text-xs text-muted-foreground">
-          LAMaS v1.0 · Phase 4
+          LAMaS v1.0 · Phase 5
         </p>
       </div>
     </aside>
