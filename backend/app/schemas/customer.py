@@ -334,7 +334,7 @@ class CustomerListItem(BaseModel):
     is_assigned: bool
     portfolio_id: int | None = None
     promoter_id: int | None = None
-    created_at: datetime
+    created_at: datetime | None = None
 
     class Config:
         from_attributes = True
@@ -365,8 +365,8 @@ class CustomerReadSchema(BaseModel):
     financial_info: CustomerFinancialInfoCreate | None = None
     job_info: CustomerJobInfoCreate | None = None
 
-    created_at: datetime
-    updated_at: datetime
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
     class Config:
         from_attributes = True

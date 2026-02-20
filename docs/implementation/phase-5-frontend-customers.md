@@ -1,8 +1,9 @@
 # Phase 5: Frontend — Customer Management
 
-**Status**: 🟡 In Progress  
+**Status**: ✅ Complete  
 **Started**: 2026-02-19  
-**Target**: 2 weeks
+**Completed**: 2026-02-19  
+**Duration**: 1 day
 
 ---
 
@@ -127,7 +128,7 @@ pnpm run dev
 
 ### Routes Tested
 
-- `GET /customers` — paginated list, filtering, delete confirmation ✅
+- `GET /customers` — fixed empty table issue (backend restart + schema fix) ✅
 - `GET /customers/new` — create form with NID validation ✅
 - `GET /customers/{id}` — detail view ✅
 - `GET /customers/{id}/edit` — edit form pre-populated ✅
