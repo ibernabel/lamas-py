@@ -45,9 +45,7 @@ function makePaginatedResponse(
     total: customers.length,
     page,
     per_page: 20,
-    total_pages: 1,
-    has_next: false,
-    has_prev: false,
+    pages: 1,
   };
 }
 
@@ -191,8 +189,7 @@ describe("CustomerTable", () => {
     const data: PaginatedResponse<CustomerListItem> = {
       ...makePaginatedResponse([makeCustomer()]),
       total: 50,
-      total_pages: 3,
-      has_next: true,
+      pages: 3,
     };
 
     render(

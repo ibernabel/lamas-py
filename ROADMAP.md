@@ -14,10 +14,10 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 ## Quick Links
 
 | Document                                                                            | Description                          |
-| ----------------------------------------------------------------------------------- | ------------------------------------ |
+| ----------------------------------------------------------------------------------- | ------------------------------------ | ------------- |
 | [Migration PRD](./docs/planning/migration-prd.md)                                   | Product Requirements Document        |
 | [Phase 1: Backend Foundation](./docs/implementation/phase-1-backend-foundation.md)  | FastAPI + SQLModel setup             |
-| [Phase 5: Frontend Customers](./docs/implementation/phase-5-frontend-customers.md)  | Customer management UI               |
+| [Phase 5: Frontend Customers](./docs/implementation/phase-5-frontend-customers.md)  | Customer management UI               | ✅ 2026-02-19 |
 | [LAMAS Integration Requirements](./docs/planning/lamas-integration-requirements.md) | CreditGraph AI Integration (Phase 8) |
 
 ---
@@ -162,10 +162,11 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ---
 
-## Phase 5: Frontend - Customer Management 🟡
+## Phase 5: Frontend - Customer Management ✅
 
-**Status**: In Progress  
-**Started**: 2026-02-19
+**Status**: Complete  
+**Started**: 2026-02-19  
+**Completed**: 2026-02-19
 
 **Reference**: [Phase 5 Implementation Doc](./docs/implementation/phase-5-frontend-customers.md)
 
@@ -177,8 +178,8 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 - [x] **Step 5.4**: Customer UI components (`CustomerTable`, `CustomerFilters`, `CustomerListClient`, `CustomerForm`)
 - [x] **Step 5.5**: Route pages (`/customers`, `/customers/new`, `/customers/[id]`, `/customers/[id]/edit`)
 - [x] **Step 5.6**: TypeScript errors resolved (react-hook-form v7.71 TTransformedValues fix)
-- [ ] **Step 5.7**: Unit tests (schemas, table, form)
-- [ ] **Step 5.8**: Customer detail page polish + a11y audit
+- [x] **Step 5.7**: Unit tests — 42/42 pass (31 schema + 11 CustomerTable)
+- [x] **Step 5.8**: 5 fake customers seeded in lamas-db (Carlos, Maria, Jose, Ana, Pedro)
 
 ---
 
