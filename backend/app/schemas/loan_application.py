@@ -24,9 +24,11 @@ from app.schemas.customer import PaginatedResponse, PaginationParams  # noqa: F4
 class LoanApplicationDetailCreate(BaseModel):
     """Loan application financial details schema."""
 
-    amount: float = Field(gt=0, description="Loan amount requested (must be > 0)")
+    amount: float = Field(
+        gt=0, description="Loan amount requested (must be > 0)")
     term: int = Field(gt=0, description="Loan term in months (must be > 0)")
-    rate: float = Field(ge=0, le=100, description="Annual interest rate (0-100%)")
+    rate: float = Field(
+        ge=0, le=100, description="Annual interest rate (0-100%)")
     quota: float = Field(ge=0, description="Monthly payment amount")
     frequency: str | None = Field(
         None,
@@ -34,13 +36,15 @@ class LoanApplicationDetailCreate(BaseModel):
         description="Payment frequency (monthly, biweekly, weekly)",
     )
     purpose: str | None = Field(None, description="Loan purpose description")
-    customer_comment: str | None = Field(None, description="Customer's comment")
+    customer_comment: str | None = Field(
+        None, description="Customer's comment")
 
 
 class LoanApplicationCreate(BaseModel):
     """Schema for creating a new loan application."""
 
-    customer_id: int = Field(description="ID of the customer applying for the loan")
+    customer_id: int = Field(
+        description="ID of the customer applying for the loan")
     detail: LoanApplicationDetailCreate
 
 
@@ -53,7 +57,8 @@ class LoanApplicationUpdate(BaseModel):
 class LoanApplicationStatusUpdate(BaseModel):
     """Schema for transitioning loan application status."""
 
-    status: LoanStatus = Field(description="Target status for the loan application")
+    status: LoanStatus = Field(
+        description="Target status for the loan application")
     note: str | None = Field(
         None, description="Optional note explaining the status change"
     )
@@ -68,7 +73,8 @@ class LoanApplicationNoteCreate(BaseModel):
 class CreditRiskAssociation(BaseModel):
     """Schema for associating a credit risk with a loan application."""
 
-    credit_risk_id: int = Field(description="ID of the credit risk to associate")
+    credit_risk_id: int = Field(
+        description="ID of the credit risk to associate")
 
 
 # ============================================================================
@@ -117,6 +123,8 @@ class LoanApplicationListItem(BaseModel):
     is_archived: bool
     is_new: bool
     amount: float | None = None   # Pulled from detail for convenience
+    customer_name: str | None = None
+    customer_nid: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
 

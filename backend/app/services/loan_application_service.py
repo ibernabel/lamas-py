@@ -262,6 +262,13 @@ async def list_loan_applications(
             )
         ).first()
 
+        customer = session.get(Customer, loan.customer_id)
+        customer_name = None
+        if customer and customer.detail:
+            first = customer.detail.first_name or ""
+            last = customer.detail.last_name or ""
+            customer_name = f"{first} {last}".strip() or None
+
         item = LoanApplicationListItem(
             id=loan.id,
             customer_id=loan.customer_id,
@@ -273,6 +280,8 @@ async def list_loan_applications(
             is_archived=loan.is_archived,
             is_new=loan.is_new,
             amount=detail.amount if detail else None,
+            customer_name=customer_name,
+            customer_nid=customer.nid if customer else None,
             created_at=loan.created_at,
             updated_at=loan.updated_at,
         )

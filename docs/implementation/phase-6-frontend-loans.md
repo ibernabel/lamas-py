@@ -30,31 +30,39 @@ Implementation of the full Loan Application management UI, enabling creation, li
 - `/loans/new`: Creation entry point.
 - `/loans/[id]`: Detail view with financial terms, notes timeline, and workflow controls.
 
-## Verification Results
+## Implementation Notes
 
-### Automated Tests
+### Backend Logic Fixes
 
-- `LoanTable.test.tsx`: 3/3 passed.
-- `loan-application.schema.test.ts`: 7/7 passed.
-- Full frontend build: Successful.
+- **Customer Name Construction**: Fixed `LoanApplicationListItem` to correctly construct names from `CustomerDetail` (`first_name` + `last_name`). Previously, it was attempting to access a non-existent `name` attribute on the `Customer` model.
+- **Dependency Management**: Identified and resolved missing `email-validator` dependency in the backend environment.
+- **Port Conflict**: Switched local backend to port `8088` to avoid conflicts with other services on `8001`.
 
-### Design Patterns
+### CORS & Connectivity
 
-- Followed "Search/Filter + Table" pattern from Phase 5.
-- Implemented "Detail + Timeline" layout for better readability of loan history.
-- Leveraged Shadcn UI for consistent, premium aesthetics.
-
-## Technical Progress
-
-- [x] API Client extension (`loan-applications.ts`) — **Fixed lint errors on payload types.**
-- [x] Hook implementation (`use-loan-applications.ts`) — **Fixed AxiosError typing.**
-- [x] UI Components: `LoanTable`, `LoanFilters`, `LoanForm`, `AddNoteDialog`, `StatusTransitionDialog`.
-- [x] Pages: `/loans`, `/loans/new`, `/loans/[id]`.
+- Updated `ALLOWED_ORIGINS` in backend `.env` to specifically include `http://127.0.0.1:3000` to resolve browser blocking issues during cross-origin fetch.
+- Transitioned frontend configuration from `localhost` to `127.0.0.1` for the API URL to ensure consistent IPv4 routing.
 
 ## Verification Details
 
-- **Unit Tests**: 10 passed (3 UI, 7 Schemas).
-- **Manual QA**: Verified login and core dashboard navigation.
-- **Linting**: All errors resolved.
+- **Manual QA**: verified the full cycle:
+  1. Login with `test@example.com`
+  2. Redirection to Dashboard (Stats loading verified)
+  3. Navigation to "Loan Applications"
+  4. Data Grid populated with real customer names (e.g., "Carlos Ramirez", "Maria Gonzalez").
+- **Screenshot**: Final verification showing populated table.
 
-![Loan Verification Flow](/home/ibernabel/.gemini/antigravity/brain/e20bee4a-2868-44ad-845a-3cdbc085a3c6/loan_verification_flow_1772412797002.webp)
+![Final Loans Verification](./phase-6-loans-verification.png)
+
+## Technical Progress
+
+- [x] API Client extension (`loan-applications.ts`)
+- [x] Hook implementation (`use-loan-applications.ts`)
+- [x] UI Components: `LoanTable`, `LoanFilters`, `LoanForm`, `AddNoteDialog`, `StatusTransitionDialog`.
+- [x] Pages: `/loans`, `/loans/new`, `/loans/[id]`.
+- [x] **BugFix**: Backend customer name resolution logic.
+- [x] **BugFix**: Frontend/Backend CORS and environment sync.
+
+---
+
+[Return to ROADMAP.md](../../ROADMAP.md)
