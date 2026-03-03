@@ -12,6 +12,7 @@ Implements:
 - POST   /loan-applications/{id}/notes    - Add note
 - POST   /loan-applications/{id}/evaluate - AI evaluation placeholder
 """
+from app.schemas.creditgraph import CreditGraphAnalysisRead
 from fastapi import APIRouter, HTTPException, Query, status
 
 from app.api.v1.deps import CurrentUser, DatabaseSession
@@ -37,6 +38,7 @@ from app.services.loan_application_service import (
     transition_loan_status,
     update_loan_application,
 )
+from app.services.creditgraph_service import trigger_analysis
 
 router = APIRouter()
 
@@ -239,12 +241,15 @@ async def add_note_endpoint(
     return loan
 
 
-@router.post("/{loan_id}/evaluate")
+@router.post(
+    "/{loan_id}/evaluate",
+    response_model=CreditGraphAnalysisRead,
+)
 async def evaluate_loan_application_endpoint(
     loan_id: int,
     current_user: CurrentUser,
     session: DatabaseSession,
-) -> dict:
+) -> CreditGraphAnalysisRead:
     """
     Trigger AI evaluation for a loan application.
 
@@ -256,17 +261,15 @@ async def evaluate_loan_application_endpoint(
     - Store the analysis result in creditgraph_analyses table
     - Return decision: APPROVED, REJECTED, or MANUAL_REVIEW
     """
-    loan = await get_loan_application_with_relations(session, loan_id)
-    if not loan:
+    try:
+        return trigger_analysis(session, loan_id)
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Loan application with ID {loan_id} not found.",
+            detail=str(e),
         )
-
-    return {
-        "loan_id": loan_id,
-        "status": "pending",
-        "message": "AI evaluation placeholder — CreditGraph AI integration coming in Phase 8.",
-        "triggered_by": current_user.email,
-        "loan_status": loan.status,
-    }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"CreditGraph API error: {str(e)}",
+        )

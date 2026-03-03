@@ -21,75 +21,7 @@ from tests.factories.loan_application_factory import (
 )
 
 
-# ============================================================================
-# Fixtures
-# ============================================================================
-
-@pytest.fixture
-def auth_headers(client: TestClient, session: Session):
-    """Create a test user and return auth headers."""
-    user = User(
-        name="Test User",
-        email="test@example.com",
-        password=get_password_hash("testpass"),
-        is_approved=True,
-    )
-    session.add(user)
-    session.commit()
-
-    response = client.post(
-        "/api/v1/auth/login",
-        json={"email": "test@example.com", "password": "testpass"},
-    )
-    assert response.status_code == 200
-    token = response.json()["access_token"]
-    return {"Authorization": f"Bearer {token}"}
-
-
-@pytest.fixture
-def test_customer(session: Session) -> Customer:
-    """Create a test customer in the database."""
-    customer = Customer(nid="12345678901", is_active=True, is_assigned=False)
-    session.add(customer)
-    session.flush()
-
-    detail = CustomerDetail(
-        customer_id=customer.id,
-        first_name="Juan",
-        last_name="Pérez",
-        email="juan.perez@example.com",
-    )
-    session.add(detail)
-    session.commit()
-    session.refresh(customer)
-    return customer
-
-
-@pytest.fixture
-def test_loan(session: Session, test_customer: Customer) -> LoanApplication:
-    """Create a test loan application with detail."""
-    loan = LoanApplication(
-        customer_id=test_customer.id,
-        status=LoanStatus.RECEIVED.value,
-        is_active=True,
-        is_new=True,
-    )
-    session.add(loan)
-    session.flush()
-
-    detail = LoanApplicationDetail(
-        loan_application_id=loan.id,
-        amount=100000.0,
-        term=24,
-        rate=15.0,
-        quota=5000.0,
-        frequency="monthly",
-        purpose="home improvement",
-    )
-    session.add(detail)
-    session.commit()
-    session.refresh(loan)
-    return loan
+# Fixtures are now centrally located in conftest.py
 
 
 @pytest.fixture
@@ -495,33 +427,56 @@ def test_add_note_empty_content(
 # Step 3.4: AI Evaluation Placeholder Tests
 # ============================================================================
 
-def test_evaluate_placeholder_returns_structured_response(
-    client: TestClient, session: Session, auth_headers: dict, test_loan: LoanApplication
+def test_evaluate_endpoint_calls_creditgraph(
+    client: TestClient,
+    session: Session,
+    auth_headers: dict,
+    test_loan: LoanApplication,
 ):
-    """Evaluate endpoint returns a structured placeholder response."""
-    response = client.post(
-        f"/api/v1/loan-applications/{test_loan.id}/evaluate",
-        headers=auth_headers,
-    )
+    """The /evaluate endpoint is now a proxy for CreditGraph analysis."""
+    from unittest.mock import patch
 
-    assert response.status_code == 200
-    data = response.json()
-    assert data["loan_id"] == test_loan.id
-    assert data["status"] == "pending"
-    assert "Phase 8" in data["message"]
-    assert "loan_status" in data
+    mock_response = {
+        "case_id": "cg-evaluate",
+        "decision": "APPROVED",
+        "irs_score": 90,
+        "confidence": 0.99,
+        "risk_level": "LOW",
+        "full_response": {"test": "data"},
+    }
+
+    with patch(
+        "app.services.creditgraph_client.CreditGraphClient.analyze_loan_application"
+    ) as mock_analyze:
+        mock_analyze.return_value = mock_response
+
+        response = client.post(
+            f"/api/v1/loan-applications/{test_loan.id}/evaluate",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["decision"] == "APPROVED"
+        assert data["case_id"] == "cg-evaluate"
 
 
 def test_evaluate_loan_not_found(
     client: TestClient, session: Session, auth_headers: dict
 ):
     """Returns 404 if loan does not exist for evaluate endpoint."""
-    response = client.post(
-        "/api/v1/loan-applications/99999/evaluate",
-        headers=auth_headers,
-    )
+    from unittest.mock import patch
+    with patch("app.api.v1.endpoints.loan_applications.trigger_analysis") as mock_trigger:
+        mock_trigger.side_effect = ValueError(
+            "Loan application 99999 not found")
 
-    assert response.status_code == 404
+        response = client.post(
+            "/api/v1/loan-applications/99999/evaluate",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 404
+        assert "not found" in response.json()["detail"]
 
 
 # ============================================================================

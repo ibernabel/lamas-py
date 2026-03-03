@@ -2,6 +2,7 @@
 SQLModel Models - Database tables and API schemas.
 """
 from app.models.user import User, UserCreate, UserRead, UserLogin
+from app.models.creditgraph import CreditGraphAnalysis
 from app.models.customer import (
     Customer,
     CustomerDetail,

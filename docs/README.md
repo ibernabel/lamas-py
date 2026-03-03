@@ -16,9 +16,9 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Phase 3: Loan Application APIs](./implementation/phase-3-loan-application-apis.md) - ✅
 - [Phase 4: Frontend Foundation](./implementation/phase-4-frontend-foundation.md) - ✅
 - [Maintenance & Environment](./implementation/maintenance.md) - 🔧
-- [Phase 5: Frontend - Customer Management](./implementation/phase-5-frontend-customers.md) - 🟡
-- Phase 6: Frontend - Loan Applications - ⚪
-- Phase 7: Integration & Deployment - ⚪
+- [Phase 5: Frontend - Customer Management](./implementation/phase-5-frontend-customers.md) - ✅
+- [Phase 6: Frontend - Loan Applications](./implementation/phase-6-frontend-loans.md) - ✅
+- [Phase 8: CreditGraph AI Integration](./implementation/phase-8-creditgraph-backend.md) - 🟡
 
 ### Testing
 

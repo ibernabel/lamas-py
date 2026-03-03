@@ -31,11 +31,13 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
 
     # CORS
-    ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:3001"]
+    ALLOWED_ORIGINS: list[str] = [
+        "http://localhost:3000", "http://localhost:3001"]
 
     # CreditGraph AI (External Risk Engine)
     CREDITGRAPH_API_URL: str = "https://api.creditgraph.ai"
     CREDITGRAPH_API_KEY: str = "placeholder_key"
+    CREDITGRAPH_TIMEOUT: int = 60
 
 
 @lru_cache

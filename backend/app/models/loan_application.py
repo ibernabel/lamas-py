@@ -3,12 +3,13 @@ Loan Application and related models.
 """
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from app.models.customer import Customer
+    from app.models.creditgraph import CreditGraphAnalysis
 
 
 class LoanStatus(str, Enum):
@@ -21,6 +22,10 @@ class LoanStatus(str, Enum):
     APPROVED = "approved"
     REJECTED = "rejected"
     ARCHIVED = "archived"
+    AUTO_APPROVED = "auto_approved"
+    AUTO_REJECTED = "auto_rejected"
+    PENDING_SENIOR_REVIEW = "pending_senior_review"
+    PENDING_JUNIOR_REVIEW = "pending_junior_review"
 
 
 class LoanApplication(SQLModel, table=True):
@@ -53,6 +58,9 @@ class LoanApplication(SQLModel, table=True):
         back_populates="loan_application")
     notes: list["LoanApplicationNote"] = Relationship(
         back_populates="loan_application")
+    creditgraph_analysis: Optional["CreditGraphAnalysis"] = Relationship(
+        back_populates="loan_application", sa_relationship_kwargs={"uselist": False}
+    )
 
 
 class LoanApplicationDetail(SQLModel, table=True):
