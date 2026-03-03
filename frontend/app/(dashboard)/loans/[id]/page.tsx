@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
   ChevronLeft,
   Calendar,
@@ -26,7 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function LoanDetailPage() {
   const { id } = useParams();
   const loanId = parseInt(id as string);
-  const router = useRouter();
+
 
   const { data: loan, isLoading } = useLoanApplication(loanId);
   const [noteOpen, setNoteOpen] = useState(false);
@@ -50,7 +50,7 @@ export default function LoanDetailPage() {
 
   if (!loan) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
+      <div className="flex flex-col items-center justify-center min-h-100 text-center">
         <h2 className="text-xl font-bold">Loan Application Not Found</h2>
         <p className="text-muted-foreground mt-2">The application you are looking for does not exist or has been removed.</p>
         <Button asChild className="mt-4">
@@ -85,7 +85,7 @@ export default function LoanDetailPage() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <EvaluateLoanButton loanId={loan.id} status={loan.status} />
+          <EvaluateLoanButton loanId={loanId} />
           <Button variant="outline" onClick={() => setNoteOpen(true)}>
             <MessageSquare className="mr-2 h-4 w-4" />
             Add Note
@@ -167,7 +167,7 @@ export default function LoanDetailPage() {
                   <p className="text-sm italic">No internal notes yet.</p>
                 </div>
               ) : (
-                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
+                <div className="space-y-6 relative pl-8 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:bg-linear-to-b before:from-indigo-500 before:to-purple-500">
                   {loan.notes.map((note) => (
                     <div key={note.id} className="relative pl-12">
                       <div className="absolute left-0 top-1 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 border-4 border-white shadow-sm ring-1 ring-slate-300">

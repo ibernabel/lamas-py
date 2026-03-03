@@ -18,7 +18,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Maintenance & Environment](./implementation/maintenance.md) - 🔧
 - [Phase 5: Frontend - Customer Management](./implementation/phase-5-frontend-customers.md) - ✅
 - [Phase 6: Frontend - Loan Applications](./implementation/phase-6-frontend-loans.md) - ✅
-- [Phase 8: CreditGraph AI Integration](./implementation/phase-8-creditgraph-backend.md) - 🟡
+- [Phase 8: CreditGraph AI Integration](./implementation/phase-8-creditgraph.md) - ✅
 
 ### Testing
 
