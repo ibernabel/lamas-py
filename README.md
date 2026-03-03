@@ -14,8 +14,7 @@
 <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License">
 </p>
 
-> **🚧 Migration in Progress**: This project is being migrated from Laravel to FastAPI + Next.js  
-> **Status**: Phase 1 Complete ✅ | Phase 2 In Progress 🟡
+> **Status**: Phase 8 Complete ✅ | Phase 9 Planned ⚪
 
 # Loan Applications Management System - LAMaS
 
@@ -30,12 +29,11 @@
 
 ### Migration Status
 
-| Phase | Name                  | Status         |
-| ----- | --------------------- | -------------- |
-| 1     | Backend Foundation    | ✅ Complete    |
-| 2     | Customer APIs         | 🟡 In Progress |
-| 3     | Loan Application APIs | ⚪ Planned     |
-| 4-7   | Frontend & Deployment | ⚪ Planned     |
+| Phase | Name                 | Status         |
+| ----- | -------------------- | -------------- |
+| 1-6   | Foundation & Core UI | ✅ Complete    |
+| 8     | CreditGraph AI       | ✅ Complete    |
+| 7,9+  | CI/CD & Deploy       | 🟡 In Progress |
 
 ---
 
@@ -64,53 +62,29 @@
 
 ---
 
-## 🚀 Quick Start
+### ⚡ Super Quick Start (Recommended)
 
-### Prerequisites
+One command for each terminal:
 
-- Docker & Docker Compose
-- (Optional) Python 3.11+ with [uv](https://github.com/astral-sh/uv)
+1. **Start Database** (Docker required):
 
-### Run with Docker (Recommended)
+   ```bash
+   make db
+   ```
 
-```bash
-# Clone the repository
-git clone https://github.com/ibernabel/lamas-py.git
-cd lamas-py
+2. **Start Backend**:
 
-# Start services
-docker compose up -d
+   ```bash
+   make backend
+   ```
 
-# Check status
-docker compose ps
+3. **Start Frontend**:
+   ```bash
+   make frontend
+   ```
 
-# View logs
-docker compose logs -f backend
-```
-
-**API will be available at**: http://localhost:8001  
-**API Docs (Swagger)**: http://localhost:8001/api/v1/docs
-
-### Local Development (without Docker)
-
-```bash
-cd backend
-
-# Install dependencies using uv (faster)
-uv pip install -e ".[dev]"
-
-# Or use pip
-pip install -e ".[dev]"
-
-# Copy environment file
-cp .env.example .env
-
-# Edit .env with your database URL
-# DATABASE_URL=postgresql://user:pass@localhost:5432/lamas
-
-# Run the server
-uvicorn app.main:app --reload
-```
+> [!TIP]
+> Use `make seed` to populate your database with fresh sample data.
 
 ### Run Tests
 
