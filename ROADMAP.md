@@ -280,3 +280,4 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 - ✅ Automatic file versioning management
 - ✅ Integrated document management in 3 key UI areas
 - ✅ 4 backend integration tests
+- ⚠️ **Known Issue**: Document preview modal currently fails in local dev due to routing mismatch (see [Known Issue](./docs/knowledges/known_issue-document-viewer-404.md))

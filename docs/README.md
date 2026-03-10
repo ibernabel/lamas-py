@@ -18,11 +18,16 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Maintenance & Environment](./implementation/maintenance.md) - 🔧
 - [Phase 5: Frontend - Customer Management](./implementation/phase-5-frontend-customers.md) - ✅
 - [Phase 6: Frontend - Loan Applications](./implementation/phase-6-frontend-loans.md) - ✅
+- [Phase 7/9: Document Management](./implementation/phase-7-document-management.md) - ✅ (Manual verification pending fixes)
 - [Phase 8: CreditGraph AI Integration](./implementation/phase-8-creditgraph.md) - ✅
 
 ### Testing
 
-- Testing Documentation _(Coming Soon)_
+- [Document Viewer Verification](./testing/document-viewer-manual-verification.md) - 2026-03-10
+
+### Knowledges & Issues
+
+- [Known Issue: Document Viewer 404](./knowledges/known_issue-document-viewer-404.md) - Identified 2026-03-10
 
 ## Quick Start
 
