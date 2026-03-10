@@ -95,5 +95,36 @@ pytest tests/test_health.py -v
 
 ## Database
 
-The backend connects to an existing PostgreSQL database from Laravel.  
-No migrations are needed as we're using the existing schema.
+This project uses **SQLModel** (`SQLAlchemy` under the hood) with `metadata.create_all()` as its schema management strategy. **Alembic is not used.**
+
+### Initial Setup
+
+Run the setup script to create all tables and seed the default admin user:
+
+```bash
+# Create all tables defined in app/models/ and seed the default admin user
+.venv/bin/python scripts/setup_db.py
+```
+
+### ⚠️ Adding a New SQLModel
+
+Every time you add a new `SQLModel` class with `table=True`, you **must**:
+
+1. Import it in `app/models/__init__.py` so SQLModel's metadata registry knows about it.
+2. Re-run the setup script to materialize the new table in PostgreSQL:
+
+```bash
+# Detect and create any new tables (safe to run multiple times — existing tables are skipped)
+.venv/bin/python scripts/setup_db.py
+```
+
+> `create_all()` is **additive only**: it creates missing tables but never drops or alters existing ones. It is safe to run at any time.
+
+### Scripts Reference
+
+| Script                      | Purpose                                           |
+| --------------------------- | ------------------------------------------------- |
+| `scripts/setup_db.py`       | Create all tables + seed default admin user       |
+| `scripts/init_db.py`        | Lightweight alternative (tables only + test user) |
+| `scripts/seed_customers.py` | Seed sample customer data for development         |
+| `scripts/seed_loans.py`     | Seed sample loan application data for development |
