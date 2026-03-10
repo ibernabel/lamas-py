@@ -250,8 +250,7 @@ class CustomerSimpleCreateSchema(BaseModel):
             raise ValueError("NID must be exactly 11 digits")
         return v
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CustomerUpdateSchema(BaseModel):
@@ -290,8 +289,7 @@ class PhoneRead(BaseModel):
     number: str
     type: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AddressRead(BaseModel):
@@ -304,8 +302,7 @@ class AddressRead(BaseModel):
     postal_code: str | None = None
     country: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CustomerDetailRead(BaseModel):
@@ -319,8 +316,7 @@ class CustomerDetailRead(BaseModel):
     gender: str | None = None
     marital_status: str | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CustomerListItem(BaseModel):
@@ -336,8 +332,7 @@ class CustomerListItem(BaseModel):
     promoter_id: int | None = None
     created_at: datetime | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CustomerReadSchema(BaseModel):
@@ -368,8 +363,7 @@ class CustomerReadSchema(BaseModel):
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ============================================================================
