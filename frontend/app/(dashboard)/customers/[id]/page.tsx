@@ -24,6 +24,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DocumentsSection } from "@/components/documents/DocumentsSection";
 import { useCustomer } from "@/hooks/use-customers";
 
 // ── Helper components ──────────────────────────────────────────────────────
@@ -111,105 +113,133 @@ export default function CustomerDetailPage() {
         </Button>
       </div>
 
-      {/* Identity card */}
-      <Card>
-        <CardHeader className="flex-row items-center gap-2">
-          <User className="h-4 w-4 text-muted-foreground" />
-          <CardTitle className="text-base">Identity</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-          <InfoRow label="NID" value={customer.nid} />
-          <InfoRow label="Lead Channel" value={customer.lead_channel} />
-          <InfoRow label="Referred" value={customer.is_referred ? "Yes" : "No"} />
-          {customer.is_referred && (
-            <InfoRow label="Referred By" value={customer.referred_by} />
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="w-full justify-start border-b rounded-none h-11 bg-transparent p-0">
+          <TabsTrigger 
+            value="overview" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none h-11 px-6"
+          >
+            Resumen
+          </TabsTrigger>
+          <TabsTrigger 
+            value="documents" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none h-11 px-6"
+          >
+            Documentos
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6 pt-6">
+          {/* Identity card */}
+          <Card>
+            <CardHeader className="flex-row items-center gap-2">
+              <User className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">Identity</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <InfoRow label="NID" value={customer.nid} />
+              <InfoRow label="Lead Channel" value={customer.lead_channel} />
+              <InfoRow label="Referred" value={customer.is_referred ? "Yes" : "No"} />
+              {customer.is_referred && (
+                <InfoRow label="Referred By" value={customer.referred_by} />
+              )}
+              <InfoRow label="Assigned" value={customer.is_assigned ? "Yes" : "No"} />
+            </CardContent>
+          </Card>
+
+          {/* Personal details */}
+          {customer.detail && (
+            <Card>
+              <CardHeader className="flex-row items-center gap-2">
+                <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-base">Personal Details</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                <InfoRow label="First Name" value={customer.detail.first_name} />
+                <InfoRow label="Last Name" value={customer.detail.last_name} />
+                <InfoRow label="Email" value={customer.detail.email} />
+                <InfoRow label="Birthday" value={customer.detail.birthday} />
+                <InfoRow
+                  label="Gender"
+                  value={
+                    customer.detail.gender === "M"
+                      ? "Male"
+                      : customer.detail.gender === "F"
+                      ? "Female"
+                      : customer.detail.gender === "O"
+                      ? "Other"
+                      : null
+                  }
+                />
+                <InfoRow label="Marital Status" value={customer.detail.marital_status} />
+              </CardContent>
+            </Card>
           )}
-          <InfoRow label="Assigned" value={customer.is_assigned ? "Yes" : "No"} />
-        </CardContent>
-      </Card>
 
-      {/* Personal details */}
-      {customer.detail && (
-        <Card>
-          <CardHeader className="flex-row items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-muted-foreground" />
-            <CardTitle className="text-base">Personal Details</CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            <InfoRow label="First Name" value={customer.detail.first_name} />
-            <InfoRow label="Last Name" value={customer.detail.last_name} />
-            <InfoRow label="Email" value={customer.detail.email} />
-            <InfoRow label="Birthday" value={customer.detail.birthday} />
-            <InfoRow
-              label="Gender"
-              value={
-                customer.detail.gender === "M"
-                  ? "Male"
-                  : customer.detail.gender === "F"
-                  ? "Female"
-                  : customer.detail.gender === "O"
-                  ? "Other"
-                  : null
-              }
-            />
-            <InfoRow label="Marital Status" value={customer.detail.marital_status} />
-          </CardContent>
-        </Card>
-      )}
+          {/* Phones */}
+          {customer.phones.length > 0 && (
+            <Card>
+              <CardHeader className="flex-row items-center gap-2">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-base">Phone Numbers</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {customer.phones.map((phone) => (
+                  <div key={phone.id} className="flex items-center gap-3">
+                    <span className="font-mono text-sm">{phone.number}</span>
+                    <span className="capitalize text-xs text-muted-foreground">({phone.type})</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
 
-      {/* Phones */}
-      {customer.phones.length > 0 && (
-        <Card>
-          <CardHeader className="flex-row items-center gap-2">
-            <Phone className="h-4 w-4 text-muted-foreground" />
-            <CardTitle className="text-base">Phone Numbers</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {customer.phones.map((phone) => (
-              <div key={phone.id} className="flex items-center gap-3">
-                <span className="font-mono text-sm">{phone.number}</span>
-                <Badge variant="outline" className="capitalize text-xs">
-                  {phone.type}
-                </Badge>
+          {/* Addresses */}
+          {customer.addresses.length > 0 && (
+            <Card>
+              <CardHeader className="flex-row items-center gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-base">Addresses</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {customer.addresses.map((addr, i) => (
+                  <div key={addr.id}>
+                    {i > 0 && <Separator className="mb-4" />}
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      <InfoRow label="Street" value={addr.street} />
+                      <InfoRow label="City" value={addr.city} />
+                      <InfoRow label="Province" value={addr.province} />
+                      <InfoRow label="Postal Code" value={addr.postal_code} />
+                      <InfoRow label="Country" value={addr.country} />
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Metadata */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground">
+                <InfoRow label="Created" value={new Date(customer.created_at).toLocaleString()} />
+                <InfoRow label="Last Updated" value={new Date(customer.updated_at).toLocaleString()} />
               </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Addresses */}
-      {customer.addresses.length > 0 && (
-        <Card>
-          <CardHeader className="flex-row items-center gap-2">
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-            <CardTitle className="text-base">Addresses</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {customer.addresses.map((addr, i) => (
-              <div key={addr.id}>
-                {i > 0 && <Separator className="mb-4" />}
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  <InfoRow label="Street" value={addr.street} />
-                  <InfoRow label="City" value={addr.city} />
-                  <InfoRow label="Province" value={addr.province} />
-                  <InfoRow label="Postal Code" value={addr.postal_code} />
-                  <InfoRow label="Country" value={addr.country} />
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Metadata */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground">
-            <InfoRow label="Created" value={new Date(customer.created_at).toLocaleString()} />
-            <InfoRow label="Last Updated" value={new Date(customer.updated_at).toLocaleString()} />
-          </div>
-        </CardContent>
-      </Card>
+        <TabsContent value="documents" className="pt-6">
+          <DocumentsSection 
+            entityType="customer" 
+            entityId={customer.id} 
+            requiredTypes={[
+              { type: "nid", label: "Cédula de Identidad (NID)" },
+              { type: "labor_letter", label: "Carta de Trabajo Reciente" }
+            ]}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

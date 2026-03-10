@@ -1,6 +1,7 @@
 """
 Application configuration using Pydantic Settings.
 """
+from typing import Optional
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -38,6 +39,17 @@ class Settings(BaseSettings):
     CREDITGRAPH_API_URL: str = "https://api.creditgraph.ai"
     CREDITGRAPH_API_KEY: str = "placeholder_key"
     CREDITGRAPH_TIMEOUT: int = 60
+
+    # Storage
+    STORAGE_BACKEND: str = "local"  # "local" | "r2"
+    STORAGE_LOCAL_UPLOAD_DIR: str = "./uploads"
+
+    # Cloudflare R2
+    R2_ACCOUNT_ID: str | None = None
+    R2_ACCESS_KEY_ID: str | None = None
+    R2_SECRET_ACCESS_KEY: str | None = None
+    R2_BUCKET_NAME: str = "lamas-documents"
+    R2_PUBLIC_URL: str | None = None
 
 
 @lru_cache

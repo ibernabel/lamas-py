@@ -22,6 +22,7 @@ import { AddNoteDialog } from "@/components/loans/AddNoteDialog";
 import { StatusTransitionDialog } from "@/components/loans/StatusTransitionDialog";
 import { EvaluateLoanButton } from "@/components/loans/EvaluateLoanButton";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DocumentsSection } from "@/components/documents/DocumentsSection";
 
 export default function LoanDetailPage() {
   const { id } = useParams();
@@ -183,6 +184,25 @@ export default function LoanDetailPage() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Documents Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Documents & Proofs</CardTitle>
+              <CardDescription>Upload bank statements and credit reports for this application.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DocumentsSection 
+                entityType="loan" 
+                entityId={loan.id} 
+                requiredTypes={[
+                  { type: "bank_statement", label: "Bank Statement (Popular)", bankName: "popular" },
+                  { type: "bank_statement", label: "Bank Statement (BHD)", bankName: "bhd" },
+                  { type: "credit_report", label: "Credit Report (TransUnion/DataCrédito)" }
+                ]}
+              />
             </CardContent>
           </Card>
         </div>

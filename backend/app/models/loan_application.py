@@ -10,6 +10,7 @@ from sqlmodel import Field, Relationship, SQLModel
 if TYPE_CHECKING:
     from app.models.customer import Customer
     from app.models.creditgraph import CreditGraphAnalysis
+    from app.models.document import CustomerDocument
 
 
 class LoanStatus(str, Enum):
@@ -61,6 +62,8 @@ class LoanApplication(SQLModel, table=True):
     creditgraph_analysis: Optional["CreditGraphAnalysis"] = Relationship(
         back_populates="loan_application", sa_relationship_kwargs={"uselist": False}
     )
+    documents: list["CustomerDocument"] = Relationship(
+        back_populates="loan_application")
 
 
 class LoanApplicationDetail(SQLModel, table=True):

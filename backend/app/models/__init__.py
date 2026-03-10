@@ -23,6 +23,7 @@ from app.models.phone import Phone
 from app.models.address import Address, Addressable
 from app.models.portfolio import Portfolio, Broker, Promoter
 from app.models.credit_risk import CreditRisk, CreditRiskCategory
+from app.models.document import CustomerDocument
 
 __all__ = [
     "User",
@@ -49,4 +50,5 @@ __all__ = [
     "Promoter",
     "CreditRisk",
     "CreditRiskCategory",
+    "CustomerDocument",
 ]

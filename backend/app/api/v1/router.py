@@ -3,7 +3,7 @@ API v1 Router - Aggregates all endpoint routers.
 """
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, customers, credit_risks, loan_applications, creditgraph
+from app.api.v1.endpoints import auth, customers, credit_risks, loan_applications, creditgraph, documents
 
 api_router = APIRouter()
 
@@ -18,4 +18,7 @@ api_router.include_router(
 )
 api_router.include_router(
     credit_risks.router, prefix="/credit-risks", tags=["credit-risks"]
+)
+api_router.include_router(
+    documents.router, prefix="/documents", tags=["documents"]
 )

@@ -82,7 +82,8 @@ describe("addressSchema", () => {
   });
 
   it("rejects missing street", () => {
-    const { street: _, ...noStreet } = validAddress;
+    const noStreet = { ...validAddress } as Record<string, unknown>;
+    delete noStreet.street;
     const result = addressSchema.safeParse(noStreet);
     expect(result.success).toBe(false);
   });
@@ -218,7 +219,8 @@ describe("customerFormSchema", () => {
 
   it("requires is_referred to be a boolean (not optional)", () => {
     // Omitting is_referred should fail
-    const { is_referred: _, ...noRef } = validForm;
+    const noRef = { ...validForm } as Record<string, unknown>;
+    delete noRef.is_referred;
     const result = customerFormSchema.safeParse(noRef);
     expect(result.success).toBe(false);
   });

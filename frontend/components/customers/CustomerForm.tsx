@@ -14,12 +14,13 @@
  *   3. Phones   — dynamic list, at least 1 required
  *   4. Addresses — dynamic optional list
  */
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2, XCircle, Loader2, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, Plus, Trash2, ArrowLeft, Check } from "lucide-react";
+import { toast } from "sonner";
+import { DocumentsSection } from "@/components/documents/DocumentsSection";
 
 import {
   Form,
@@ -72,6 +73,7 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
   const updateMutation = useUpdateCustomer();
 
   const [nidState, setNidState] = useState<NidValidationState>("idle");
+  const [createdCustomerId, setCreatedCustomerId] = useState<number | null>(null);
 
   // ── Single unified form ────────────────────────────────────────────────────
 
@@ -166,7 +168,10 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
           referred_by: values.referred_by || undefined,
         },
         {
-          onSuccess: (data) => router.push(`/customers/${data.id}`),
+          onSuccess: (data) => {
+            setCreatedCustomerId(data.id);
+            toast.success("Cliente creado. Por favor, cargue los documentos obligatorios.");
+          },
         }
       );
     } else if (customer) {
@@ -190,9 +195,42 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    if (createdCustomerId) {
+      return (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6 flex flex-col items-center text-center space-y-2">
+            <div className="bg-green-100 p-3 rounded-full">
+              <Check className="w-8 h-8 text-green-600" />
+            </div>
+            <h2 className="text-xl font-bold text-green-900">¡Cliente Creado!</h2>
+            <p className="text-green-700">
+              El perfil de {form.getValues("detail.first_name")} ha sido registrado. 
+              Ahora debe cargar los documentos requeridos para completar el expediente.
+            </p>
+          </div>
+
+          <DocumentsSection 
+            entityType="customer" 
+            entityId={createdCustomerId}
+            requiredTypes={[
+              { type: "nid", label: "Cédula de Identidad (NID)" },
+              { type: "labor_letter", label: "Carta de Trabajo Reciente" }
+            ]}
+          />
+
+          <div className="flex justify-end pt-6 border-t">
+            <Button onClick={() => router.push(`/customers/${createdCustomerId}`)}>
+              Finalizar y ver perfil
+              <CheckCircle2 className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="identity" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="identity">Identity</TabsTrigger>

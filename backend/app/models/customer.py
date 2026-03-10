@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from app.models.loan_application import LoanApplication
     from app.models.portfolio import Portfolio, Promoter
     from app.models.phone import Phone
+    from app.models.document import CustomerDocument
 
 
 class Customer(SQLModel, table=True):
@@ -43,6 +44,8 @@ class Customer(SQLModel, table=True):
     accounts: list["CustomersAccount"] = Relationship(
         back_populates="customer")
     loan_applications: list["LoanApplication"] = Relationship(
+        back_populates="customer")
+    documents: list["CustomerDocument"] = Relationship(
         back_populates="customer")
 
 

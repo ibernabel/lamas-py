@@ -8,6 +8,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from app.models.portfolio import Broker, Promoter
+    from app.models.document import CustomerDocument
 
 
 class UserBase(SQLModel):
@@ -34,6 +35,8 @@ class User(UserBase, table=True):
     # Relationships
     broker: "Broker" = Relationship(back_populates="user")
     promoter: "Promoter" = Relationship(back_populates="user")
+    uploaded_documents: list["CustomerDocument"] = Relationship(
+        back_populates="uploader")
 
 
 class UserCreate(SQLModel):
