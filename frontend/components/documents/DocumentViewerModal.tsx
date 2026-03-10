@@ -30,15 +30,30 @@ export function DocumentViewerModal({
 }: DocumentViewerModalProps) {
   const isOpen = document !== null;
 
+  /**
+   * Resolve a URL returned by the backend.
+   * LocalStorageService returns relative paths like "/api/v1/documents/download/..."
+   * which the browser would resolve to port 3000 (Next.js) instead of 8001 (FastAPI).
+   * We prepend the API base URL for relative paths so they always hit FastAPI.
+   * Absolute URLs (e.g. R2 presigned URLs) are returned unchanged.
+   */
+  const resolveUrl = (url: string | undefined): string => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    const apiBase = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/v1\/?$/, "") ?? "";
+    return `${apiBase}${url}`;
+  };
+
   const renderContent = () => {
     if (!document) return null;
 
     const { content_type, download_url, file_name } = document;
+    const resolvedUrl = resolveUrl(download_url);
 
     if (content_type === "application/pdf") {
       return (
         <iframe
-          src={download_url}
+          src={resolvedUrl}
           title={file_name}
           className="w-full rounded-md border bg-white"
           style={{ minHeight: "65vh" }}
@@ -51,7 +66,7 @@ export function DocumentViewerModal({
         <div className="flex items-center justify-center min-h-[40vh]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={download_url}
+            src={resolvedUrl}
             alt={file_name}
             className="max-w-full max-h-[65vh] rounded-md border object-contain shadow-sm"
           />
@@ -68,7 +83,7 @@ export function DocumentViewerModal({
         </p>
         <Button
           variant="default"
-          onClick={() => window.open(download_url, "_blank")}
+          onClick={() => window.open(resolvedUrl, "_blank")}
         >
           <Download className="mr-2 h-4 w-4" />
           Descargar

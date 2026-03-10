@@ -1,7 +1,9 @@
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Annotated, List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Query
+from fastapi.responses import FileResponse
 from sqlmodel import select, and_
 
 from app.api.v1.deps import CurrentUser, DatabaseSession
@@ -218,3 +220,44 @@ async def get_document_download_url(
     download_url = await storage.get_url(db_doc.file_key)
 
     return {"download_url": download_url}
+
+
+@router.get("/download/{file_key:path}", include_in_schema=False)
+async def serve_local_file(file_key: str):
+    """
+    Stream a locally stored document directly to the browser.
+
+    This endpoint is exclusively for the LocalStorageService (development).
+    In production, R2 generates presigned URLs that are served directly from
+    the CDN, so this route is never called.
+
+    The file_key:path parameter type allows nested paths such as:
+        clients/1/nid/20260310_120000_cedula.pdf
+    """
+    from app.services.storage import LocalStorageService
+
+    storage = get_storage_service()
+
+    # Safety guard: only serve files when using local storage
+    if not isinstance(storage, LocalStorageService):
+        raise HTTPException(
+            status_code=404,
+            detail="Direct file serving is only available in local development mode.",
+        )
+
+    file_path = storage.base_path / file_key
+
+    # Prevent path traversal attacks
+    try:
+        file_path.resolve().relative_to(storage.base_path.resolve())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid file path.")
+
+    if not file_path.exists() or not file_path.is_file():
+        raise HTTPException(status_code=404, detail="File not found.")
+
+    return FileResponse(
+        path=str(file_path),
+        filename=file_path.name,
+        media_type=None,  # Let FileResponse auto-detect from extension
+    )
