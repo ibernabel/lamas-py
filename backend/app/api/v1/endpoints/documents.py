@@ -256,8 +256,16 @@ async def serve_local_file(file_key: str):
     if not file_path.exists() or not file_path.is_file():
         raise HTTPException(status_code=404, detail="File not found.")
 
+    # Detect content type from file extension
+    import mimetypes
+    detected_type, _ = mimetypes.guess_type(str(file_path))
+    media_type = detected_type or "application/octet-stream"
+
     return FileResponse(
         path=str(file_path),
-        filename=file_path.name,
-        media_type=None,  # Let FileResponse auto-detect from extension
+        media_type=media_type,
+        headers={
+            # 'inline' causes the browser to render the file (PDF/image) instead of downloading it
+            "Content-Disposition": f"inline; filename=\"{file_path.name}\"",
+        },
     )

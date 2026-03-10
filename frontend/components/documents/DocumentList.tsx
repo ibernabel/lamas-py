@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { CustomerDocument } from "@/lib/api/types";
 import { deleteDocument } from "@/lib/api/documents";
+import { resolveDocumentUrl } from "@/lib/utils/document-url";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -129,7 +130,7 @@ export function DocumentList({ documents, onDeleteSuccess }: DocumentListProps) 
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-primary"
-                    onClick={() => window.open(doc.download_url, "_blank")}
+                    onClick={() => window.open(resolveDocumentUrl(doc.download_url), "_blank")}
                     title="Descargar"
                   >
                     <Download className="h-4 w-4" />

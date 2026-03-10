@@ -99,7 +99,8 @@ describe("DocumentViewerModal", () => {
       <DocumentViewerModal document={makeDocument()} onClose={onClose} />
     );
 
-    const closeBtn = screen.getByRole("button", { name: /cerrar visor/i });
+    // shadcn/ui DialogContent renders a built-in close button with aria-label="Close"
+    const closeBtn = screen.getByRole("button", { name: /close/i });
     await user.click(closeBtn);
     expect(onClose).toHaveBeenCalledOnce();
   });

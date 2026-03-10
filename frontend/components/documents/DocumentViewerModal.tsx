@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, FileText, X } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CustomerDocument } from "@/lib/api/types";
+import { resolveDocumentUrl } from "@/lib/utils/document-url";
 
 interface DocumentViewerModalProps {
   /** Document to display; null means the modal is closed. */
@@ -20,9 +21,12 @@ interface DocumentViewerModalProps {
 /**
  * Inline document preview modal.
  *
- * - PDF  → `<iframe>` embedded viewer
+ * - PDF  → `<iframe>` embedded viewer (Content-Disposition: inline from backend)
  * - Image → `<img>` centered viewer
  * - Other → fallback with a download button
+ *
+ * shadcn/ui DialogContent provides its own close (X) button automatically,
+ * so no custom close button is needed here.
  */
 export function DocumentViewerModal({
   document,
@@ -30,25 +34,11 @@ export function DocumentViewerModal({
 }: DocumentViewerModalProps) {
   const isOpen = document !== null;
 
-  /**
-   * Resolve a URL returned by the backend.
-   * LocalStorageService returns relative paths like "/api/v1/documents/download/..."
-   * which the browser would resolve to port 3000 (Next.js) instead of 8001 (FastAPI).
-   * We prepend the API base URL for relative paths so they always hit FastAPI.
-   * Absolute URLs (e.g. R2 presigned URLs) are returned unchanged.
-   */
-  const resolveUrl = (url: string | undefined): string => {
-    if (!url) return "";
-    if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    const apiBase = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/v1\/?$/, "") ?? "";
-    return `${apiBase}${url}`;
-  };
-
   const renderContent = () => {
     if (!document) return null;
 
     const { content_type, download_url, file_name } = document;
-    const resolvedUrl = resolveUrl(download_url);
+    const resolvedUrl = resolveDocumentUrl(download_url);
 
     if (content_type === "application/pdf") {
       return (
@@ -56,7 +46,7 @@ export function DocumentViewerModal({
           src={resolvedUrl}
           title={file_name}
           className="w-full rounded-md border bg-white"
-          style={{ minHeight: "65vh" }}
+          style={{ minHeight: "70vh" }}
         />
       );
     }
@@ -68,7 +58,7 @@ export function DocumentViewerModal({
           <img
             src={resolvedUrl}
             alt={file_name}
-            className="max-w-full max-h-[65vh] rounded-md border object-contain shadow-sm"
+            className="max-w-full max-h-[70vh] rounded-md border object-contain shadow-sm"
           />
         </div>
       );
@@ -95,22 +85,13 @@ export function DocumentViewerModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl w-full p-0 overflow-hidden">
-        <DialogHeader className="flex flex-row items-center justify-between px-6 py-4 border-b bg-muted/40">
-          <DialogTitle className="text-sm font-medium truncate max-w-[80%]">
+        <DialogHeader className="px-6 py-4 border-b bg-muted/40">
+          <DialogTitle className="text-sm font-medium truncate pr-8">
             {document?.file_name ?? "Documento"}
           </DialogTitle>
           <DialogDescription className="sr-only">
             Visor de documento: {document?.file_name ?? "archivo"}
           </DialogDescription>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 shrink-0"
-            onClick={onClose}
-            aria-label="Cerrar visor"
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
 
         <div className="p-4">{renderContent()}</div>
