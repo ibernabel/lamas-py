@@ -53,3 +53,42 @@ Run tests:
 ```bash
 .venv/bin/python -m pytest tests/test_documents_api.py -v
 ```
+
+---
+
+## Document Viewer Modal (Extension)
+
+Added inline document preview to the customer documents tab.
+
+### New Components
+
+| File                                           | Purpose                                                                   |
+| ---------------------------------------------- | ------------------------------------------------------------------------- |
+| `components/documents/DocumentViewerModal.tsx` | PDF (iframe), image (img), fallback download                              |
+| `lib/utils/document-url.ts`                    | `resolveDocumentUrl()` — rewrites relative backend URLs to the auth proxy |
+| `app/api/proxy/documents/[...path]/route.ts`   | Next.js Route Handler proxy with NextAuth session check                   |
+
+### Backend Addition
+
+`GET /documents/download/{file_key:path}` — serves local files via `FileResponse` with:
+
+- `Content-Disposition: inline` (renders in browser, not download)
+- `mimetypes.guess_type()` for auto content-type
+- Path traversal protection
+- Local-only guard (inactive when using R2)
+
+### Security Architecture
+
+Browsers cannot attach `Authorization` headers to `<iframe src>` / `<img src>`. The Next.js proxy solves this:
+
+```
+Browser → /api/proxy/documents/{key} (port 3000, session-checked)
+  → FastAPI /api/v1/documents/download/{key} (Bearer token injected)
+  → File streamed back with Content-Type + Content-Disposition
+```
+
+See [ADR 002](../decisions/002-document-proxy-auth.md) for full rationale.
+
+### Frontend Tests
+
+6 unit tests in `components/documents/__tests__/DocumentViewerModal.test.tsx` — all passing (58/58 total).

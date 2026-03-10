@@ -3,8 +3,14 @@
 ## Status
 
 **Identified:** 2026-03-10
-**Severity:** High (Feature non-functional for local development)
+**Resolved:** 2026-03-10
+**Severity:** ~~High~~ → ✅ **RESOLVED**
 **Component:** Frontend (DocumentViewerModal), Backend (LocalStorageService)
+
+**Fix Summary:**
+
+- Backend: Added `GET /download/{file_key:path}` with `FileResponse(Content-Disposition: inline)`.
+- Frontend: Created Next.js authenticated proxy route at `app/api/proxy/documents/[...path]`. `resolveDocumentUrl()` rewrites all relative backend URLs to the proxy path. See [ADR 002](../decisions/002-document-proxy-auth.md).
 
 ## Description
 

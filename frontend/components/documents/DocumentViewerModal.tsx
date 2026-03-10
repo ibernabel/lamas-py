@@ -46,7 +46,7 @@ export function DocumentViewerModal({
           src={resolvedUrl}
           title={file_name}
           className="w-full rounded-md border bg-white"
-          style={{ minHeight: "70vh" }}
+          style={{ minHeight: "80vh" }}
         />
       );
     }
@@ -84,9 +84,9 @@ export function DocumentViewerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl w-full p-0 overflow-hidden">
+      <DialogContent className="w-[95vw] max-w-[1200px] p-0 overflow-hidden">
         <DialogHeader className="px-6 py-4 border-b bg-muted/40">
-          <DialogTitle className="text-sm font-medium truncate pr-8">
+          <DialogTitle className="text-sm font-medium truncate pr-12">
             {document?.file_name ?? "Documento"}
           </DialogTitle>
           <DialogDescription className="sr-only">
