@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Download, Trash2 } from "lucide-react";
+import { FileText, Download, Trash2, Eye } from "lucide-react";
+import { DocumentViewerModal } from "./DocumentViewerModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -25,6 +26,7 @@ interface DocumentListProps {
 
 export function DocumentList({ documents, onDeleteSuccess }: DocumentListProps) {
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
+  const [viewingDoc, setViewingDoc] = useState<CustomerDocument | null>(null);
 
   const handleDelete = async (docId: number) => {
     if (!confirm("¿Estás seguro de que deseas eliminar este documento?")) return;
@@ -117,9 +119,18 @@ export function DocumentList({ documents, onDeleteSuccess }: DocumentListProps) 
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-primary"
+                    onClick={() => setViewingDoc(doc)}
+                    title="Visualizar"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     className="h-8 w-8 text-primary"
                     onClick={() => window.open(doc.download_url, "_blank")}
-                    title="Ver/Descargar"
+                    title="Descargar"
                   >
                     <Download className="h-4 w-4" />
                   </Button>
@@ -139,6 +150,11 @@ export function DocumentList({ documents, onDeleteSuccess }: DocumentListProps) 
           ))}
         </TableBody>
       </Table>
+
+      <DocumentViewerModal
+        document={viewingDoc}
+        onClose={() => setViewingDoc(null)}
+      />
     </div>
   );
 }
