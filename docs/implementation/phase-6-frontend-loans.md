@@ -60,6 +60,7 @@ Implementation of the full Loan Application management UI, enabling creation, li
 - [x] Hook implementation (`use-loan-applications.ts`)
 - [x] UI Components: `LoanTable`, `LoanFilters`, `LoanForm`, `AddNoteDialog`, `StatusTransitionDialog`.
 - [x] Pages: `/loans`, `/loans/new`, `/loans/[id]`.
+- [x] **New Feature**: Async Loan Requests DataTable in Customer Summary tab.
 - [x] **BugFix**: Backend customer name resolution logic.
 - [x] **BugFix**: Frontend/Backend CORS and environment sync.
 

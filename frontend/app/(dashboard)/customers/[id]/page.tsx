@@ -26,6 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DocumentsSection } from "@/components/documents/DocumentsSection";
+import { CustomerLoansTable } from "@/components/loans/CustomerLoansTable";
 import { useCustomer } from "@/hooks/use-customers";
 
 // ── Helper components ──────────────────────────────────────────────────────
@@ -227,6 +228,9 @@ export default function CustomerDetailPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Customer Loan Applications */}
+          <CustomerLoansTable customerId={customer.id} />
         </TabsContent>
 
         <TabsContent value="documents" className="pt-6">
