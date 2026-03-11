@@ -86,14 +86,21 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
       NID: mode === "create" ? "" : undefined,
       lead_channel: customer?.lead_channel ?? "",
       is_referred: customer?.is_referred ?? false,
-      referred_by: "",
+      referred_by: customer?.referred_by ?? "",
       detail: {
         first_name: customer?.detail?.first_name ?? "",
         last_name: customer?.detail?.last_name ?? "",
         email: customer?.detail?.email ?? "",
+        nickname: customer?.detail?.nickname ?? "",
         birthday: customer?.detail?.birthday ?? "",
         gender: customer?.detail?.gender ?? undefined,
         marital_status: (customer?.detail?.marital_status as CustomerFormValues["detail"]["marital_status"]) ?? undefined,
+        education_level: customer?.detail?.education_level ?? "",
+        nationality: customer?.detail?.nationality ?? "",
+        housing_type: customer?.detail?.housing_type ?? "",
+        housing_possession_type: customer?.detail?.housing_possession_type ?? "",
+        move_in_date: customer?.detail?.move_in_date ?? "",
+        mode_of_transport: customer?.detail?.mode_of_transport ?? "",
       },
       phones: customer?.phones?.length
         ? customer.phones.map((p) => ({
@@ -107,6 +114,48 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
         province: a.province,
         country: a.country ?? "Dominican Republic",
         postal_code: a.postal_code ?? undefined,
+      })) ?? [],
+      job_info: {
+        role: customer?.job_info?.role ?? "",
+        salary: customer?.job_info?.salary ?? 0,
+        start_date: customer?.job_info?.start_date ?? "",
+        payment_type: customer?.job_info?.payment_type ?? "",
+        payment_frequency: customer?.job_info?.payment_frequency ?? "",
+        payment_bank: customer?.job_info?.payment_bank ?? "",
+        other_incomes: customer?.job_info?.other_incomes ?? 0,
+        other_incomes_source: customer?.job_info?.other_incomes_source ?? "",
+        schedule: customer?.job_info?.schedule ?? "",
+        supervisor_name: customer?.job_info?.supervisor_name ?? "",
+        is_self_employed: customer?.job_info?.is_self_employed ?? false,
+      },
+      company: {
+        name: customer?.company?.name ?? "",
+        industry: customer?.company?.industry ?? "",
+        address: customer?.company?.address ?? "",
+        phone: customer?.company?.phone ?? "",
+      },
+      vehicle: {
+        vehicle_type: customer?.vehicle?.vehicle_type ?? "",
+        vehicle_brand: customer?.vehicle?.vehicle_brand ?? "",
+        vehicle_model: customer?.vehicle?.vehicle_model ?? "",
+        vehicle_year: customer?.vehicle?.vehicle_year ?? 0,
+        vehicle_color: customer?.vehicle?.vehicle_color ?? "",
+        vehicle_plate_number: customer?.vehicle?.vehicle_plate_number ?? "",
+        is_owned: customer?.vehicle?.is_owned ?? false,
+        is_financed: customer?.vehicle?.is_financed ?? false,
+        is_leased: customer?.vehicle?.is_leased ?? false,
+      },
+      references: customer?.references?.map((r) => ({
+        id: r.id,
+        name: r.name,
+        nid: r.nid ?? "",
+        email: r.email ?? "",
+        relationship: r.relationship,
+        reference_since: r.reference_since ?? "",
+        occupation: r.occupation ?? "",
+        is_who_referred: r.is_who_referred ?? false,
+        type: r.type ?? "",
+        address: r.address ?? "",
       })) ?? [],
     },
   });
@@ -124,6 +173,12 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
     append: addAddress,
     remove: removeAddress,
   } = useFieldArray({ control: form.control, name: "addresses" });
+
+  const {
+    fields: referenceFields,
+    append: addReference,
+    remove: removeReference,
+  } = useFieldArray({ control: form.control, name: "references" });
 
   // ── NID async validation ───────────────────────────────────────────────────
 
@@ -181,9 +236,14 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
           payload: {
             lead_channel: values.lead_channel || undefined,
             is_referred: values.is_referred,
+            referred_by: values.referred_by || undefined,
             detail: values.detail,
             phones: values.phones,
             addresses: values.addresses,
+            job_info: values.job_info,
+            company: values.company,
+            vehicle: values.vehicle,
+            references: values.references,
           },
         },
         { onSuccess: () => router.push(`/customers/${customer.id}`) }
@@ -232,11 +292,14 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="identity" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="identity">Identity</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="identity">Identidad</TabsTrigger>
             <TabsTrigger value="personal">Personal</TabsTrigger>
-            <TabsTrigger value="phones">Phones</TabsTrigger>
-            <TabsTrigger value="addresses">Addresses</TabsTrigger>
+            <TabsTrigger value="phones">Teléfonos</TabsTrigger>
+            <TabsTrigger value="addresses">Dirección</TabsTrigger>
+            <TabsTrigger value="laboral">Laboral</TabsTrigger>
+            <TabsTrigger value="vehicle">Vehículo</TabsTrigger>
+            <TabsTrigger value="references">Referencias</TabsTrigger>
           </TabsList>
 
           {/* ── Tab 1: Identity ── */}
@@ -282,37 +345,85 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
               name="lead_channel"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Lead Channel</FormLabel>
+                  <FormLabel>Canal de Captación</FormLabel>
                   <FormControl>
-                    <Input id="lead-channel-input" placeholder="e.g. referral, social media…" {...field} value={field.value ?? ""} />
+                    <Input id="lead-channel-input" placeholder="Ej. referido, redes sociales…" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="detail.housing_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Vivienda</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej. Casa, Apartamento" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="detail.housing_possession_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Posesión de Vivienda</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej. Propia, Alquilada" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
               name="is_referred"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Is Referred</FormLabel>
-                  <Select
-                    value={field.value ? "yes" : "no"}
-                    onValueChange={(v) => field.onChange(v === "yes")}
-                  >
-                    <SelectTrigger id="is-referred-select">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="no">No</SelectItem>
-                      <SelectItem value="yes">Yes</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel>¿Viene referido?</FormLabel>
+                  </div>
+                  <FormControl>
+                    <Select
+                      value={field.value ? "yes" : "no"}
+                      onValueChange={(v) => field.onChange(v === "yes")}
+                    >
+                      <SelectTrigger id="is-referred-select" className="w-24">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="no">No</SelectItem>
+                        <SelectItem value="yes">Sí</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
                 </FormItem>
               )}
             />
+
+            {form.watch("is_referred") && (
+              <FormField
+                control={form.control}
+                name="referred_by"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cédula del Referidor</FormLabel>
+                    <FormControl>
+                      <Input placeholder="00000000000" maxLength={11} {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </TabsContent>
 
           {/* ── Tab 2: Personal ── */}
@@ -366,7 +477,7 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                 name="detail.birthday"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Birthday</FormLabel>
+                    <FormLabel>Fecha de Nacimiento</FormLabel>
                     <FormControl>
                       <Input id="birthday-input" type="date" {...field} value={field.value ?? ""} />
                     </FormControl>
@@ -380,15 +491,15 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                 name="detail.gender"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Gender</FormLabel>
+                    <FormLabel>Género</FormLabel>
                     <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v || undefined)}>
                       <SelectTrigger id="gender-select">
-                        <SelectValue placeholder="Select…" />
+                        <SelectValue placeholder="Seleccionar…" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="M">Male</SelectItem>
-                        <SelectItem value="F">Female</SelectItem>
-                        <SelectItem value="O">Other</SelectItem>
+                        <SelectItem value="M">Masculino</SelectItem>
+                        <SelectItem value="F">Femenino</SelectItem>
+                        <SelectItem value="O">Otro</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -401,18 +512,76 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                 name="detail.marital_status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Marital Status</FormLabel>
+                    <FormLabel>Estado Civil</FormLabel>
                     <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v || undefined)}>
                       <SelectTrigger id="marital-status-select">
-                        <SelectValue placeholder="Select…" />
+                        <SelectValue placeholder="Seleccionar…" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="single">Single</SelectItem>
-                        <SelectItem value="married">Married</SelectItem>
-                        <SelectItem value="divorced">Divorced</SelectItem>
-                        <SelectItem value="widowed">Widowed</SelectItem>
+                        <SelectItem value="single">Soltero/a</SelectItem>
+                        <SelectItem value="married">Casado/a</SelectItem>
+                        <SelectItem value="divorced">Divorciado/a</SelectItem>
+                        <SelectItem value="widowed">Viudo/a</SelectItem>
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="detail.nickname"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Apodo</FormLabel>
+                    <FormControl>
+                      <Input id="nickname-input" placeholder="Ej. El Rubio" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="detail.nationality"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nacionalidad</FormLabel>
+                    <FormControl>
+                      <Input id="nationality-input" placeholder="Dominicana" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="detail.education_level"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nivel Educativo</FormLabel>
+                    <FormControl>
+                      <Input id="education-input" placeholder="Universitario, Bachiller..." {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="detail.mode_of_transport"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Medio de Transporte</FormLabel>
+                    <FormControl>
+                      <Input id="transport-input" placeholder="Vehículo propio, Público..." {...field} value={field.value ?? ""} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -597,7 +766,472 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
               }
             >
               <Plus className="mr-2 h-4 w-4" />
-              Add Address
+              Agregar Dirección
+            </Button>
+          </TabsContent>
+
+          {/* ── Tab 5: Laboral ── */}
+          <TabsContent value="laboral" className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="job_info.is_self_employed"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel>Trabajador Independiente</FormLabel>
+                    </div>
+                    <FormControl>
+                      <Select
+                        value={field.value ? "yes" : "no"}
+                        onValueChange={(v) => field.onChange(v === "yes")}
+                      >
+                        <SelectTrigger className="w-24">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="no">No</SelectItem>
+                          <SelectItem value="yes">Sí</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="company.name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre de la Empresa</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej. ACME Corp" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="job_info.role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cargo / Ocupación</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej. Gerente de Ventas" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="job_info.salary"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Salario Mensual</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        placeholder="0.00" 
+                        {...field} 
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value ?? 0} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="job_info.start_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fecha de Ingreso</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="company.phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Teléfono Empresa</FormLabel>
+                    <FormControl>
+                      <Input placeholder="809-000-0000" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Separator />
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="job_info.payment_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Método de Pago</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Transferencia, Efectivo..." {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="job_info.payment_bank"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Banco de Nómina</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Banreservas, Popular..." {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="job_info.supervisor_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre del Supervisor</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nombre completo" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="job_info.schedule"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Horario Laboral</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej. L-V 8:00 - 5:00" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="job_info.other_incomes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Otros Ingresos</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        placeholder="0.00" 
+                        {...field} 
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value ?? 0} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="job_info.other_incomes_source"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fuente de Otros Ingresos</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej. Ventas informales, Rentas..." {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </TabsContent>
+
+          {/* ── Tab 6: Vehicle ── */}
+          <TabsContent value="vehicle" className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="vehicle.vehicle_brand"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Marca</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Toyota, Honda..." {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="vehicle.vehicle_model"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Modelo</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Camry, Civic..." {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <FormField
+                control={form.control}
+                name="vehicle.vehicle_year"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Año</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        placeholder="2020" 
+                        {...field} 
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value ?? 0}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="vehicle.vehicle_color"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Color</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Blanco, Negro..." {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="vehicle.vehicle_plate_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Placa</FormLabel>
+                    <FormControl>
+                      <Input placeholder="A000000" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <FormField
+                control={form.control}
+                name="vehicle.is_owned"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <FormLabel>Propio</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value ? "yes" : "no"}
+                        onValueChange={(v) => field.onChange(v === "yes")}
+                      >
+                        <SelectTrigger className="w-20">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="no">No</SelectItem>
+                          <SelectItem value="yes">Sí</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="vehicle.is_financed"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <FormLabel>Financiado</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value ? "yes" : "no"}
+                        onValueChange={(v) => field.onChange(v === "yes")}
+                      >
+                        <SelectTrigger className="w-20">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="no">No</SelectItem>
+                          <SelectItem value="yes">Sí</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="vehicle.is_leased"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <FormLabel>Leasing</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value ? "yes" : "no"}
+                        onValueChange={(v) => field.onChange(v === "yes")}
+                      >
+                        <SelectTrigger className="w-20">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="no">No</SelectItem>
+                          <SelectItem value="yes">Sí</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </TabsContent>
+
+          {/* ── Tab 7: References ── */}
+          <TabsContent value="references" className="space-y-4 pt-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                Agregue referencias personales o comerciales.
+              </p>
+              <Badge variant="outline">{referenceFields.length} referencia{referenceFields.length !== 1 ? "s" : ""}</Badge>
+            </div>
+
+            {referenceFields.map((refField, index) => (
+              <div key={refField.id} className="rounded-md border p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium">Referencia {index + 1}</p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-destructive"
+                    onClick={() => removeReference(index)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name={`references.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nombre Completo *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Juan Pérez" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`references.${index}.relationship`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Relación *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Amigo, Familiar, Colega..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name={`references.${index}.occupation`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ocupación</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Abogado, Comerciante..." {...field} value={field.value ?? ""} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`references.${index}.type`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo</FormLabel>
+                        <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar…" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="personal">Personal</SelectItem>
+                            <SelectItem value="commercial">Comercial</SelectItem>
+                            <SelectItem value="family">Familiar</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            ))}
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                addReference({
+                  name: "",
+                  relationship: "",
+                  occupation: "",
+                  is_who_referred: false,
+                  type: "personal",
+                })
+              }
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Agregar Referencia
             </Button>
           </TabsContent>
         </Tabs>
@@ -612,11 +1246,11 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
             onClick={() => router.back()}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Cancel
+            Cancelar
           </Button>
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {mode === "create" ? "Create Customer" : "Save Changes"}
+            {mode === "create" ? "Crear Cliente" : "Guardar Cambios"}
           </Button>
         </div>
       </form>

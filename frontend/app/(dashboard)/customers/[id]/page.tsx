@@ -9,10 +9,11 @@ import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   PencilLine,
-  Phone,
   MapPin,
   User,
   CalendarDays,
+  Briefcase,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,11 +32,11 @@ import { useCustomer } from "@/hooks/use-customers";
 
 // ── Helper components ──────────────────────────────────────────────────────
 
-function InfoRow({ label, value }: { label: string; value: string | null | undefined }) {
+function InfoRow({ label, value, className }: { label: string; value: string | React.ReactNode | null | undefined; className?: string }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-sm font-medium">{value ?? "—"}</span>
+    <div className={`flex items-start py-2 border-b border-muted/30 last:border-0 ${className}`}>
+      <span className="text-sm text-muted-foreground w-1/3 min-w-30 pt-0.5">{label}</span>
+      <div className="text-sm font-medium flex-1">{value ?? "—"}</div>
     </div>
   );
 }
@@ -131,93 +132,159 @@ export default function CustomerDetailPage() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6 pt-6">
-          {/* Identity card */}
-          <Card>
-            <CardHeader className="flex-row items-center gap-2">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <CardTitle className="text-base">Identity</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-              <InfoRow label="NID" value={customer.nid} />
-              <InfoRow label="Lead Channel" value={customer.lead_channel} />
-              <InfoRow label="Referred" value={customer.is_referred ? "Yes" : "No"} />
-              {customer.is_referred && (
-                <InfoRow label="Referred By" value={customer.referred_by} />
-              )}
-              <InfoRow label="Assigned" value={customer.is_assigned ? "Yes" : "No"} />
-            </CardContent>
-          </Card>
-
-          {/* Personal details */}
-          {customer.detail && (
+          {/* Identity & Personal Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
-              <CardHeader className="flex-row items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                <CardTitle className="text-base">Personal Details</CardTitle>
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-base">Información del Socio</CardTitle>
+                </div>
               </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                <InfoRow label="First Name" value={customer.detail.first_name} />
-                <InfoRow label="Last Name" value={customer.detail.last_name} />
-                <InfoRow label="Email" value={customer.detail.email} />
-                <InfoRow label="Birthday" value={customer.detail.birthday} />
-                <InfoRow
-                  label="Gender"
+              <CardContent className="space-y-0">
+                <InfoRow label="Nombre" value={`${customer.detail?.first_name ?? ""} ${customer.detail?.last_name ?? ""}`} />
+                <InfoRow label="Cédula" value={customer.nid} />
+                <InfoRow label="Fecha de Nacimiento" value={customer.detail?.birthday} />
+                <InfoRow 
+                  label="Celular" 
+                  value={customer.phones.find(p => p.type === "mobile")?.number} 
+                />
+                <InfoRow 
+                  label="Teléfono Casa" 
+                  value={customer.phones.find(p => p.type === "home")?.number} 
+                />
+                <InfoRow label="Email" value={customer.detail?.email} />
+                <InfoRow label="Estado Civil" value={customer.detail?.marital_status} className="capitalize" />
+                <InfoRow label="Nacionalidad" value={customer.detail?.nationality} />
+                <InfoRow 
+                  label="Género"
                   value={
-                    customer.detail.gender === "M"
-                      ? "Male"
-                      : customer.detail.gender === "F"
-                      ? "Female"
-                      : customer.detail.gender === "O"
-                      ? "Other"
+                    customer.detail?.gender === "M"
+                      ? "Masculino"
+                      : customer.detail?.gender === "F"
+                      ? "Femenino"
+                      : customer.detail?.gender === "O"
+                      ? "Otro"
                       : null
                   }
                 />
-                <InfoRow label="Marital Status" value={customer.detail.marital_status} />
+                <InfoRow label="Educación" value={customer.detail?.education_level} />
               </CardContent>
             </Card>
-          )}
 
-          {/* Phones */}
-          {customer.phones.length > 0 && (
             <Card>
-              <CardHeader className="flex-row items-center gap-2">
-                <Phone className="h-4 w-4 text-muted-foreground" />
-                <CardTitle className="text-base">Phone Numbers</CardTitle>
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-base">Vivienda y Ubicación</CardTitle>
+                </div>
               </CardHeader>
-              <CardContent className="space-y-2">
-                {customer.phones.map((phone) => (
-                  <div key={phone.id} className="flex items-center gap-3">
-                    <span className="font-mono text-sm">{phone.number}</span>
-                    <span className="capitalize text-xs text-muted-foreground">({phone.type})</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Addresses */}
-          {customer.addresses.length > 0 && (
-            <Card>
-              <CardHeader className="flex-row items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <CardTitle className="text-base">Addresses</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {customer.addresses.map((addr, i) => (
-                  <div key={addr.id}>
-                    {i > 0 && <Separator className="mb-4" />}
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                      <InfoRow label="Street" value={addr.street} />
-                      <InfoRow label="City" value={addr.city} />
-                      <InfoRow label="Province" value={addr.province} />
-                      <InfoRow label="Postal Code" value={addr.postal_code} />
-                      <InfoRow label="Country" value={addr.country} />
+              <CardContent className="space-y-0">
+                <InfoRow 
+                  label="Dirección" 
+                  value={customer.addresses[0] ? (
+                    <div>
+                      {customer.addresses[0].street}
+                      <br />
+                      {customer.addresses[0].city}, {customer.addresses[0].province}
                     </div>
-                  </div>
-                ))}
+                  ) : null} 
+                />
+                <InfoRow label="Tipo de vivienda" value={customer.detail?.housing_type} />
+                <InfoRow label="Posesión" value={customer.detail?.housing_possession_type} />
+                <InfoRow label="Reside desde" value={customer.detail?.move_in_date} />
+                <InfoRow label="Medio de transporte" value={customer.detail?.mode_of_transport} />
+                
+                <Separator className="my-4" />
+                
+                <InfoRow label="Canal de Captación" value={customer.lead_channel} />
+                <InfoRow label="Referido" value={customer.is_referred ? "Sí" : "No"} />
+                {customer.is_referred && (
+                  <InfoRow label="Referido Por" value={customer.referred_by} />
+                )}
               </CardContent>
             </Card>
-          )}
+          </div>
+
+          {/* Laboral Info */}
+          <Card>
+            <CardHeader className="pb-3 text-right">
+              <div className="flex items-center gap-2 justify-end">
+                <CardTitle className="text-base">Información Laboral</CardTitle>
+                <Briefcase className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-0">
+              <InfoRow label="Trabajador Independiente" value={customer.job_info?.is_self_employed ? "Sí" : "No"} />
+              <InfoRow label="Empresa" value={customer.company?.name} />
+              <InfoRow 
+                label="Dirección Empresa" 
+                value={customer.company?.department || customer.company?.branch ? `${customer.company.department ?? ""} ${customer.company.branch ?? ""}` : null} 
+              />
+              <InfoRow label="Teléfono" value={customer.company?.email} /> {/* Note: Backend Company model has email but maybe no phone? Using email as placeholder if so, or check if phones relationship applies to company */}
+              <InfoRow label="Cargo" value={customer.job_info?.role} />
+              <InfoRow label="Fecha de Ingreso" value={customer.job_info?.start_date} />
+              <InfoRow label="Salario" value={customer.job_info?.salary ? `RD$ ${customer.job_info.salary.toLocaleString()}` : null} />
+              <InfoRow label="Tipo de Pago" value={customer.job_info?.payment_type} />
+              <InfoRow label="Frecuencia de Pago" value={customer.job_info?.payment_frequency} />
+              <InfoRow label="Banco Nomina" value={customer.job_info?.payment_bank} />
+              <InfoRow label="Otros Ingresos" value={customer.job_info?.other_incomes} />
+              <InfoRow label="Fuente Otros Ingresos" value={customer.job_info?.other_incomes_source} />
+              <InfoRow label="Horario" value={customer.job_info?.schedule} />
+              <InfoRow label="Supervisor" value={customer.job_info?.supervisor_name} />
+            </CardContent>
+          </Card>
+
+          {/* References & Vehicle */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader className="pb-3 text-right">
+                <div className="flex items-center gap-2 justify-end">
+                  <CardTitle className="text-base">Referencias</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {customer.references && customer.references.length > 0 ? (
+                  customer.references.map((ref, index) => (
+                    <div key={ref.id} className="space-y-0">
+                      <div className="text-sm font-semibold text-muted-foreground mb-2">Referencia {index + 1}</div>
+                      <InfoRow label="Nombre" value={ref.name} />
+                      <InfoRow label="Ocupación" value={ref.occupation} />
+                      <InfoRow label="Relación" value={ref.relationship} />
+                      <InfoRow label="Teléfono" value={ref.nid ? "Consultar NID" : null} /> {/* Placeholder for phone logic */}
+                      <InfoRow label="Tipo" value={ref.type} />
+                      {index < customer.references.length - 1 && <Separator className="my-4" />}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground italic py-4">No hay referencias registradas.</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3 text-right">
+                <div className="flex items-center gap-2 justify-end">
+                  <CardTitle className="text-base">Información de Vehículo</CardTitle>
+                  <Briefcase className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-0">
+                <InfoRow label="Tipo" value={customer.vehicle?.vehicle_type} />
+                <InfoRow label="Marca" value={customer.vehicle?.vehicle_brand} />
+                <InfoRow label="Modelo" value={customer.vehicle?.vehicle_model} />
+                <InfoRow label="Año" value={customer.vehicle?.vehicle_year} />
+                <InfoRow label="Color" value={customer.vehicle?.vehicle_color} />
+                <InfoRow label="Placa" value={customer.vehicle?.vehicle_plate_number} />
+                <InfoRow label="Estado" value={
+                  customer.vehicle?.is_owned ? "Propio" : 
+                  customer.vehicle?.is_financed ? "Financiado" : 
+                  customer.vehicle?.is_leased ? "Leasing" : null
+                } />
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Metadata */}
           <Card>

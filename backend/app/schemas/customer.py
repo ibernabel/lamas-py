@@ -317,6 +317,29 @@ class CustomerDetailRead(BaseModel):
     birthday: date | None = None
     gender: str | None = None
     marital_status: str | None = None
+    education_level: str | None = None
+    nationality: str | None = None
+    housing_type: str | None = None
+    housing_possession_type: str | None = None
+    move_in_date: date | None = None
+    mode_of_transport: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CustomerReferenceRead(BaseModel):
+    """Customer reference response schema."""
+
+    id: int
+    name: str
+    nid: str | None = None
+    email: str | None = None
+    relationship: str
+    reference_since: date | None = None
+    occupation: str | None = None
+    is_who_referred: bool = False
+    type: str | None = None
+    address: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -377,6 +400,8 @@ class CustomerReadSchema(BaseModel):
     financial_info: CustomerFinancialInfoCreate | None = None
     job_info: CustomerJobInfoCreate | None = None
     company: CompanyRead | None = None
+    references: list[CustomerReferenceRead] = []
+    vehicle: CustomerVehicleCreate | None = None
 
     created_at: datetime | None = None
     updated_at: datetime | None = None

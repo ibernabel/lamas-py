@@ -403,7 +403,9 @@ async def get_customer_with_relations(
         financial_info=customer.financial_info,
         job_info=customer.job_info,
         company=customer.company,
-        accounts=customer.accounts
+        accounts=customer.accounts,
+        references=customer.references,
+        vehicle=customer.vehicle
     )
 
 

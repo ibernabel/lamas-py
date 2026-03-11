@@ -74,9 +74,9 @@ export default function EditCustomerPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Edit Customer</CardTitle>
+          <CardTitle>Editar Cliente</CardTitle>
           <CardDescription>
-            Updating profile for <strong>{fullName}</strong> — {customer.nid}
+            Actualizando perfil de <strong>{fullName}</strong> — {customer.nid}
           </CardDescription>
         </CardHeader>
         <CardContent>
