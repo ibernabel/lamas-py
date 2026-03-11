@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
     API_V1_PREFIX: str = "/api/v1"
     DEBUG: bool = False
+    LOG_FILE: str = "app.log"
+    LOG_LEVEL: str = "INFO"
 
     # Database
     DATABASE_URL: str = "postgresql://lamas:lamas@localhost:5432/lamas"

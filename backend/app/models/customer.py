@@ -4,12 +4,14 @@ Customer and related models using SQLModel.
 from datetime import date, datetime
 from typing import TYPE_CHECKING
 
+from pydantic import ConfigDict
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from app.models.loan_application import LoanApplication
     from app.models.portfolio import Portfolio, Promoter
     from app.models.phone import Phone
+    from app.models.address import Address, Addressable
     from app.models.document import CustomerDocument
 
 
@@ -17,6 +19,8 @@ class Customer(SQLModel, table=True):
     """Customer database model."""
 
     __tablename__ = "customers"
+
+    model_config = ConfigDict(extra="allow")
 
     id: int | None = Field(default=None, primary_key=True)
     nid: str = Field(unique=True, index=True, max_length=11,

@@ -298,8 +298,9 @@ class AddressRead(BaseModel):
     id: int
     street: str
     city: str
-    province: str
-    postal_code: str | None = None
+    province: str = Field(validation_alias="state")
+    postal_code: str | None = Field(
+        default=None, validation_alias="postal_code")
     country: str
 
     model_config = ConfigDict(from_attributes=True)
@@ -312,6 +313,7 @@ class CustomerDetailRead(BaseModel):
     first_name: str
     last_name: str
     email: str | None = None
+    nickname: str | None = None
     birthday: date | None = None
     gender: str | None = None
     marital_status: str | None = None

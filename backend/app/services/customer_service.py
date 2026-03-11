@@ -84,7 +84,7 @@ async def validate_nid(session: Session, nid: str) -> NIDValidationResponse:
 async def create_customer_with_nested_data(
     session: Session,
     customer_data: CustomerCreateSchema
-) -> Customer:
+) -> CustomerReadSchema:
     """
     Create a customer with all nested data (FULL version).
 
@@ -223,9 +223,7 @@ async def create_customer_with_nested_data(
             session.add(addressable)
 
         session.commit()
-        session.refresh(customer)
-
-        return customer
+        return await get_customer_with_relations(session, customer.id)
 
     except Exception as e:
         session.rollback()
@@ -238,7 +236,7 @@ async def create_customer_with_nested_data(
 async def create_customer_simple(
     session: Session,
     customer_data: CustomerSimpleCreateSchema
-) -> Customer:
+) -> CustomerReadSchema:
     """
     Create a customer with minimal data (SIMPLE version).
 
@@ -333,9 +331,7 @@ async def create_customer_simple(
             session.add(addressable)
 
         session.commit()
-        session.refresh(customer)
-
-        return customer
+        return await get_customer_with_relations(session, customer.id)
 
     except Exception as e:
         session.rollback()
@@ -345,29 +341,19 @@ async def create_customer_simple(
         )
 
 
-async def get_customer_with_relations(
+async def get_customer_model_with_relations(
     session: Session,
     customer_id: int
 ) -> Customer | None:
     """
-    Get customer by ID with all relationships eagerly loaded.
-
-    Args:
-        session: Database session
-        customer_id: Customer ID to fetch
-
-    Returns:
-        Customer instance with relationships or None if not found
-
-    Note:
-        Uses eager loading to avoid N+1 query problems.
+    Get customer model by ID with all relationships eagerly loaded.
+    INTERNAL USE ONLY (returns SQLModel instance).
     """
     statement = select(Customer).where(Customer.id == customer_id)
     customer = session.exec(statement).first()
 
     if customer:
-        # Manually load relationships
-        # (SQLModel/SQLAlchemy will lazy load when accessed)
+        # Load relationships (SQLAlchemy lazy load)
         _ = customer.detail
         _ = customer.financial_info
         _ = customer.job_info
@@ -375,15 +361,57 @@ async def get_customer_with_relations(
         _ = customer.vehicle
         _ = customer.company
         _ = customer.accounts
+        return customer
 
-    return customer
+    return None
+
+
+async def get_customer_with_relations(
+    session: Session,
+    customer_id: int
+) -> CustomerReadSchema | None:
+    """
+    Get customer by ID with all relationships eagerly loaded for API response.
+    """
+    customer = await get_customer_model_with_relations(session, customer_id)
+
+    if not customer:
+        return None
+
+    # Manually load polymorphic phones
+    phones_stmt = select(Phone).where(
+        Phone.phoneable_type == "Customer",
+        Phone.phoneable_id == customer.id
+    )
+    phones = session.exec(phones_stmt).all()
+
+    # Manually load polymorphic addresses (via pivot)
+    addresses_stmt = select(Address).join(
+        Addressable, Address.id == Addressable.address_id
+    ).where(
+        Addressable.addressable_type == "Customer",
+        Addressable.addressable_id == customer.id
+    )
+    addresses = session.exec(addresses_stmt).all()
+
+    # Return as schema to avoid issues with extra attribute assignment on SQLModel
+    return CustomerReadSchema(
+        **customer.model_dump(),
+        detail=customer.detail,
+        phones=phones,
+        addresses=addresses,
+        financial_info=customer.financial_info,
+        job_info=customer.job_info,
+        company=customer.company,
+        accounts=customer.accounts
+    )
 
 
 async def update_customer(
     session: Session,
     customer_id: int,
     customer_data: CustomerUpdateSchema
-) -> Customer | None:
+) -> CustomerReadSchema | None:
     """
     Update customer with partial data support.
 
@@ -402,7 +430,7 @@ async def update_customer(
         Only provided fields will be updated.
         Nested entities will be updated/replaced if provided.
     """
-    customer = await get_customer_with_relations(session, customer_id)
+    customer = await get_customer_model_with_relations(session, customer_id)
 
     if not customer:
         return None
@@ -444,12 +472,88 @@ async def update_customer(
                 )
                 session.add(job_info)
 
-        # TODO: Update phones, addresses, references (polymorphic handling)
+        # Update phones (replace all)
+        if customer_data.phones is not None:
+            # Delete existing phones
+            existing_phones_stmt = select(Phone).where(
+                Phone.phoneable_type == "Customer",
+                Phone.phoneable_id == customer.id
+            )
+            existing_phones = session.exec(existing_phones_stmt).all()
+            for p in existing_phones:
+                session.delete(p)
+
+            # Add new phones
+            for phone_data in customer_data.phones:
+                new_phone = Phone(
+                    number=phone_data.number,
+                    type=phone_data.type,
+                    country_area=phone_data.country_area,
+                    extension=phone_data.extension,
+                    phoneable_type="Customer",
+                    phoneable_id=customer.id
+                )
+                session.add(new_phone)
+
+        # Update addresses (replace all)
+        if customer_data.addresses is not None:
+            # Delete existing addressable pivots and their addresses
+            existing_pivots_stmt = select(Addressable).where(
+                Addressable.addressable_type == "Customer",
+                Addressable.addressable_id == customer.id
+            )
+            existing_pivots = session.exec(existing_pivots_stmt).all()
+
+            for pivot in existing_pivots:
+                # Get the address to delete it too
+                addr = session.get(Address, pivot.address_id)
+                if addr:
+                    session.delete(addr)
+                session.delete(pivot)
+
+            # Add new addresses
+            for address_data in customer_data.addresses:
+                new_address = Address(
+                    street=address_data.street,
+                    street2=address_data.street2,
+                    city=address_data.city,
+                    state=address_data.state,
+                    type=address_data.type,
+                    postal_code=address_data.postal_code,
+                    country=address_data.country,
+                    references=address_data.references,
+                )
+                session.add(new_address)
+                session.flush()
+
+                new_pivot = Addressable(
+                    address_id=new_address.id,
+                    addressable_type="Customer",
+                    addressable_id=customer.id
+                )
+                session.add(new_pivot)
+
+        # Update references (replace all)
+        if customer_data.references is not None:
+            # Delete existing references
+            existing_refs_stmt = select(CustomerReference).where(
+                CustomerReference.customer_id == customer.id
+            )
+            existing_refs = session.exec(existing_refs_stmt).all()
+            for r in existing_refs:
+                session.delete(r)
+
+            # Add new references
+            for ref_data in customer_data.references:
+                new_ref = CustomerReference(
+                    customer_id=customer.id,
+                    **ref_data.model_dump()
+                )
+                session.add(new_ref)
 
         session.commit()
-        session.refresh(customer)
 
-        return customer
+        return await get_customer_with_relations(session, customer_id)
 
     except Exception as e:
         session.rollback()
@@ -599,7 +703,7 @@ async def assign_customer_to_portfolio(
                 detail=f"Promoter with ID {promoter_id} not found"
             )
 
-    customer = await get_customer_with_relations(session, customer_id)
+    customer = await get_customer_model_with_relations(session, customer_id)
 
     if not customer:
         return None
@@ -619,9 +723,8 @@ async def assign_customer_to_portfolio(
             customer.assigned_at = datetime.now(timezone.utc)
 
         session.commit()
-        session.refresh(customer)
 
-        return customer
+        return await get_customer_with_relations(session, customer_id)
 
     except Exception as e:
         session.rollback()

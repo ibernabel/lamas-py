@@ -340,3 +340,90 @@ def test_validate_nid_endpoint_invalid(client: TestClient):
     data = response.json()
     assert data["is_valid"] is False
     assert "must be exactly 11 digits" in data["message"]
+
+
+def test_update_customer_phones(client: TestClient, session: Session, auth_headers: dict):
+    """Test updating customer phone numbers."""
+    from app.models.phone import Phone
+
+    # 1. Create customer with one phone
+    customer = Customer(nid="66666666666")
+    session.add(customer)
+    session.flush()
+    detail = CustomerDetail(customer_id=customer.id,
+                            first_name="Phone", last_name="Test")
+    session.add(detail)
+    phone = Phone(number="1111111111", type="mobile",
+                  phoneable_type="Customer", phoneable_id=customer.id)
+    session.add(phone)
+    session.commit()
+
+    # 2. Update to a different phone
+    payload = {
+        "phones": [
+            {"number": "8098887777", "type": "work"}
+        ]
+    }
+    response = client.put(
+        f"/api/v1/customers/{customer.id}", json=payload, headers=auth_headers)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["phones"]) == 1
+    assert data["phones"][0]["number"] == "8098887777"
+    assert data["phones"][0]["type"] == "work"
+
+    # 3. Verify old phone is gone
+    existing_phones = session.exec(select(Phone).where(
+        Phone.phoneable_id == customer.id)).all()
+    assert len(existing_phones) == 1
+    assert existing_phones[0].number == "8098887777"
+
+
+def test_update_customer_addresses(client: TestClient, session: Session, auth_headers: dict):
+    """Test updating customer addresses."""
+    from app.models.address import Address, Addressable
+
+    # 1. Create customer with one address
+    customer = Customer(nid="77777777777")
+    session.add(customer)
+    session.flush()
+    detail = CustomerDetail(customer_id=customer.id,
+                            first_name="Addr", last_name="Test")
+    session.add(detail)
+    addr = Address(street="Old Street", city="Old City", state="Old Province")
+    session.add(addr)
+    session.flush()
+    pivot = Addressable(
+        address_id=addr.id, addressable_type="Customer", addressable_id=customer.id)
+    session.add(pivot)
+    session.commit()
+
+    # 2. Update to a new address
+    payload = {
+        "addresses": [
+            {
+                "street": "New Avenue",
+                "city": "New City",
+                "province": "New Province"
+            }
+        ]
+    }
+    response = client.put(
+        f"/api/v1/customers/{customer.id}", json=payload, headers=auth_headers)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["addresses"]) == 1
+    assert data["addresses"][0]["street"] == "New Avenue"
+    assert data["addresses"][0]["province"] == "New Province"
+
+    # 3. Verify old address and pivot are gone
+    pivots = session.exec(select(Addressable).where(
+        Addressable.addressable_id == customer.id)).all()
+    assert len(pivots) == 1
+
+    # Verify the old address record was also deleted
+    old_addr = session.exec(select(Address).where(
+        Address.street == "Old Street")).first()
+    assert old_addr is None
