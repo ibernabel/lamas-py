@@ -38,6 +38,7 @@ export default function LoanDetailPage() {
   const { data: customer, isLoading: isCustomerLoading } = useCustomer(loan?.customer_id ?? 0);
   const [noteOpen, setNoteOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
+  const [notesExpanded, setNotesExpanded] = useState(false);
 
   if (isLoading) {
     return (
@@ -175,19 +176,39 @@ export default function LoanDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-6 relative pl-8 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:bg-linear-to-b before:from-indigo-500 before:to-purple-500">
-                  {loan.notes.map((note) => (
-                    <div key={note.id} className="relative pl-12">
-                      <div className="absolute left-0 top-1 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 border-4 border-white shadow-sm ring-1 ring-slate-300">
-                        <MessageSquare className="h-4 w-4 text-slate-500" />
-                      </div>
-                      <div className="bg-slate-50 p-4 rounded-lg border dark:bg-slate-900/50">
-                        <p className="text-sm mb-1">{note.note}</p>
-                        <p className="text-[10px] text-muted-foreground">
-                          {new Date(note.created_at!).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                  {(() => {
+                    const sortedNotes = [...loan.notes].sort((a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime());
+                    const visibleNotes = notesExpanded ? sortedNotes : sortedNotes.slice(0, 5);
+                    return (
+                      <>
+                        {visibleNotes.map((note) => (
+                          <div key={note.id} className="relative pl-12">
+                            <div className="absolute left-0 top-1 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 border-4 border-white shadow-sm ring-1 ring-slate-300">
+                              <MessageSquare className="h-4 w-4 text-slate-500" />
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg border dark:bg-slate-900/50">
+                              <p className="text-sm mb-1">{note.note}</p>
+                              <p className="text-[10px] text-muted-foreground">
+                                {new Date(note.created_at!).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                        {sortedNotes.length > 5 && (
+                          <div className="relative pl-12 pt-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => setNotesExpanded(!notesExpanded)}
+                              className="w-full text-muted-foreground text-xs hover:bg-slate-100"
+                            >
+                              {notesExpanded ? "Ver menos" : `Ver más (${sortedNotes.length - 5})`}
+                            </Button>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               )}
             </CardContent>
