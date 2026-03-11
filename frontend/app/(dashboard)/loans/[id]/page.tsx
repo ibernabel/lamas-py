@@ -11,6 +11,10 @@ import {
   MessageSquare,
   History,
   Plus,
+  User,
+  Phone,
+  Mail,
+  Briefcase,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -23,6 +27,7 @@ import { StatusTransitionDialog } from "@/components/loans/StatusTransitionDialo
 import { EvaluateLoanButton } from "@/components/loans/EvaluateLoanButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DocumentsSection } from "@/components/documents/DocumentsSection";
+import { useCustomer } from "@/hooks/use-customers";
 
 export default function LoanDetailPage() {
   const { id } = useParams();
@@ -30,6 +35,7 @@ export default function LoanDetailPage() {
 
 
   const { data: loan, isLoading } = useLoanApplication(loanId);
+  const { data: customer, isLoading: isCustomerLoading } = useCustomer(loan?.customer_id ?? 0);
   const [noteOpen, setNoteOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
 
@@ -214,15 +220,81 @@ export default function LoanDetailPage() {
               <CardTitle className="text-md">Customer Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-sm">
-                <p className="text-muted-foreground font-medium mb-1">ID</p>
-                <p className="font-mono">#{loan.customer_id}</p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                    <User className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] text-muted-foreground uppercase font-medium">Full Name</p>
+                    <div className="text-sm font-semibold whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]">
+                      {isCustomerLoading ? (
+                        <Skeleton className="h-4 w-24" />
+                      ) : (
+                        `${customer?.detail?.first_name ?? "Unknown"} ${customer?.detail?.last_name ?? ""}`
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                    <Phone className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] text-muted-foreground uppercase font-medium">Phone</p>
+                    <div className="text-sm">
+                      {isCustomerLoading ? (
+                        <Skeleton className="h-4 w-20" />
+                      ) : (
+                        customer?.phones?.[0]?.number || "—"
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                    <Mail className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] text-muted-foreground uppercase font-medium">Email</p>
+                    <div className="text-sm truncate max-w-[180px]">
+                      {isCustomerLoading ? (
+                        <Skeleton className="h-4 w-32" />
+                      ) : (
+                        customer?.detail?.email || "—"
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                    <Briefcase className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] text-muted-foreground uppercase font-medium">Employment</p>
+                    <div className="text-sm font-medium">
+                      {isCustomerLoading ? (
+                        <Skeleton className="h-4 w-28" />
+                      ) : (
+                        customer?.job_info?.role 
+                          ? `${customer.job_info.role}${customer.company?.name ? ` at ${customer.company.name}` : ""}`
+                          : customer?.company?.name || "—"
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <Button asChild variant="outline" className="w-full">
-                <Link href={`/customers/${loan.customer_id}`}>
-                  View Full Profile
-                </Link>
-              </Button>
+
+              <div className="pt-2">
+                <Button asChild variant="outline" className="w-full h-9 text-xs">
+                  <Link href={`/customers/${loan.customer_id}`}>
+                    View Full Profile
+                  </Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
 

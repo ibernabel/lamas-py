@@ -197,7 +197,8 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 - [x] **Step 6.4**: UI Components (LoanTable, LoanForm, Dialogs)
 - [x] **Step 6.5**: Route pages (list, new, detail)
 - [x] **Step 6.6**: Customer Summary Integration (Async Loan DataTable)
-- [x] **Step 6.7**: Documentation update
+- [x] **Step 6.7**: Enrich Loan Detail Customer Card (Full info & Employment)
+- [x] **Step 6.8**: Documentation update
 
 ---
 

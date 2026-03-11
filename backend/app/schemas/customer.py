@@ -319,6 +319,21 @@ class CustomerDetailRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class CompanyRead(BaseModel):
+    """Employer company response schema."""
+
+    id: int
+    name: str | None = None
+    email: str | None = None
+    type: str | None = None
+    website: str | None = None
+    rnc: str | None = None
+    department: str | None = Field(None, alias="province")
+    branch: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class CustomerListItem(BaseModel):
     """Customer list item schema for pagination responses."""
 
@@ -359,6 +374,7 @@ class CustomerReadSchema(BaseModel):
     addresses: list[AddressRead] = []
     financial_info: CustomerFinancialInfoCreate | None = None
     job_info: CustomerJobInfoCreate | None = None
+    company: CompanyRead | None = None
 
     created_at: datetime | None = None
     updated_at: datetime | None = None
