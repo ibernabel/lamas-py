@@ -40,7 +40,42 @@ from app.services.loan_application_service import (
 )
 from app.services.creditgraph_service import trigger_analysis
 
+from app.services.loan_submission_service import LoanSubmissionService
+
 router = APIRouter()
+
+
+@router.post(
+    "/submit",
+    status_code=status.HTTP_201_CREATED,
+)
+async def submit_public_loan_application_endpoint(
+    payload: dict,
+    session: DatabaseSession,
+):
+    """
+    Public endpoint for loan application submission. No auth required.
+
+    Validates strict Law 172-13 legal consent (privacy_consent_accepted & bureau_authorization_accepted).
+    """
+    legal = payload.get("legal_consent", {})
+    if not legal.get("privacy_consent_accepted") or not legal.get("bureau_authorization_accepted"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Privacy consent and bureau authorization are required under Law 172-13.",
+        )
+
+    service = LoanSubmissionService(session)
+    result = service.submit_loan(payload)
+
+    return {
+        "status": "success",
+        "message": "Loan application submitted successfully",
+        "loan_application_id": result["loan_application"].id,
+        "customer_id": result["customer"].id,
+        "core_task_id": result["core_task"].id,
+    }
+
 
 
 @router.post(

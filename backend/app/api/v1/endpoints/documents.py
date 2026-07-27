@@ -20,7 +20,7 @@ async def upload_customer_document(
     session: DatabaseSession,
     customer_id: int,
     document_type: str = Query(
-        ..., description="nid | labor_letter | bank_statement | credit_report"),
+        ..., description="nid | guarantor_nid | labor_letter | pay_stub | bank_statement | credit_report | tax_declaration | business_financial_statement | vehicle_registration | property_title | collateral_appraisal | bureau_authorization | chat_transcript | utility_bill | other_support"),
     bank_name: Optional[str] = Query(
         None, description="Only for bank_statement"),
     file: UploadFile = File(...),
@@ -87,7 +87,7 @@ async def upload_loan_document(
     session: DatabaseSession,
     loan_id: int,
     document_type: str = Query(...,
-                               description="bank_statement | credit_report"),
+                               description="nid | guarantor_nid | labor_letter | pay_stub | bank_statement | credit_report | tax_declaration | business_financial_statement | vehicle_registration | property_title | collateral_appraisal | bureau_authorization | chat_transcript | utility_bill | other_support"),
     bank_name: Optional[str] = Query(
         None, description="Only for bank_statement"),
     file: UploadFile = File(...),

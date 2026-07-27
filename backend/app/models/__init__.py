@@ -24,6 +24,13 @@ from app.models.address import Address, Addressable
 from app.models.portfolio import Portfolio, Broker, Promoter
 from app.models.credit_risk import CreditRisk, CreditRiskCategory
 from app.models.document import CustomerDocument
+from app.models.system_integration_map import SystemIntegrationMap
+from app.models.cooperative_profile import CooperativeProfile
+from app.models.legal_consent import LegalConsent
+from app.models.customer_shadow_risk import CustomerShadowRisk, ShadowRiskLevel
+from app.models.conversational_log import ConversationalLog
+from app.models.core_task_queue import CoreTaskQueue, TaskType, TaskStatus
+from app.models.system_config import SystemConfig
 
 __all__ = [
     "User",
@@ -51,4 +58,14 @@ __all__ = [
     "CreditRisk",
     "CreditRiskCategory",
     "CustomerDocument",
+    "SystemIntegrationMap",
+    "CooperativeProfile",
+    "LegalConsent",
+    "CustomerShadowRisk",
+    "ShadowRiskLevel",
+    "ConversationalLog",
+    "CoreTaskQueue",
+    "TaskType",
+    "TaskStatus",
+    "SystemConfig",
 ]

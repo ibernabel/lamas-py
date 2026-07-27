@@ -16,6 +16,23 @@ class CustomerDocument(SQLModel, table=True):
     """
     Customer document database model.
     Supports versioning via uploaded_at and is_latest.
+    
+    Document Types supported:
+    - nid: Cédula de Identidad del solicitante
+    - guarantor_nid: Cédula de Identidad del garante/codeudor/cónyuge
+    - labor_letter: Carta de trabajo
+    - pay_stub: Volante de pago de nómina
+    - bank_statement: Estado de cuenta bancario (requiere bank_name)
+    - credit_report: Reporte de buró de crédito
+    - tax_declaration: Declaración de impuestos IR-1 / IR-2
+    - business_financial_statement: Estados financieros de negocio
+    - vehicle_registration: Matrícula / Título de vehículo
+    - property_title: Título de propiedad inmobiliaria
+    - collateral_appraisal: Tasación pericial de garantía
+    - bureau_authorization: Autorización firmada de buró de crédito (Ley 172-13)
+    - chat_transcript: Transcripción / Exportación de chat de WhatsApp
+    - utility_bill: Comprobante de servicio residencial
+    - other_support: Comprobante o documento de soporte adicional
     """
     __tablename__ = "customer_documents"
 
@@ -24,10 +41,10 @@ class CustomerDocument(SQLModel, table=True):
     loan_application_id: int | None = Field(
         default=None, foreign_key="loan_applications.id", index=True)
 
-    # Document Type: nid, labor_letter, bank_statement, credit_report
+    # Document Type
     document_type: str = Field(max_length=50, index=True)
 
-    # Bank name for bank statements (bhd, popular, banreservas)
+    # Bank name for bank statements (bhd, popular, banreservas, etc.)
     bank_name: Optional[str] = Field(default=None, max_length=50)
 
     # File details

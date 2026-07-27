@@ -54,10 +54,21 @@ export function DocumentList({ documents, onDeleteSuccess }: DocumentListProps) 
 
   const getDocTypeName = (type: string) => {
     const types: Record<string, string> = {
-      nid: "Cédula (NID)",
+      nid: "Cédula de Identidad (Solicitante)",
+      guarantor_nid: "Cédula (Garante / Codeudor)",
       labor_letter: "Carta de Trabajo",
-      bank_statement: "Estado de Cuenta",
-      credit_report: "Reporte de Crédito",
+      pay_stub: "Volante de Pago (Nómina)",
+      bank_statement: "Estado de Cuenta Bancario",
+      credit_report: "Reporte de Buró de Crédito",
+      tax_declaration: "Declaración Impuestos (IR-1 / IR-2)",
+      business_financial_statement: "Estados Financieros de Negocio",
+      vehicle_registration: "Matrícula / Título Vehículo",
+      property_title: "Título de Propiedad Inmobiliaria",
+      collateral_appraisal: "Tasación Pericial de Garantía",
+      bureau_authorization: "Autorización Buró (Ley 172-13)",
+      chat_transcript: "Transcripción de Chat (WhatsApp)",
+      utility_bill: "Comprobante de Servicio Residencial",
+      other_support: "Comprobante / Soporte Adicional",
     };
     return types[type] || type;
   };

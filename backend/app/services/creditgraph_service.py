@@ -86,6 +86,13 @@ def trigger_analysis(
         (datetime.utcnow() - start_time).total_seconds() * 1000)
 
     # 5. Store/Update results
+    shadow_score = result_json.get("shadow_risk_score")
+    shadow_details = result_json.get("shadow_risk_details")
+    collection_route = result_json.get("collection_route")
+    pii_sanitized = result_json.get("pii_sanitized", True)
+    narrative_es = result_json.get("narrative_es") or result_json.get("narrative")
+    narrative_en = result_json.get("narrative_en")
+
     if existing:
         analysis = existing
         analysis.case_id = result_json["case_id"]
@@ -93,6 +100,12 @@ def trigger_analysis(
         analysis.irs_score = result_json["irs_score"]
         analysis.confidence = result_json["confidence"]
         analysis.risk_level = result_json["risk_level"]
+        analysis.shadow_risk_score = shadow_score
+        analysis.shadow_risk_details = shadow_details
+        analysis.collection_route = collection_route
+        analysis.pii_sanitized = pii_sanitized
+        analysis.narrative_es = narrative_es
+        analysis.narrative_en = narrative_en
         analysis.suggested_amount = result_json.get("suggested_amount")
         analysis.suggested_term = result_json.get("suggested_term")
         analysis.full_response = result_json
@@ -106,6 +119,12 @@ def trigger_analysis(
             irs_score=result_json["irs_score"],
             confidence=result_json["confidence"],
             risk_level=result_json["risk_level"],
+            shadow_risk_score=shadow_score,
+            shadow_risk_details=shadow_details,
+            collection_route=collection_route,
+            pii_sanitized=pii_sanitized,
+            narrative_es=narrative_es,
+            narrative_en=narrative_en,
             suggested_amount=result_json.get("suggested_amount"),
             suggested_term=result_json.get("suggested_term"),
             full_response=result_json,

@@ -31,6 +31,14 @@ class CreditGraphAnalysis(SQLModel, table=True):
     suggested_amount: float | None = Field(default=None)
     suggested_term: int | None = Field(default=None)
 
+    # v2 GAP fields
+    shadow_risk_score: int | None = Field(default=None, index=True)
+    shadow_risk_details: dict | None = Field(sa_column=Column(JSON), default=None)
+    collection_route: dict | None = Field(sa_column=Column(JSON), default=None)
+    pii_sanitized: bool = Field(default=True)
+    narrative_es: str | None = Field(default=None)
+    narrative_en: str | None = Field(default=None)
+
     # Full response for dashboard and audit trail
     full_response: dict = Field(sa_column=Column(JSON), default={})
 

@@ -1,16 +1,17 @@
 """
 Initialize database schema and create a default admin user.
 """
-from app.models import *
 import sys
 import os
+
+# Add parent dir to path to import app
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from app.models import *
 from sqlmodel import Session, select, SQLModel
 from app.core.database import engine
 from app.core.security import get_password_hash
 from app.models.user import User
-
-# Add parent dir to path to import app
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import all models to ensure metadata is populated
 

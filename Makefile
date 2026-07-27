@@ -34,7 +34,7 @@ clean:
 
 seed:
 	@echo "🌱 Seeding database..."
-	cd backend && .venv/bin/python scripts/setup_db.py
-	cd backend && .venv/bin/python scripts/seed_customers.py
-	cd backend && .venv/bin/python scripts/seed_loans.py
+	cd backend && uv run python scripts/setup_db.py
+	cd backend && uv run python scripts/seed_customers.py
+	cd backend && uv run python scripts/seed_loans.py
 	@echo "✅ Seeding complete!"
