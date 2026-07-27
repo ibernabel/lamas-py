@@ -1,0 +1,173 @@
+"use client";
+
+import React from "react";
+import { useFormContext } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Briefcase } from "lucide-react";
+import { FullLoanApplicationFormValues } from "@/lib/validations/loan-application.schema";
+
+interface EmploymentStepProps {
+  onNext: () => void;
+  onBack: () => void;
+}
+
+export function EmploymentStep({ onNext, onBack }: EmploymentStepProps) {
+  const {
+    register,
+    formState: { errors },
+    trigger,
+  } = useFormContext<FullLoanApplicationFormValues>();
+
+  const handleContinue = async () => {
+    const isStepValid = await trigger([
+      "job.occupation_type",
+      "job.company_name",
+      "job.role",
+      "job.salary",
+      "job.payment_bank",
+      "job.employment_start_date",
+    ]);
+
+    if (isStepValid) {
+      onNext();
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+          <Briefcase className="h-6 w-6 text-primary" />
+          Paso 3: Información Laboral
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Suministre los detalles sobre su empleo actual o actividad económica.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        {/* Occupation Type & Cargo */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="occupation-type">Tipo de Ocupación</Label>
+            <select
+              id="occupation-type"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              {...register("job.occupation_type")}
+            >
+              <option value="">Seleccione...</option>
+              <option value="EMPLOYED">Empleado Privado / Público</option>
+              <option value="INDEPENDENT">Profesional Independiente</option>
+              <option value="BUSINESS_OWNER">Dueño de Empresa / Negocio</option>
+              <option value="OTHER">Otro</option>
+            </select>
+            {errors.job?.occupation_type && (
+              <p className="text-xs text-destructive">{errors.job.occupation_type.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="job-role">Cargo / Puesto de Trabajo</Label>
+            <Input
+              id="job-role"
+              placeholder="Analista Senior / Gerente"
+              {...register("job.role")}
+              className={errors.job?.role ? "border-destructive" : ""}
+            />
+            {errors.job?.role && (
+              <p className="text-xs text-destructive">{errors.job.role.message}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Company Name & RNC */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="company-name">Nombre de la Empresa u Organización</Label>
+            <Input
+              id="company-name"
+              placeholder="Banco BHD León / Claro RD"
+              {...register("job.company_name")}
+              className={errors.job?.company_name ? "border-destructive" : ""}
+            />
+            {errors.job?.company_name && (
+              <p className="text-xs text-destructive">{errors.job.company_name.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="company-rnc">RNC de la Empresa (Opcional)</Label>
+            <Input
+              id="company-rnc"
+              placeholder="1-01-01001-7"
+              {...register("job.company_rnc")}
+            />
+          </div>
+        </div>
+
+        {/* Salary & Payment Bank */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="job-salary">Salario Mensual Bruto (RD$)</Label>
+            <Input
+              id="job-salary"
+              type="number"
+              placeholder="55000"
+              {...register("job.salary", { valueAsNumber: true })}
+              className={errors.job?.salary ? "border-destructive" : ""}
+            />
+            {errors.job?.salary && (
+              <p className="text-xs text-destructive">{errors.job.salary.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="payment-bank">Banco donde recibe la Nómina</Label>
+            <select
+              id="payment-bank"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              {...register("job.payment_bank")}
+            >
+              <option value="">Seleccione...</option>
+              <option value="BANRESERVAS">Banreservas</option>
+              <option value="POPULAR">Banco Popular Dominicano</option>
+              <option value="BHD">Banco BHD</option>
+              <option value="SCOTIABANK">Scotiabank</option>
+              <option value="SANTA_CRUZ">Banco Santa Cruz</option>
+              <option value="PROMERICA">Banco Promerica</option>
+              <option value="OTHER">Otro Banco / Efectivo</option>
+            </select>
+            {errors.job?.payment_bank && (
+              <p className="text-xs text-destructive">{errors.job.payment_bank.message}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Start Date */}
+        <div className="space-y-2">
+          <Label htmlFor="employment-start-date">Fecha de Ingreso Laboral</Label>
+          <Input
+            id="employment-start-date"
+            type="date"
+            {...register("job.employment_start_date")}
+            className={errors.job?.employment_start_date ? "border-destructive" : ""}
+          />
+          {errors.job?.employment_start_date && (
+            <p className="text-xs text-destructive">{errors.job.employment_start_date.message}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="pt-4 flex items-center justify-between gap-3">
+        <Button type="button" variant="outline" onClick={onBack}>
+          &larr; Atrás
+        </Button>
+        <Button type="button" onClick={handleContinue}>
+          Continuar a Situación Financiera &rarr;
+        </Button>
+      </div>
+    </div>
+  );
+}

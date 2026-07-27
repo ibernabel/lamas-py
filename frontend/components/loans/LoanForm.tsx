@@ -35,7 +35,7 @@ export function LoanForm() {
   const createLoan = useCreateLoanApplication();
 
   const form = useForm<LoanApplicationCreateInput>({
-    resolver: zodResolver(loanApplicationCreateSchema),
+    resolver: zodResolver(loanApplicationCreateSchema) as any,
     defaultValues: {
       customer_id: undefined,
       detail: {

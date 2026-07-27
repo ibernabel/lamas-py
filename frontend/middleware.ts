@@ -24,6 +24,13 @@ export default auth((req: NextRequest & { auth: unknown }) => {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
+  // Allow public pages without authentication
+  const isPublicPage =
+    pathname.startsWith("/solicitar") ||
+    pathname.startsWith("/privacidad") ||
+    pathname.startsWith("/terminos");
+  if (isPublicPage) return NextResponse.next();
+
   // Redirect unauthenticated users to login
   if (!isLoggedIn && !isAuthPage) {
     const loginUrl = new URL("/login", req.url);
