@@ -2,7 +2,7 @@
 
 /**
  * Top header bar component.
- * Shows page title and user avatar dropdown with sign-out option.
+ * Shows page title, theme toggle, and user avatar dropdown with sign-out option.
  */
 import { signOut, useSession } from "next-auth/react";
 import { LogOut, User, Settings } from "lucide-react";
@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface HeaderProps {
   title?: string;
@@ -36,51 +37,55 @@ export function Header({ title = "Dashboard" }: HeaderProps) {
   const userEmail = session?.user?.email ?? "";
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border bg-background px-6">
+    <header className="flex h-16 items-center justify-between border-b border-border bg-background px-6 transition-colors">
       {/* Page title */}
       <h1 className="text-lg font-semibold text-foreground">{title}</h1>
 
-      {/* User menu */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-2 px-2"
-            id="user-menu-trigger"
-          >
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                {getInitials(userName)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="hidden text-left sm:block">
-              <p className="text-sm font-medium leading-none">{userName}</p>
-              <p className="text-xs text-muted-foreground">{userEmail}</p>
-            </div>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem disabled>
-            <User className="mr-2 h-4 w-4" />
-            Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled>
-            <Settings className="mr-2 h-4 w-4" />
-            Settings
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            id="sign-out-button"
-            className="text-destructive focus:text-destructive"
-            onClick={() => signOut({ callbackUrl: "/login" })}
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {/* Header controls & User menu */}
+      <div className="flex items-center gap-3">
+        <ThemeToggle />
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-2 px-2"
+              id="user-menu-trigger"
+            >
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+                  {getInitials(userName)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="hidden text-left sm:block">
+                <p className="text-sm font-medium leading-none">{userName}</p>
+                <p className="text-xs text-muted-foreground">{userEmail}</p>
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem disabled>
+              <User className="mr-2 h-4 w-4" />
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              id="sign-out-button"
+              className="text-destructive focus:text-destructive cursor-pointer"
+              onClick={() => signOut({ callbackUrl: "/login" })}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </header>
   );
 }

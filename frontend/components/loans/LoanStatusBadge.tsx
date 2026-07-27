@@ -13,31 +13,31 @@ const statusConfig: Record<
 > = {
   received: {
     label: "Received",
-    className: "bg-blue-100 text-blue-800 hover:bg-blue-100/80 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800",
+    className: "bg-[var(--secondary)] text-[var(--brand)] border-[var(--border)]",
   },
   verified: {
     label: "Verified",
-    className: "bg-indigo-100 text-indigo-800 hover:bg-indigo-100/80 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800",
+    className: "bg-[var(--secondary)] text-[var(--primary)] border-[var(--border)]",
   },
   assigned: {
     label: "Assigned",
-    className: "bg-purple-100 text-purple-800 hover:bg-purple-100/80 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800",
+    className: "bg-[var(--secondary)] text-indigo-500 border-[var(--border)]",
   },
   analyzed: {
     label: "Analyzed",
-    className: "bg-amber-100 text-amber-800 hover:bg-amber-100/80 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800",
+    className: "bg-[var(--warning-bg)] text-[var(--warning-fg)] border-[var(--warning-fg)]/20",
   },
   approved: {
     label: "Approved",
-    className: "bg-emerald-100 text-emerald-800 hover:bg-emerald-100/80 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800",
+    className: "bg-[var(--success-bg)] text-[var(--success-fg)] border-[var(--success-fg)]/20",
   },
   rejected: {
     label: "Rejected",
-    className: "bg-rose-100 text-rose-800 hover:bg-rose-100/80 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800",
+    className: "bg-[var(--danger-bg)] text-[var(--danger-fg)] border-[var(--danger-fg)]/20",
   },
   archived: {
     label: "Archived",
-    className: "bg-slate-100 text-slate-800 hover:bg-slate-100/80 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800",
+    className: "bg-[var(--secondary)] text-muted-foreground border-[var(--border)]",
   },
 };
 
@@ -47,7 +47,7 @@ export function LoanStatusBadge({ status, className }: LoanStatusBadgeProps) {
   return (
     <Badge
       variant="outline"
-      className={cn("font-medium transition-colors", config.className, className)}
+      className={cn("font-semibold transition-colors", config.className, className)}
     >
       {config.label}
     </Badge>

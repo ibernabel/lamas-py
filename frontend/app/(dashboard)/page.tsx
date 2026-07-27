@@ -1,7 +1,6 @@
 /**
  * Dashboard home page.
- * Displays a welcome card with quick stats placeholders.
- * Full data will be populated in Phases 5 & 6.
+ * Displays welcome banner and KPI cards with SoliPres shadcn/ui styling.
  */
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
@@ -20,28 +19,28 @@ const stats = [
     value: "—",
     description: "Registered customers",
     icon: Users,
-    color: "text-blue-500",
+    color: "text-primary",
   },
   {
     title: "Loan Applications",
     value: "—",
     description: "All time",
     icon: FileText,
-    color: "text-indigo-500",
+    color: "text-brand",
   },
   {
     title: "Approved",
     value: "—",
     description: "This month",
     icon: CheckCircle,
-    color: "text-green-500",
+    color: "text-[var(--success-fg)]",
   },
   {
     title: "Pending Review",
     value: "—",
     description: "Awaiting action",
     icon: Clock,
-    color: "text-amber-500",
+    color: "text-[var(--warning-fg)]",
   },
 ];
 
@@ -51,40 +50,42 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Welcome */}
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">
+      {/* Welcome Banner */}
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">
           Welcome back, {session.user?.name?.split(" ")[0] ?? "User"} 👋
         </h2>
-        <p className="text-muted-foreground">
-          Here&apos;s an overview of your loan management system.
+        <p className="text-muted-foreground mt-1">
+          Here&apos;s an overview of your SoluFime loan management system.
         </p>
       </div>
 
-      {/* Stats grid */}
+      {/* Stats grid with SoliPres KPI card styling */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+          <div key={stat.title} className="solipres-kpi-card">
+            <div className="flex flex-row items-center justify-between pb-2">
+              <span className="text-sm font-medium text-muted-foreground">
                 {stat.title}
-              </CardTitle>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <CardDescription className="text-xs">
+              </span>
+              <stat.icon className={`h-5 w-5 ${stat.color}`} />
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+              <p className="text-xs text-muted-foreground mt-1">
                 {stat.description}
-              </CardDescription>
-            </CardContent>
-          </Card>
+              </p>
+            </div>
+          </div>
         ))}
       </div>
 
-      {/* Placeholder for Phase 5 & 6 content */}
-      <Card>
+      {/* System Overview Card */}
+      <Card className="border-border bg-card shadow-sm">
         <CardHeader>
-          <CardTitle>Getting Started</CardTitle>
+          <CardTitle className="text-lg font-semibold text-foreground">
+            Getting Started
+          </CardTitle>
           <CardDescription>
             Navigate using the sidebar to manage customers and loan applications.
           </CardDescription>

@@ -1,12 +1,9 @@
 "use client";
 
 /**
- * Login page with email/password form.
+ * Login page with email/password form and SoliPres shadcn/ui styling.
  * Uses NextAuth.js v5 signIn with Credentials provider.
- *
- * LoginForm is extracted into a separate component so that
- * useSearchParams() can be wrapped in a Suspense boundary,
- * as required by Next.js App Router for static prerendering.
+ * Includes ThemeToggle for switching between light and dark modes.
  */
 import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
@@ -22,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2, LogIn } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 function LoginForm() {
   const router = useRouter();
@@ -59,9 +57,9 @@ function LoginForm() {
   };
 
   return (
-    <Card>
+    <Card className="border-border bg-card shadow-md">
       <CardHeader>
-        <CardTitle>Sign in</CardTitle>
+        <CardTitle className="text-xl font-bold">Sign in</CardTitle>
         <CardDescription>
           Enter your credentials to access the dashboard.
         </CardDescription>
@@ -81,6 +79,7 @@ function LoginForm() {
               required
               autoComplete="email"
               disabled={loading}
+              className="bg-card text-foreground border-border focus-visible:ring-primary"
             />
           </div>
 
@@ -100,13 +99,14 @@ function LoginForm() {
               required
               autoComplete="current-password"
               disabled={loading}
+              className="bg-card text-foreground border-border focus-visible:ring-primary"
             />
           </div>
 
           {error && (
             <div
               role="alert"
-              className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
+              className="rounded-md bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive border border-destructive/20"
             >
               {error}
             </div>
@@ -114,7 +114,7 @@ function LoginForm() {
 
           <Button
             type="submit"
-            className="w-full"
+            className="w-full bg-primary text-primary-foreground hover:bg-brand-hover shadow-sm"
             disabled={loading}
             id="login-submit-button"
           >
@@ -138,7 +138,7 @@ function LoginForm() {
 
 function LoginFormSkeleton() {
   return (
-    <Card>
+    <Card className="border-border bg-card">
       <CardHeader>
         <Skeleton className="h-6 w-24" />
         <Skeleton className="h-4 w-48" />
@@ -154,14 +154,19 @@ function LoginFormSkeleton() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-background p-4 transition-colors">
+      {/* Absolute Theme Toggle at top right */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
         <div className="flex flex-col items-center gap-2 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg">
-            <span className="text-xl font-bold text-primary-foreground">L</span>
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg">
+            <span className="text-xl font-bold">L</span>
           </div>
-          <h1 className="text-2xl font-bold">LAMaS</h1>
+          <h1 className="text-2xl font-bold text-foreground">LAMaS</h1>
           <p className="text-sm text-muted-foreground">
             Loan Applications Management System
           </p>
@@ -173,7 +178,7 @@ export default function LoginPage() {
         </Suspense>
 
         <p className="text-center text-xs text-muted-foreground">
-          LAMaS · Loan Applications Management System
+          LAMaS · SoluFime Loan Management System
         </p>
       </div>
     </div>

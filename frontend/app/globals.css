@@ -26,6 +26,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -38,6 +39,10 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -49,71 +54,117 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* SoliPres Light Palette (SoluFime Corporate Theme) */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  
+  --primary: #0284c7;
+  --primary-foreground: #ffffff;
+  
+  --brand: #0284c7;
+  --brand-hover: #0369a1;
+  
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  
+  --success: #16a34a;
+  --success-bg: #dcfce7;
+  --success-fg: #15803d;
+  
+  --warning: #d97706;
+  --warning-bg: #fef3c7;
+  --warning-fg: #b45309;
+  
+  --danger-bg: #fee2e2;
+  --danger-fg: #dc2626;
+  
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0284c7;
+  
+  --chart-1: #0284c7;
+  --chart-2: #0d9488;
+  --chart-3: #16a34a;
+  --chart-4: #d97706;
+  --chart-5: #6366f1;
+  
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #0284c7;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0284c7;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #0284c7;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* SoliPres Dark Palette (Deep Dark Theme) */
+  --background: #090d16;
+  --foreground: #f8fafc;
+  --card: #111827;
+  --card-foreground: #f8fafc;
+  --popover: #111827;
+  --popover-foreground: #f8fafc;
+  
+  --primary: #38bdf8;
+  --primary-foreground: #0f172a;
+  
+  --brand: #38bdf8;
+  --brand-hover: #0284c7;
+  
+  --secondary: #1f2937;
+  --secondary-foreground: #f8fafc;
+  
+  --muted: #1f2937;
+  --muted-foreground: #94a3b8;
+  
+  --accent: #1f2937;
+  --accent-foreground: #f8fafc;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #f8fafc;
+  
+  --success-bg: rgba(22, 163, 74, 0.15);
+  --success-fg: #4ade80;
+  
+  --warning-bg: rgba(217, 119, 6, 0.15);
+  --warning-fg: #fbbf24;
+  
+  --danger-bg: rgba(239, 68, 68, 0.15);
+  --danger-fg: #f87171;
+  
+  --border: #1f2937;
+  --input: #1f2937;
+  --ring: #38bdf8;
+  
+  --chart-1: #38bdf8;
+  --chart-2: #2dd4bf;
+  --chart-3: #4ade80;
+  --chart-4: #fbbf24;
+  --chart-5: #818cf8;
+  
+  --sidebar: #0f172a;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #38bdf8;
+  --sidebar-primary-foreground: #0f172a;
+  --sidebar-accent: #1f2937;
+  --sidebar-accent-foreground: #38bdf8;
+  --sidebar-border: #1f2937;
+  --sidebar-ring: #38bdf8;
 }
 
 @layer base {
@@ -121,6 +172,30 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-200;
+  }
+}
+
+/* Custom SoliPres Component Styles */
+@layer components {
+  .solipres-kpi-card {
+    @apply relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:shadow-md;
+  }
+  
+  .solipres-kpi-card::before {
+    content: "";
+    @apply absolute top-0 left-0 right-0 h-1 bg-primary transition-all duration-200;
+  }
+
+  .solipres-badge-success {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-[var(--success-bg)] text-[var(--success-fg)];
+  }
+
+  .solipres-badge-warning {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-[var(--warning-bg)] text-[var(--warning-fg)];
+  }
+
+  .solipres-badge-danger {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-[var(--danger-bg)] text-[var(--danger-fg)];
   }
 }
