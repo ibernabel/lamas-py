@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { APP_VERSION, APP_VERSION_SHORT } from "@/lib/version";
 
 const navItems = [
   {
@@ -58,7 +59,7 @@ export function Sidebar() {
           </div>
         </div>
         <span className="rounded bg-sidebar-accent px-1.5 py-0.5 text-[10px] font-semibold text-sidebar-primary">
-          v1.0
+          v{APP_VERSION_SHORT}
         </span>
       </div>
 
@@ -104,7 +105,7 @@ export function Sidebar() {
       {/* Footer info */}
       <div className="border-t border-sidebar-border p-3">
         <p className="px-3 text-xs text-muted-foreground">
-          SoluFime · LAMaS py v1.0
+          SoluFime · LAMaS py v{APP_VERSION}
         </p>
       </div>
     </aside>

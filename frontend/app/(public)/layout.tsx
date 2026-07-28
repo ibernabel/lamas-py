@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { APP_VERSION, APP_VERSION_SHORT } from "@/lib/version";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -25,12 +26,18 @@ export default function PublicLayout({
             L
           </div>
           <span>LAMaS</span>
+          <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+            v{APP_VERSION_SHORT}
+          </span>
         </div>
         <ThemeToggle />
       </header>
       <main className="w-full flex-1 flex flex-col items-center justify-center p-3 sm:p-6">
         {children}
       </main>
+      <footer className="border-t border-border py-3 text-center text-xs text-muted-foreground">
+        SoluFime · LAMaS py v{APP_VERSION}
+      </footer>
     </div>
   );
 }

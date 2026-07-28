@@ -20,6 +20,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2, LogIn } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { APP_VERSION } from "@/lib/version";
 
 function LoginForm() {
   const router = useRouter();
@@ -178,7 +179,7 @@ export default function LoginPage() {
         </Suspense>
 
         <p className="text-center text-xs text-muted-foreground">
-          LAMaS · SoluFime Loan Management System
+          LAMaS v{APP_VERSION} · SoluFime Loan Management System
         </p>
       </div>
     </div>
