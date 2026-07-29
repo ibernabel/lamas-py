@@ -7,7 +7,9 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 ### Planning
 
 - [Migration PRD](./planning/migration-prd.md) - Product Requirements Document
-- [Status Report (Feb 2026)](./status-report.md) - Current projects health and progress
+- [LAMaS Integration Requirements](./planning/lamas-integration-requirements.md) - CreditGraph & API Integration Requirements
+- [CreditGraph UI Technical Spec](./planning/creditgraph-ui-technical-spec.md) - Technical Specification & UI/UX Data Contract for CreditGraph AI
+- [Status Report (Jul 2026)](./status-report.md) - Current projects health and progress
 
 ### Implementation Phases
 
@@ -21,6 +23,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Phase 7/9: Document Management](./implementation/phase-7-document-management.md) - ✅ (Manual verification pending fixes)
 - [Phase 8: CreditGraph AI Integration](./implementation/phase-8-creditgraph.md) - ✅
 - [Version Bump & Frontend Sync](./implementation/2026-07-27-version-bump-and-frontend-sync.md) - ✅ (Version 1.0.0)
+- [Customer Detail Redesign & CreditGraph Spec](./implementation/2026-07-28-customer-detail-redesign-and-creditgraph-spec.md) - ✅ (2026-07-28)
 
 ### Testing
 

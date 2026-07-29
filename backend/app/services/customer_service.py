@@ -448,31 +448,60 @@ async def update_customer(
                 setattr(customer, field, value)
 
         # Update nested entities if provided
-        if customer_data.detail and customer.detail:
-            for field, value in customer_data.detail.model_dump().items():
-                setattr(customer.detail, field, value)
+        if customer_data.detail:
+            if customer.detail:
+                for field, value in customer_data.detail.model_dump(exclude_unset=True, exclude_none=True).items():
+                    setattr(customer.detail, field, value)
+            else:
+                detail = CustomerDetail(
+                    customer_id=customer.id,
+                    **customer_data.detail.model_dump(exclude_unset=True, exclude_none=True)
+                )
+                session.add(detail)
 
         if customer_data.financial_info:
             if customer.financial_info:
-                for field, value in customer_data.financial_info.model_dump().items():
+                for field, value in customer_data.financial_info.model_dump(exclude_unset=True, exclude_none=True).items():
                     setattr(customer.financial_info, field, value)
             else:
                 financial_info = CustomerFinancialInfo(
                     customer_id=customer.id,
-                    **customer_data.financial_info.model_dump()
+                    **customer_data.financial_info.model_dump(exclude_unset=True, exclude_none=True)
                 )
                 session.add(financial_info)
 
         if customer_data.job_info:
             if customer.job_info:
-                for field, value in customer_data.job_info.model_dump().items():
+                for field, value in customer_data.job_info.model_dump(exclude_unset=True, exclude_none=True).items():
                     setattr(customer.job_info, field, value)
             else:
                 job_info = CustomerJobInfo(
                     customer_id=customer.id,
-                    **customer_data.job_info.model_dump()
+                    **customer_data.job_info.model_dump(exclude_unset=True, exclude_none=True)
                 )
                 session.add(job_info)
+
+        if customer_data.company:
+            if customer.company:
+                for field, value in customer_data.company.model_dump(exclude_unset=True, exclude_none=True).items():
+                    setattr(customer.company, field, value)
+            else:
+                company = Company(
+                    customer_id=customer.id,
+                    **customer_data.company.model_dump(exclude_unset=True, exclude_none=True)
+                )
+                session.add(company)
+
+        if customer_data.vehicle:
+            if customer.vehicle:
+                for field, value in customer_data.vehicle.model_dump(exclude_unset=True, exclude_none=True).items():
+                    setattr(customer.vehicle, field, value)
+            else:
+                vehicle = CustomerVehicle(
+                    customer_id=customer.id,
+                    **customer_data.vehicle.model_dump(exclude_unset=True, exclude_none=True)
+                )
+                session.add(vehicle)
 
         # Update phones (replace all)
         if customer_data.phones is not None:
@@ -499,19 +528,26 @@ async def update_customer(
 
         # Update addresses (replace all)
         if customer_data.addresses is not None:
-            # Delete existing addressable pivots and their addresses
+            # Delete existing addressable pivots first, then delete addresses
             existing_pivots_stmt = select(Addressable).where(
                 Addressable.addressable_type == "Customer",
                 Addressable.addressable_id == customer.id
             )
             existing_pivots = session.exec(existing_pivots_stmt).all()
 
+            address_ids_to_delete = [p.address_id for p in existing_pivots]
+
+            # 1. Delete pivot records first to avoid ForeignKeyViolation
             for pivot in existing_pivots:
-                # Get the address to delete it too
-                addr = session.get(Address, pivot.address_id)
+                session.delete(pivot)
+            session.flush()
+
+            # 2. Delete address records after pivots are removed
+            for addr_id in address_ids_to_delete:
+                addr = session.get(Address, addr_id)
                 if addr:
                     session.delete(addr)
-                session.delete(pivot)
+            session.flush()
 
             # Add new addresses
             for address_data in customer_data.addresses:

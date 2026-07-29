@@ -261,6 +261,63 @@ def test_update_customer(client: TestClient, session: Session, auth_headers: dic
     assert data["detail"]["first_name"] == "Updated"
 
 
+def test_update_customer_with_empty_and_zero_defaults(client: TestClient, session: Session, auth_headers: dict):
+    """Test updating customer when form submits empty strings and zero default values for optional sections."""
+    customer = Customer(
+        nid="55555555555",
+        is_active=True,
+        is_assigned=False
+    )
+    session.add(customer)
+    session.flush()
+
+    detail = CustomerDetail(
+        customer_id=customer.id,
+        first_name="Carlos",
+        last_name="Ramirez",
+        email="carlos.ramirez@gmail.com"
+    )
+    session.add(detail)
+    session.commit()
+
+    # Payload with empty strings in detail/referred_by and zero defaults in job_info/vehicle
+    payload = {
+        "lead_channel": "",
+        "referred_by": "",
+        "detail": {
+            "first_name": "Carlos",
+            "last_name": "Ramirez",
+            "email": "",
+            "birthday": "",
+            "move_in_date": ""
+        },
+        "job_info": {
+            "role": "",
+            "salary": 0,
+            "start_date": ""
+        },
+        "vehicle": {
+            "vehicle_type": "",
+            "vehicle_year": 0
+        },
+        "company": {
+            "name": "",
+            "phone": ""
+        }
+    }
+
+    response = client.put(
+        f"/api/v1/customers/{customer.id}",
+        json=payload,
+        headers=auth_headers
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["detail"]["first_name"] == "Carlos"
+
+
+
 def test_assign_customer_to_portfolio(client: TestClient, session: Session, auth_headers: dict):
     """Test assigning customer to portfolio after creation."""
     # Create test customer

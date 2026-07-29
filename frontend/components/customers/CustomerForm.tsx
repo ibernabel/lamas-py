@@ -51,6 +51,8 @@ import {
 import { customersApi } from "@/lib/api/customers";
 import { useCreateCustomer, useUpdateCustomer } from "@/hooks/use-customers";
 import type { Customer } from "@/lib/api/types";
+import { sanitizeCustomerUpdatePayload } from "@/lib/utils/payload-sanitizer";
+
 
 // ============================================================================
 // Types
@@ -230,21 +232,11 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
         }
       );
     } else if (customer) {
+      const sanitizedPayload = sanitizeCustomerUpdatePayload(values);
       updateMutation.mutate(
         {
           id: customer.id,
-          payload: {
-            lead_channel: values.lead_channel || undefined,
-            is_referred: values.is_referred,
-            referred_by: values.referred_by || undefined,
-            detail: values.detail,
-            phones: values.phones,
-            addresses: values.addresses,
-            job_info: values.job_info,
-            company: values.company,
-            vehicle: values.vehicle,
-            references: values.references,
-          },
+          payload: sanitizedPayload,
         },
         { onSuccess: () => router.push(`/customers/${customer.id}`) }
       );
@@ -288,9 +280,14 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
       );
     }
 
-    return (
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+  const onInvalid = (errors: Record<string, unknown>) => {
+    console.error("Form validation errors:", errors);
+    toast.error("Por favor revise los campos del formulario marcados con error.");
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6">
         <Tabs defaultValue="identity" className="w-full">
           <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="identity">Identidad</TabsTrigger>

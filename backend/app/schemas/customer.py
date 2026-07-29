@@ -8,7 +8,7 @@ This module defines all schemas for customer CRUD operations including:
 """
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Generic, Literal, TypeVar
+from typing import Any, Generic, Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
@@ -35,6 +35,49 @@ class CustomerDetailCreate(BaseModel):
     housing_possession_type: str | None = Field(None, max_length=100)
     move_in_date: date | None = None
     mode_of_transport: str | None = Field(None, max_length=100)
+
+    @field_validator(
+        "email", "nickname", "birthday", "gender", "marital_status",
+        "education_level", "nationality", "housing_type",
+        "housing_possession_type", "move_in_date", "mode_of_transport",
+        mode="before"
+    )
+    @classmethod
+    def coerce_empty_str_to_none(cls, v: Any) -> Any:
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
+
+
+class CustomerDetailUpdate(BaseModel):
+    """Customer personal details update schema (all fields optional)."""
+
+    first_name: str | None = Field(None, min_length=2, max_length=255)
+    last_name: str | None = Field(None, min_length=2, max_length=255)
+    email: EmailStr | None = None
+    nickname: str | None = Field(None, max_length=255)
+    birthday: date | None = None
+    gender: Literal["M", "F", "O"] | None = None
+    marital_status: Literal["single", "married",
+                            "divorced", "widowed"] | None = None
+    education_level: str | None = Field(None, max_length=100)
+    nationality: str | None = Field(None, max_length=100)
+    housing_type: str | None = Field(None, max_length=100)
+    housing_possession_type: str | None = Field(None, max_length=100)
+    move_in_date: date | None = None
+    mode_of_transport: str | None = Field(None, max_length=100)
+
+    @field_validator(
+        "first_name", "last_name", "email", "nickname", "birthday", "gender",
+        "marital_status", "education_level", "nationality", "housing_type",
+        "housing_possession_type", "move_in_date", "mode_of_transport",
+        mode="before"
+    )
+    @classmethod
+    def coerce_empty_str_to_none(cls, v: Any) -> Any:
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
 
 
 class PhoneCreate(BaseModel):
@@ -107,6 +150,28 @@ class CustomerJobInfoCreate(BaseModel):
     schedule: str | None = Field(None, max_length=255)
     supervisor_name: str | None = Field(None, max_length=255)
 
+    @field_validator(
+        "role", "level", "start_date", "other_incomes_source", "payment_type",
+        "payment_frequency", "payment_bank", "payment_account_number",
+        "schedule", "supervisor_name",
+        mode="before"
+    )
+    @classmethod
+    def coerce_empty_str_to_none(cls, v: Any) -> Any:
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
+
+    @field_validator("salary", "other_incomes", mode="before")
+    @classmethod
+    def coerce_zero_to_none(cls, v: Any) -> Any:
+        if v is not None and (v == 0 or v == "0" or v == 0.0):
+            return None
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
+
+
 
 class CustomerReferenceCreate(BaseModel):
     """Customer personal reference schema."""
@@ -122,6 +187,16 @@ class CustomerReferenceCreate(BaseModel):
     is_who_referred: bool = False
     type: str | None = Field(None, max_length=50)
     address: str | None = None
+
+    @field_validator(
+        "nid", "email", "reference_since", "occupation", "type", "address",
+        mode="before"
+    )
+    @classmethod
+    def coerce_empty_str_to_none(cls, v: Any) -> Any:
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
 
 
 class CustomerVehicleCreate(BaseModel):
@@ -139,6 +214,26 @@ class CustomerVehicleCreate(BaseModel):
     is_rented: bool = False
     is_shared: bool = False
 
+    @field_validator(
+        "vehicle_type", "vehicle_brand", "vehicle_model", "vehicle_color",
+        "vehicle_plate_number",
+        mode="before"
+    )
+    @classmethod
+    def coerce_empty_str_to_none(cls, v: Any) -> Any:
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
+
+    @field_validator("vehicle_year", mode="before")
+    @classmethod
+    def coerce_invalid_year_to_none(cls, v: Any) -> Any:
+        if v is not None and (v == 0 or v == "0" or v == 0.0):
+            return None
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
+
 
 class CompanyCreate(BaseModel):
     """Employer company information schema."""
@@ -151,6 +246,40 @@ class CompanyCreate(BaseModel):
                             description="Dominican tax ID")
     department: str | None = Field(None, max_length=255)
     branch: str | None = Field(None, max_length=255)
+
+    @field_validator(
+        "name", "email", "type", "website", "rnc", "department", "branch",
+        mode="before"
+    )
+    @classmethod
+    def coerce_empty_str_to_none(cls, v: Any) -> Any:
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
+
+
+class CompanyUpdate(BaseModel):
+    """Employer company update schema."""
+
+    name: str | None = Field(None, max_length=255)
+    email: EmailStr | None = None
+    type: str | None = Field(None, max_length=100)
+    website: str | None = Field(None, max_length=255)
+    rnc: str | None = Field(None, max_length=50, description="Dominican tax ID")
+    department: str | None = Field(None, max_length=255)
+    branch: str | None = Field(None, max_length=255)
+
+    @field_validator(
+        "name", "email", "type", "website", "rnc", "department", "branch",
+        mode="before"
+    )
+    @classmethod
+    def coerce_empty_str_to_none(cls, v: Any) -> Any:
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
+
+
 
 
 class CustomersAccountCreate(BaseModel):
@@ -266,15 +395,36 @@ class CustomerUpdateSchema(BaseModel):
     referred_by: str | None = None
 
     # Nested data (all optional)
-    detail: CustomerDetailCreate | None = None
+    detail: CustomerDetailUpdate | None = None
     phones: list[PhoneCreate] | None = None
     addresses: list[AddressCreate] | None = None
     financial_info: CustomerFinancialInfoCreate | None = None
     job_info: CustomerJobInfoCreate | None = None
     references: list[CustomerReferenceCreate] | None = None
-    company: CompanyCreate | None = None
+    company: CompanyUpdate | None = None
     vehicle: CustomerVehicleCreate | None = None
     accounts: list[CustomersAccountCreate] | None = None
+
+    @field_validator("lead_channel", "referred_by", mode="before")
+    @classmethod
+    def coerce_empty_str_to_none(cls, v: Any) -> Any:
+        if isinstance(v, str) and not v.strip():
+            return None
+        return v
+
+    @field_validator("job_info", "company", "vehicle", "financial_info", mode="before")
+    @classmethod
+    def coerce_empty_nested_to_none(cls, v: Any) -> Any:
+        if isinstance(v, dict):
+            # Check if dict contains any non-empty non-zero value
+            non_empty_values = [
+                val for k, val in v.items()
+                if val is not None and val != "" and val != 0 and val is not False
+            ]
+            if not non_empty_values:
+                return None
+        return v
+
 
 
 # ============================================================================
@@ -359,6 +509,64 @@ class CompanyRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class CustomerFinancialInfoRead(BaseModel):
+    """Customer financial information response schema."""
+
+    id: int
+    other_incomes: Decimal | None = Decimal("0")
+    discounts: Decimal | None = Decimal("0")
+    housing_type: str | None = None
+    monthly_housing_payment: Decimal | None = None
+    total_debts: Decimal | None = None
+    loan_installments: Decimal | None = None
+    household_expenses: Decimal | None = None
+    labor_benefits: Decimal | None = None
+    guarantee_assets: str | None = None
+    total_incomes: Decimal | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CustomerJobInfoRead(BaseModel):
+    """Customer employment information response schema."""
+
+    id: int
+    is_self_employed: bool = False
+    role: str | None = None
+    level: str | None = None
+    start_date: date | None = None
+    salary: Decimal | None = None
+    other_incomes: Decimal | None = None
+    other_incomes_source: str | None = None
+    payment_type: str | None = None
+    payment_frequency: str | None = None
+    payment_bank: str | None = None
+    payment_account_number: str | None = None
+    schedule: str | None = None
+    supervisor_name: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CustomerVehicleRead(BaseModel):
+    """Customer vehicle response schema."""
+
+    id: int
+    vehicle_type: str | None = None
+    vehicle_brand: str | None = None
+    vehicle_model: str | None = None
+    vehicle_year: int | None = None
+    vehicle_color: str | None = None
+    vehicle_plate_number: str | None = None
+    is_financed: bool = False
+    is_owned: bool = False
+    is_leased: bool = False
+    is_rented: bool = False
+    is_shared: bool = False
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class CustomerListItem(BaseModel):
     """Customer list item schema for pagination responses."""
 
@@ -397,11 +605,11 @@ class CustomerReadSchema(BaseModel):
     detail: CustomerDetailRead | None = None
     phones: list[PhoneRead] = []
     addresses: list[AddressRead] = []
-    financial_info: CustomerFinancialInfoCreate | None = None
-    job_info: CustomerJobInfoCreate | None = None
+    financial_info: CustomerFinancialInfoRead | None = None
+    job_info: CustomerJobInfoRead | None = None
     company: CompanyRead | None = None
     references: list[CustomerReferenceRead] = []
-    vehicle: CustomerVehicleCreate | None = None
+    vehicle: CustomerVehicleRead | None = None
 
     created_at: datetime | None = None
     updated_at: datetime | None = None
