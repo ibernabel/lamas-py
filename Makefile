@@ -4,12 +4,16 @@
 
 help:
 	@echo "Available commands:"
+	@echo "  make dev      - Start all services (DB, Backend, Frontend) in one command"
 	@echo "  make db       - Start the PostgreSQL database (Docker)"
 	@echo "  make backend  - Start the FastAPI backend"
 	@echo "  make frontend - Start the Next.js frontend"
 	@echo "  make stop     - Stop the database"
 	@echo "  make seed     - Seed the database with sample data"
 	@echo "  make clean    - Stop database and remove volumes"
+
+dev:
+	@bash ./dev.sh
 
 db:
 	@echo "🚀 Starting Database..."
