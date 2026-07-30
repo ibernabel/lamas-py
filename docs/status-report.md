@@ -5,7 +5,7 @@
 
 ## 1. Resumen Ejecutivo
 
-El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.0.0`**. En las sesiones recientes se logró la refactorización arquitectónica del contrato de datos Zero-PII con CreditGraph AI, y en la sesión del 30 de julio se completó una **auditoría exhaustiva del formulario de clientes**, restaurando la semántica de 9 campos enum degradados durante la migración desde Laravel. El formulario admin (`CustomerForm.tsx`) está ahora completamente alineado con el modelo de datos del legacy y el backend FastAPI.
+El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.0.0`**. En las sesiones recientes se logró la refactorización arquitectónica del contrato de datos Zero-PII con CreditGraph AI, la auditoría del formulario de clientes admin (`CustomerForm.tsx`), y en la sesión del 30 de julio se completó la **unificación de enums del formulario público (`/solicitar`)** bajo la Opción B. El backend FastAPI actúa como fuente de verdad y todas las interfaces utilizan valores en minúsculas totalmente alineados.
 
 ## 2. Estado de Componentes
 
@@ -71,7 +71,7 @@ El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión
 
 ## 4. Próximos Pasos (Roadmap)
 
-1. **⚠️ [ALTA] Corrección formulario público `solicitar/page.tsx`**: Los enums de `marital_status`, `housing_type` y `education_level` usan MAYÚSCULAS incompatibles con el backend. Requiere sesión dedicada. Ver [Requerimientos](./planning/req-loan-application-enum-audit.md).
+1. **✅ Corrección formulario público `solicitar/page.tsx`**: Unificación de enums (Opción B) completada. Schemas Pydantic extendidos, componentes React y schemas Zod alineados en minúsculas, y migración DDL ejecutada en BD.
 2. **Integración Frontend ↔ CreditGraph Client**: Conectar los hooks de React Query con los endpoints reales de análisis de CreditGraph (`/loan-applications/{id}/creditgraph`).
 3. **Migración SQL gender**: Si la BD tiene datos legacy con `gender = 'M'/'F'/'O'`, ejecutar script de actualización.
 4. **Sincronización Git (`/sync-repo`)**: Crear el commit convencional y actualizar versión SemVer del repositorio.

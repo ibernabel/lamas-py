@@ -55,6 +55,7 @@ def trigger_analysis(
     applicant_hash = "anon_applicant_0000"
     declared_salary = 0.0
     housing_type = None
+    housing_possession_type = None
     is_self_employed = False
 
     if loan_app.customer:
@@ -66,13 +67,15 @@ def trigger_analysis(
             declared_salary = float(loan_app.customer.financial_info.total_incomes)
         if loan_app.customer.detail:
             housing_type = loan_app.customer.detail.housing_type
+            housing_possession_type = loan_app.customer.detail.housing_possession_type
         if loan_app.customer.job_info:
             is_self_employed = loan_app.customer.job_info.is_self_employed
 
     applicant_data = {
         "applicant_hash": applicant_hash,
         "declared_salary": declared_salary,
-        "housing_type": housing_type or "OTHER",
+        "housing_type": housing_type or "other",
+        "housing_possession_type": housing_possession_type or "other",
         "is_self_employed": is_self_employed,
     }
 

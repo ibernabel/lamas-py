@@ -29,6 +29,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Zero-PII Data Contract Integration](./implementation/2026-07-29-zero-pii-data-contract.md) - ✅ (2026-07-29)
 - [Customer Form Enum Audit & Restoration](./implementation/2026-07-30-customer-form-enum-audit-restoration.md) - ✅ (2026-07-30)
 - [**Multi-Language i18n & Settings View**](./implementation/2026-07-30-multi-language-i18n-and-settings-view.md) - ✅ (2026-07-30)
+- [**Public Form Enum Unification (Opción B)**](./implementation/2026-07-30-public-form-enum-unification.md) - ✅ (2026-07-30)
 
 ### Decisions & Architecture (ADRs)
 
@@ -47,7 +48,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 ### Knowledges & Issues
 
 - [Known Issue: Document Viewer 404](./knowledges/known_issue-document-viewer-404.md) - Identified 2026-03-10
-- [**Known Issue: Public Form Enum Mismatch**](./knowledges/known-issue-public-form-enum-mismatch.md) - ⚠️ Detected 2026-07-30 — Pendiente de corrección
+- [**Known Issue: Public Form Enum Mismatch**](./knowledges/known-issue-public-form-enum-mismatch.md) - ✅ **RESUELTO** 2026-07-30 — Ver [implementación](./implementation/2026-07-30-public-form-enum-unification.md)
 
 ## Quick Start
 

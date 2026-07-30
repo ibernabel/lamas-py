@@ -112,6 +112,8 @@ class CustomerJobInfo(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     customer_id: int = Field(foreign_key="customers.id")
     is_self_employed: bool = Field(default=False)
+    # Richer occupation classification; is_self_employed derived automatically in services
+    occupation_type: str | None = Field(default=None, max_length=50)
     role: str | None = Field(default=None, max_length=255)
     level: str | None = Field(default=None, max_length=100)
     start_date: date | None = Field(default=None)
@@ -129,6 +131,7 @@ class CustomerJobInfo(SQLModel, table=True):
 
     # Relationships
     customer: Customer = Relationship(back_populates="job_info")
+
 
 
 class CustomerReference(SQLModel, table=True):

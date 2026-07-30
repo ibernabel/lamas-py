@@ -14,10 +14,10 @@ def test_full_loan_submit_and_hitl_workflow(client: TestClient, auth_headers: di
             "email": "maria.alvarez@example.com",
         },
         "profile": {
-            "marital_status": "SINGLE",
-            "housing_type": "OWNED",
+            "marital_status": "single",
+            "housing_type": "owned",
             "housing_monthly_payment": 0.0,
-            "education_level": "UNIVERSITY",
+            "education_level": "bachelor",
         },
         "job": {
             "company_name": "Empresa Test SRL",

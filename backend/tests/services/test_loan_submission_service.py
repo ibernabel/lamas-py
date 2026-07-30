@@ -13,10 +13,10 @@ def test_submit_loan_service_success(session: Session):
             "email": "juan.perez@gmail.com",
         },
         "profile": {
-            "marital_status": "MARRIED",
-            "housing_type": "RENTED",
+            "marital_status": "married",
+            "housing_type": "rented",
             "housing_monthly_payment": 12000.00,
-            "education_level": "UNIVERSITY",
+            "education_level": "bachelor",
         },
         "job": {
             "company_name": "Banco BHD León",

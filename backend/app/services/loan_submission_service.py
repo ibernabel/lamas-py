@@ -52,6 +52,8 @@ class LoanSubmissionService:
             self.session.flush()
 
             # Customer Detail
+            # Note: the public wizard captures housing *possession* (owned/rented/etc.),
+            # not physical type (house/apartment). We map accordingly.
             detail = CustomerDetail(
                 customer_id=customer.id,
                 first_name=identity.get("first_name", ""),
@@ -59,13 +61,19 @@ class LoanSubmissionService:
                 email=identity.get("email"),
                 marital_status=profile.get("marital_status"),
                 education_level=profile.get("education_level"),
-                housing_type=profile.get("housing_type"),
+                housing_type=None,  # Physical type not captured in public wizard
+                housing_possession_type=profile.get("housing_type"),  # Wizard sends possession
             )
             self.session.add(detail)
 
             # Customer Job Info
+            # Derive is_self_employed from occupation_type for backward compatibility
+            # with admin form and legacy boolean field.
+            occupation = job.get("occupation_type")
             job_info = CustomerJobInfo(
                 customer_id=customer.id,
+                occupation_type=occupation,
+                is_self_employed=occupation in ("independent", "business_owner"),
                 role=job.get("role"),
                 salary=job.get("salary"),
                 other_incomes=financial.get("other_income"),

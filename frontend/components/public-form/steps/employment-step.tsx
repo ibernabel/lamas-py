@@ -58,10 +58,10 @@ export function EmploymentStep({ onNext, onBack }: EmploymentStepProps) {
               {...register("job.occupation_type")}
             >
               <option value="">Seleccione...</option>
-              <option value="EMPLOYED">Empleado Privado / Público</option>
-              <option value="INDEPENDENT">Profesional Independiente</option>
-              <option value="BUSINESS_OWNER">Dueño de Empresa / Negocio</option>
-              <option value="OTHER">Otro</option>
+              <option value="employed">Empleado Privado / Público</option>
+              <option value="independent">Profesional Independiente</option>
+              <option value="business_owner">Dueño de Empresa / Negocio</option>
+              <option value="other">Otro</option>
             </select>
             {errors.job?.occupation_type && (
               <p className="text-xs text-destructive">{errors.job.occupation_type.message}</p>

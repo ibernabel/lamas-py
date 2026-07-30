@@ -63,11 +63,11 @@ export function PersonalStep({ onNext, onBack }: PersonalStepProps) {
               {...register("profile.marital_status")}
             >
               <option value="">Seleccione...</option>
-              <option value="SINGLE">Soltero(a)</option>
-              <option value="MARRIED">Casado(a)</option>
-              <option value="COMMON_LAW">Unión Libre</option>
-              <option value="DIVORCED">Divorciado(a)</option>
-              <option value="WIDOWED">Viudo(a)</option>
+              <option value="single">Soltero(a)</option>
+              <option value="married">Casado(a)</option>
+              <option value="common_law">Unión Libre</option>
+              <option value="divorced">Divorciado(a)</option>
+              <option value="widowed">Viudo(a)</option>
             </select>
             {errors.profile?.marital_status && (
               <p className="text-xs text-destructive">{errors.profile.marital_status.message}</p>
@@ -82,11 +82,14 @@ export function PersonalStep({ onNext, onBack }: PersonalStepProps) {
               {...register("profile.education_level")}
             >
               <option value="">Seleccione...</option>
-              <option value="SECONDARY">Secundaria / Bachillerato</option>
-              <option value="TECHNICAL">Técnico Superior</option>
-              <option value="UNIVERSITY">Universitario</option>
-              <option value="POSTGRADUATE">Postgrado / Maestría</option>
-              <option value="PRIMARY">Primaria</option>
+              <option value="primary">Primaria</option>
+              <option value="secondary">Secundaria</option>
+              <option value="high_school">Bachillerato</option>
+              <option value="technical">Técnico Superior</option>
+              <option value="bachelor">Universitario / Licenciatura</option>
+              <option value="postgraduate">Postgrado</option>
+              <option value="master">Maestría</option>
+              <option value="doctorate">Doctorado</option>
             </select>
             {errors.profile?.education_level && (
               <p className="text-xs text-destructive">{errors.profile.education_level.message}</p>
@@ -104,10 +107,10 @@ export function PersonalStep({ onNext, onBack }: PersonalStepProps) {
               {...register("profile.housing_type")}
             >
               <option value="">Seleccione...</option>
-              <option value="OWNED">Propia (Pagada)</option>
-              <option value="RENTED">Alquilada</option>
-              <option value="MORTGAGED">Propia (Hipotecada)</option>
-              <option value="FAMILY">Familiar</option>
+              <option value="owned">Propia (Pagada)</option>
+              <option value="rented">Alquilada</option>
+              <option value="mortgaged">Propia (Hipotecada)</option>
+              <option value="family">Familiar</option>
             </select>
             {errors.profile?.housing_type && (
               <p className="text-xs text-destructive">{errors.profile.housing_type.message}</p>
@@ -115,7 +118,7 @@ export function PersonalStep({ onNext, onBack }: PersonalStepProps) {
           </div>
 
           {/* Conditional Housing Monthly Payment */}
-          {housingType === "RENTED" && (
+          {housingType === "rented" && (
             <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
               <Label htmlFor="housing-payment">Pago Mensual Alquiler (RD$)</Label>
               <Input

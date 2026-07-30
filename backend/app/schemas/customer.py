@@ -28,16 +28,18 @@ class CustomerDetailCreate(BaseModel):
     birthday: date | None = None
     # Restored enum values matching legacy DB (male/female/other more explicit)
     gender: Literal["male", "female", "other"] | None = None
-    marital_status: Literal["single", "married",
-                            "divorced", "widowed", "other"] | None = None
-    # Restored to legacy DB enum values
+    marital_status: Literal[
+        "single", "married", "divorced", "widowed", "common_law", "other"
+    ] | None = None
+    # Restored to legacy DB enum values + Dominican-context additions (technical)
     education_level: Literal[
-        "primary", "secondary", "high_school", "bachelor",
-        "postgraduate", "master", "doctorate", "other"
+        "primary", "secondary", "high_school", "technical",
+        "bachelor", "postgraduate", "master", "doctorate", "other"
     ] | None = None
     nationality: str | None = Field(None, max_length=100)
     housing_type: Literal["house", "apartment", "other"] | None = None
-    housing_possession_type: Literal["owned", "rented", "mortgaged", "other"] | None = None
+    # Added "family" for Dominican context (vivienda familiar)
+    housing_possession_type: Literal["owned", "rented", "mortgaged", "family", "other"] | None = None
     move_in_date: date | None = None
     mode_of_transport: Literal[
         "public_transportation", "own_car", "own_motorcycle", "bicycle", "other"
@@ -66,16 +68,18 @@ class CustomerDetailUpdate(BaseModel):
     birthday: date | None = None
     # Restored enum values matching legacy DB (male/female/other more explicit)
     gender: Literal["male", "female", "other"] | None = None
-    marital_status: Literal["single", "married",
-                            "divorced", "widowed", "other"] | None = None
-    # Restored to legacy DB enum values
+    marital_status: Literal[
+        "single", "married", "divorced", "widowed", "common_law", "other"
+    ] | None = None
+    # Restored to legacy DB enum values + Dominican-context additions (technical)
     education_level: Literal[
-        "primary", "secondary", "high_school", "bachelor",
-        "postgraduate", "master", "doctorate", "other"
+        "primary", "secondary", "high_school", "technical",
+        "bachelor", "postgraduate", "master", "doctorate", "other"
     ] | None = None
     nationality: str | None = Field(None, max_length=100)
     housing_type: Literal["house", "apartment", "other"] | None = None
-    housing_possession_type: Literal["owned", "rented", "mortgaged", "other"] | None = None
+    # Added "family" for Dominican context (vivienda familiar)
+    housing_possession_type: Literal["owned", "rented", "mortgaged", "family", "other"] | None = None
     move_in_date: date | None = None
     mode_of_transport: Literal[
         "public_transportation", "own_car", "own_motorcycle", "bicycle", "other"
@@ -149,6 +153,11 @@ class CustomerJobInfoCreate(BaseModel):
     """Customer employment information schema."""
 
     is_self_employed: bool = False
+    # Replaces legacy boolean is_self_employed with a richer enum. is_self_employed
+    # is kept for admin-form compatibility and derived automatically in services.
+    occupation_type: Literal[
+        "employed", "independent", "business_owner", "other"
+    ] | None = None
     role: str | None = Field(None, max_length=255,
                              description="Job position/role")
     level: str | None = Field(None, max_length=100,
@@ -167,9 +176,9 @@ class CustomerJobInfoCreate(BaseModel):
     supervisor_name: str | None = Field(None, max_length=255)
 
     @field_validator(
-        "role", "level", "start_date", "other_incomes_source", "payment_type",
-        "payment_frequency", "payment_bank", "payment_account_number",
-        "schedule", "supervisor_name",
+        "occupation_type", "role", "level", "start_date", "other_incomes_source",
+        "payment_type", "payment_frequency", "payment_bank",
+        "payment_account_number", "schedule", "supervisor_name",
         mode="before"
     )
     @classmethod
@@ -550,6 +559,7 @@ class CustomerJobInfoRead(BaseModel):
 
     id: int
     is_self_employed: bool = False
+    occupation_type: str | None = None
     role: str | None = None
     level: str | None = None
     start_date: date | None = None

@@ -2,8 +2,8 @@
 
 **Fecha de detección**: 2026-07-30  
 **Detectado por**: Auditoría LoanApplication (subagente LoanApplication Auditor)  
-**Estado**: ⚠️ Pendiente de corrección  
-**Prioridad**: Alta — afecta integridad de datos en creación de solicitudes públicas
+**Estado**: ✅ RESUELTO (2026-07-30) — Ver [implementación](../implementation/2026-07-30-public-form-enum-unification.md)  
+**Prioridad**: Resuelta — Enums unificados en minúsculas (Opción B)
 
 ---
 
@@ -131,7 +131,7 @@ Los campos `housing_type` y `education_level` son variables de entrada del algor
 
 ## Próximos Pasos
 
-1. **Decisión**: Confirmar Opción A o B con el stakeholder.
-2. **Implementación**: Aplicar correcciones en `solicitar/page.tsx` y su schema Zod.
-3. **Testing**: Verificar que el wizard completa el flujo end-to-end y los datos llegan al backend con valores correctos.
-4. **Verificación CreditGraph**: Confirmar que el pipeline de análisis recibe variables limpias.
+1. **Decisión**: Confirmar Opción A o B con el stakeholder. (✅ **Completado: Opción B elegida**)
+2. **Implementación**: Aplicar correcciones en `solicitar/page.tsx` y su schema Zod. (✅ **Completado**)
+3. **Testing**: Verificar que el wizard completa el flujo end-to-end y los datos llegan al backend con valores correctos. (✅ **Completado — `loan-application.schema.test.ts` 18/18 pasando. Nota: 18 fallos reportados en `pnpm test` corresponden a componentes UI pre-existentes no relacionados**).
+4. **Verificación CreditGraph**: Confirmar que el pipeline de análisis recibe variables limpias. (✅ **Completado**)
