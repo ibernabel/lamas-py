@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * CustomerFilters — search bar with debounced input and status filter.
+ * CustomerFilters — search bar with debounced input and status filter and i18n support.
  * Controlled by the parent via onFilterChange callback.
  */
 import { useCallback, useEffect, useState } from "react";
@@ -15,17 +15,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import type { CustomerFilters } from "@/lib/api/customers";
+import type { CustomerFilters as CustomerFiltersType } from "@/lib/api/customers";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 interface CustomerFiltersProps {
-  filters: CustomerFilters;
-  onFilterChange: (filters: CustomerFilters) => void;
+  filters: CustomerFiltersType;
+  onFilterChange: (filters: CustomerFiltersType) => void;
 }
 
 export function CustomerFilters({
   filters,
   onFilterChange,
 }: CustomerFiltersProps) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState(filters.name ?? "");
 
   // Debounce the name/NID search input (400ms)
@@ -69,7 +71,7 @@ export function CustomerFilters({
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           id="customer-search"
-          placeholder="Search by name or NID…"
+          placeholder={t("customers.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
@@ -88,12 +90,12 @@ export function CustomerFilters({
         onValueChange={handleStatusChange}
       >
         <SelectTrigger id="customer-status-filter" className="w-[140px]">
-          <SelectValue placeholder="Status" />
+          <SelectValue placeholder={t("common.status")} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All</SelectItem>
-          <SelectItem value="active">Active</SelectItem>
-          <SelectItem value="inactive">Inactive</SelectItem>
+          <SelectItem value="all">{t("common.all")}</SelectItem>
+          <SelectItem value="active">{t("status.active")}</SelectItem>
+          <SelectItem value="inactive">{t("status.inactive")}</SelectItem>
         </SelectContent>
       </Select>
 
@@ -101,7 +103,7 @@ export function CustomerFilters({
       {hasActiveFilters && (
         <Button variant="ghost" size="sm" onClick={handleReset}>
           <X className="mr-1 h-4 w-4" />
-          Reset
+          {t("common.cancel")}
         </Button>
       )}
     </div>

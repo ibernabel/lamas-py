@@ -5,6 +5,8 @@ import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
+import { LanguageProvider } from "@/lib/i18n/context";
+
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -33,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
@@ -42,8 +44,10 @@ export default function RootLayout({
           disableTransitionOnChange={false}
         >
           <QueryProvider>
-            {children}
-            <Toaster richColors position="top-right" />
+            <LanguageProvider>
+              {children}
+              <Toaster richColors position="top-right" />
+            </LanguageProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>

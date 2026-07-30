@@ -3,7 +3,7 @@
 /**
  * Navigation sidebar component.
  * Displays SoluFime/SoliPres branded logo, nav links, version badge,
- * and a toggle button for collapsed/expanded mode.
+ * Settings button in footer, and a toggle button for collapsed/expanded mode.
  */
 import { useState } from "react";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import {
   Users,
   FileText,
   BarChart3,
+  Settings,
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
@@ -20,35 +21,43 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { APP_VERSION, APP_VERSION_SHORT } from "@/lib/version";
-
-const navItems = [
-  {
-    label: "Dashboard",
-    href: "/",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Customers",
-    href: "/customers",
-    icon: Users,
-  },
-  {
-    label: "Loan Applications",
-    href: "/loans",
-    icon: FileText,
-  },
-  {
-    label: "Credit Analysis",
-    href: "/analysis",
-    icon: BarChart3,
-    badge: "Phase 8",
-    disabled: true,
-  },
-];
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 export function Sidebar() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const { t } = useTranslation();
+
+  const navItems = [
+    {
+      key: "nav.dashboard",
+      label: t("nav.dashboard"),
+      href: "/",
+      icon: LayoutDashboard,
+    },
+    {
+      key: "nav.customers",
+      label: t("nav.customers"),
+      href: "/customers",
+      icon: Users,
+    },
+    {
+      key: "nav.loanApplications",
+      label: t("nav.loanApplications"),
+      href: "/loans",
+      icon: FileText,
+    },
+    {
+      key: "nav.creditAnalysis",
+      label: t("nav.creditAnalysis"),
+      href: "/analysis",
+      icon: BarChart3,
+      badge: "Phase 8",
+      disabled: true,
+    },
+  ];
+
+  const isSettingsActive = pathname.startsWith("/settings");
 
   return (
     <aside
@@ -98,7 +107,7 @@ export function Sidebar() {
       >
         {!isCollapsed && (
           <p className="px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Menu
+            {t("nav.menu")}
           </p>
         )}
         <Button
@@ -107,8 +116,8 @@ export function Sidebar() {
           size="icon"
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="h-7 w-7 text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent"
-          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={isCollapsed ? t("nav.expandSidebar") : t("nav.collapseSidebar")}
+          aria-label={isCollapsed ? t("nav.expandSidebar") : t("nav.collapseSidebar")}
         >
           {isCollapsed ? (
             <ChevronRight className="h-4 w-4" />
@@ -158,23 +167,43 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Footer info */}
-      <div className="border-t border-sidebar-border p-2 text-center">
-        {isCollapsed ? (
-          <span
-            className="text-[10px] text-muted-foreground font-semibold cursor-default block"
-            title={`SoluFime · LAMaS py v${APP_VERSION}`}
-          >
-            v{APP_VERSION_SHORT}
-          </span>
-        ) : (
-          <p className="px-1 text-xs text-muted-foreground truncate">
-            SoluFime · LAMaS py v{APP_VERSION}
-          </p>
-        )}
+      {/* Footer Navigation & System info */}
+      <div className="border-t border-sidebar-border p-2 space-y-1">
+        {/* Settings Footer Link */}
+        <Link
+          id="sidebar-settings-link"
+          href="/settings"
+          title={isCollapsed ? t("nav.settings") : undefined}
+          className={cn(
+            "group flex items-center rounded-md font-medium transition-all",
+            isCollapsed
+              ? "h-9 w-9 justify-center mx-auto"
+              : "gap-3 px-3 py-2 text-sm",
+            isSettingsActive
+              ? "bg-sidebar-primary text-sidebar-primary-foreground font-semibold shadow-xs"
+              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          )}
+        >
+          <Settings className="h-4 w-4 shrink-0" />
+          {!isCollapsed && <span className="flex-1 truncate">{t("nav.settings")}</span>}
+        </Link>
+
+        {/* Version Info */}
+        <div className="pt-1 text-center">
+          {isCollapsed ? (
+            <span
+              className="text-[10px] text-muted-foreground font-semibold cursor-default block"
+              title={`SoluFime · LAMaS py v${APP_VERSION}`}
+            >
+              v{APP_VERSION_SHORT}
+            </span>
+          ) : (
+            <p className="px-1 text-xs text-muted-foreground truncate">
+              SoluFime · LAMaS py v{APP_VERSION}
+            </p>
+          )}
+        </div>
       </div>
     </aside>
   );
 }
-
-

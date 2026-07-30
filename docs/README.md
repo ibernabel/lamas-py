@@ -10,6 +10,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [LAMaS Integration Requirements](./planning/lamas-integration-requirements.md) - CreditGraph & API Integration Requirements
 - [CreditGraph UI Technical Spec](./planning/creditgraph-ui-technical-spec.md) - Technical Specification & UI/UX Data Contract for CreditGraph AI
 - [**REQ: Auditoría LoanApplication Enums**](./planning/req-loan-application-enum-audit.md) - 📋 Requerimientos para corrección de enums en formulario público
+- [**REQ: Vista de Configuración e i18n Multi-Idioma**](./planning/req-settings-view-and-i18n.md) - 📋 Requerimientos y especificación técnica de i18n y /settings
 - [Status Report (Jul 2026)](./status-report.md) - Current projects health and progress
 
 ### Implementation Phases
@@ -26,7 +27,8 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Version Bump & Frontend Sync](./implementation/2026-07-27-version-bump-and-frontend-sync.md) - ✅ (Version 1.0.0)
 - [Customer Detail Redesign & CreditGraph Spec](./implementation/2026-07-28-customer-detail-redesign-and-creditgraph-spec.md) - ✅ (2026-07-28)
 - [Zero-PII Data Contract Integration](./implementation/2026-07-29-zero-pii-data-contract.md) - ✅ (2026-07-29)
-- [**Customer Form Enum Audit & Restoration**](./implementation/2026-07-30-customer-form-enum-audit-restoration.md) - ✅ (2026-07-30)
+- [Customer Form Enum Audit & Restoration](./implementation/2026-07-30-customer-form-enum-audit-restoration.md) - ✅ (2026-07-30)
+- [**Multi-Language i18n & Settings View**](./implementation/2026-07-30-multi-language-i18n-and-settings-view.md) - ✅ (2026-07-30)
 
 ### Decisions & Architecture (ADRs)
 

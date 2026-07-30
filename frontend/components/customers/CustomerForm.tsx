@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, XCircle, Loader2, Plus, Trash2, ArrowLeft, Check } from "lucide-react";
 import { toast } from "sonner";
 import { DocumentsSection } from "@/components/documents/DocumentsSection";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 import {
   Form,
@@ -81,6 +82,7 @@ type NidValidationState = "idle" | "loading" | "valid" | "invalid" | "taken";
 
 export function CustomerForm({ mode, customer }: CustomerFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const createMutation = useCreateCustomer();
   const updateMutation = useUpdateCustomer();
 
@@ -302,12 +304,12 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6">
         <Tabs defaultValue="personal" className="w-full">
           <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="personal">Personal</TabsTrigger>
-            <TabsTrigger value="phones">Teléfonos</TabsTrigger>
-            <TabsTrigger value="addresses">Dirección</TabsTrigger>
-            <TabsTrigger value="laboral">Laboral</TabsTrigger>
-            <TabsTrigger value="vehicle">Vehículo</TabsTrigger>
-            <TabsTrigger value="references">Referencias</TabsTrigger>
+            <TabsTrigger value="personal">{t("customers.tabs.personal")}</TabsTrigger>
+            <TabsTrigger value="phones">{t("customers.fields.phone")}</TabsTrigger>
+            <TabsTrigger value="addresses">{t("customers.fields.address")}</TabsTrigger>
+            <TabsTrigger value="laboral">{t("customers.tabs.employment")}</TabsTrigger>
+            <TabsTrigger value="vehicle">{t("customers.tabs.vehicle")}</TabsTrigger>
+            <TabsTrigger value="references">{t("customers.tabs.references")}</TabsTrigger>
           </TabsList>
 
           {/* ── Tab 1: Personal ── */}
@@ -1375,11 +1377,11 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
             onClick={() => router.back()}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Cancelar
+            {t("common.cancel")}
           </Button>
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {mode === "create" ? "Crear Cliente" : "Guardar Cambios"}
+            {mode === "create" ? t("customers.newCustomer") : t("common.saveChanges")}
           </Button>
         </div>
       </form>

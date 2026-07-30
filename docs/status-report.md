@@ -34,19 +34,24 @@ El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión
 
 ### C. Frontend Foundation & UI (`lamas-py/frontend`)
 
-**Estado**: ✅ Auditoría Enum CustomerForm Completada (2026-07-30)
+**Estado**: ✅ Arquitectura Multi-Idioma (i18n) e Integración de Configuración (`/settings`) Completada (2026-07-30)
 
 - **Logros**:
   - Configuración de **Next.js 16.1 (App Router)** con **Tailwind 4** y **shadcn/ui**.
+  - **Sistema de Internacionalización (i18n)**:
+    - Módulo `frontend/lib/i18n` con diccionarios de traducción estructurados (`es.ts` e `en.ts`), `LanguageProvider` React Context y hook `useTranslation()`.
+    - Persistencia automática de preferencias en `localStorage` (`lamas_language_pref`).
+    - Selector desplegable `LanguageSwitcher` integrado en la barra superior (`Header`) con banderas 🇪🇸/🇺🇸.
+    - Traducción reactiva de componentes en tiempo real (Dashboard, Clientes, Solicitudes, Modales de Transición de Estado y Notas, Formulario de Login).
+  - **Vista Dedicada de Configuración `/settings`**:
+    - Tarjeta de control de Idioma (Español / Inglés) y Apariencia/Tema (Claro / Oscuro / Sistema).
+    - Botón con ícono `Settings` integrado en el **Footer del Sidebar** en modos expandido y colapsado.
+    - Creado el componente `@/components/ui/radio-group.tsx` para controles de selección.
   - **Vista Detalle de Cliente `/customers/[id]`**: Layout multipestañas con CreditGraph analysis, gráfico radar, y vista legacy.
   - **Auditoría y Restauración de Campos Enum** (2026-07-30):
     - 5 campos `<Input>` convertidos a `<Select>` con valores controlados: `education_level`, `mode_of_transport`, `housing_type`, `housing_possession_type`, `payment_type`.
-    - Campo `payment_frequency` agregado (estaba ausente del formulario).
-    - Campo `vehicle_type` agregado como primer campo en la pestaña Vehículo.
-    - **Pestaña Vehículo — Opción B**: Estado vacío cuando `customer.vehicle === null`.
-    - Valores `gender` migrados de `M/F/O` → `male/female/other` en backend, frontend, seeds y tests.
-    - Fix runtime: eliminadas 9 instancias de `<SelectItem value="">` incompatibles con Radix UI.
-  - **Schemas actualizados**: Pydantic `Literal`, Zod `z.enum()` y TypeScript union types sincronizados.
+    - Campo `payment_frequency` y `vehicle_type` integrados en formularios.
+    - Valores `gender` migrados de `M/F/O` → `male/female/other`.
 
 ---
 

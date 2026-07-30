@@ -1,8 +1,7 @@
 "use client";
 
 /**
- * Customer edit page — /customers/[id]/edit
- * Fetches existing customer and renders CustomerForm in edit mode.
+ * Customer edit page — /customers/[id]/edit with i18n support.
  */
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -18,12 +17,14 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { CustomerForm } from "@/components/customers/CustomerForm";
 import { useCustomer } from "@/hooks/use-customers";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 export default function EditCustomerPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const id = Number(params.id);
   const { data: customer, isLoading, isError } = useCustomer(id);
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
@@ -47,10 +48,10 @@ export default function EditCustomerPage() {
   if (isError || !customer) {
     return (
       <div className="flex h-48 flex-col items-center justify-center gap-2 text-muted-foreground">
-        <p className="font-medium">Customer not found</p>
+        <p className="font-medium">{t("customers.notFound")}</p>
         <Button variant="ghost" size="sm" onClick={() => router.push("/customers")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Customers
+          {t("customers.backToCustomers")}
         </Button>
       </div>
     );
@@ -58,7 +59,7 @@ export default function EditCustomerPage() {
 
   const fullName = customer.detail
     ? `${customer.detail.first_name} ${customer.detail.last_name}`
-    : `Customer #${customer.id}`;
+    : `${t("customers.title")} #${customer.id}`;
 
   return (
     <div className="space-y-6">
@@ -67,16 +68,16 @@ export default function EditCustomerPage() {
         <Button variant="ghost" size="sm" asChild>
           <Link href={`/customers/${id}`}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t("common.back")}
           </Link>
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Editar Cliente</CardTitle>
+          <CardTitle>{t("customers.editCustomer")}</CardTitle>
           <CardDescription>
-            Actualizando perfil de <strong>{fullName}</strong> — {customer.nid}
+            {fullName} — {customer.nid}
           </CardDescription>
         </CardHeader>
         <CardContent>

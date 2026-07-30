@@ -83,4 +83,20 @@ describe("LoanTable", () => {
 
     expect(screen.getByText("No loan applications found")).toBeDefined();
   });
+
+  it("renders the direct 'Ver' action button for loan applications", () => {
+    render(
+      <LoanTable
+        data={mockData}
+        isLoading={false}
+        currentPage={1}
+        onPageChange={vi.fn()}
+        onDelete={vi.fn()}
+      />
+    );
+
+    const viewBtn = screen.getByTitle("Ver");
+    expect(viewBtn).toBeInTheDocument();
+    expect(viewBtn.closest("a")).toHaveAttribute("href", "/loans/1");
+  });
 });

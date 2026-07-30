@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTransitionLoanStatus } from "@/hooks/use-loan-applications";
 import type { LoanStatus } from "@/lib/api/types";
 import { AlertCircle } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 interface StatusTransitionDialogProps {
   loanId: number;
@@ -30,33 +31,23 @@ interface StatusTransitionDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-/** 
- * Status transition matrix mirroring backend logic 
- */
-const nextStatusMap: Record<LoanStatus, { target: LoanStatus; label: string }[]> = {
-  received: [
-    { target: "verified", label: "Verify Application" },
-    { target: "rejected", label: "Reject Application" },
-  ],
-  verified: [
-    { target: "assigned", label: "Assign to Analyst" },
-    { target: "rejected", label: "Reject Application" },
-  ],
-  assigned: [
-    { target: "analyzed", label: "Mark as Analyzed" },
-    { target: "rejected", label: "Reject Application" },
-  ],
-  analyzed: [
-    { target: "approved", label: "Approve Loan" },
-    { target: "rejected", label: "Reject Application" },
-  ],
-  approved: [
-    { target: "archived", label: "Archive Approved Loan" },
-  ],
-  rejected: [
-    { target: "archived", label: "Archive Rejected Application" },
-  ],
-  archived: [], // No more transitions
+const transitionLabels: Record<string, { es: string; en: string }> = {
+  "verified": { es: "Verificar Solicitud", en: "Verify Application" },
+  "assigned": { es: "Asignar a Analista", en: "Assign to Analyst" },
+  "analyzed": { es: "Marcar como Analizada", en: "Mark as Analyzed" },
+  "approved": { es: "Aprobar Préstamo", en: "Approve Loan" },
+  "rejected": { es: "Rechazar Solicitud", en: "Reject Application" },
+  "archived": { es: "Archivar Solicitud", en: "Archive Application" },
+};
+
+const nextStatusMap: Record<LoanStatus, LoanStatus[]> = {
+  received: ["verified", "rejected"],
+  verified: ["assigned", "rejected"],
+  assigned: ["analyzed", "rejected"],
+  analyzed: ["approved", "rejected"],
+  approved: ["archived"],
+  rejected: ["archived"],
+  archived: [],
 };
 
 export function StatusTransitionDialog({
@@ -68,8 +59,9 @@ export function StatusTransitionDialog({
   const [targetStatus, setTargetStatus] = useState<LoanStatus | "">("");
   const [note, setNote] = useState("");
   const transition = useTransitionLoanStatus();
+  const { t, language } = useTranslation();
 
-  const nextOptions = nextStatusMap[currentStatus] || [];
+  const nextTargets = nextStatusMap[currentStatus] || [];
 
   const handleTransition = () => {
     if (!targetStatus) return;
@@ -90,46 +82,59 @@ export function StatusTransitionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-112.5">
         <DialogHeader>
-          <DialogTitle>Update Loan Status</DialogTitle>
+          <DialogTitle>{t("loans.changeStatus")}</DialogTitle>
           <DialogDescription>
-            Change the current workflow state of this application.
+            {language === "es"
+              ? "Actualiza el estado de la solicitud dentro del flujo de trabajo."
+              : "Change the current workflow state of this application."}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="target-status">Next Status</Label>
-            {nextOptions.length > 0 ? (
+            <Label htmlFor="target-status">
+              {language === "es" ? "Siguiente Estado" : "Next Status"}
+            </Label>
+            {nextTargets.length > 0 ? (
               <Select
                 value={targetStatus}
                 onValueChange={(v) => setTargetStatus(v as LoanStatus)}
               >
                 <SelectTrigger id="target-status">
-                  <SelectValue placeholder="Select next step..." />
+                  <SelectValue placeholder={language === "es" ? "— Seleccionar paso —" : "Select next step..."} />
                 </SelectTrigger>
                 <SelectContent>
-                  {nextOptions.map((opt) => (
-                    <SelectItem key={opt.target} value={opt.target}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
+                  {nextTargets.map((target) => {
+                    const labelObj = transitionLabels[target];
+                    const labelText = labelObj ? labelObj[language] : t(`status.${target}`, target);
+                    return (
+                      <SelectItem key={target} value={target}>
+                        {labelText}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             ) : (
               <div className="flex items-center gap-2 p-3 text-sm text-muted-foreground bg-muted rounded-md border border-dashed">
                 <AlertCircle className="h-4 w-4" />
-                This loan is in a terminal state ({currentStatus}).
+                {language === "es"
+                  ? `Esta solicitud está en un estado final (${t(`status.${currentStatus}`, currentStatus)}).`
+                  : `This loan is in a terminal state (${currentStatus}).`}
               </div>
             )}
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="status-note">
-              Reason / Note <span className="text-muted-foreground font-normal">(Optional)</span>
+              {language === "es" ? "Motivo / Nota" : "Reason / Note"}{" "}
+              <span className="text-muted-foreground font-normal">
+                ({language === "es" ? "Opcional" : "Optional"})
+              </span>
             </Label>
             <Textarea
               id="status-note"
-              placeholder="Provide a reason for this transition..."
+              placeholder={language === "es" ? "Detalla el motivo del cambio de estado..." : "Provide a reason for this transition..."}
               value={note}
               onChange={(e) => setNote(e.target.value)}
               className="min-h-20"
@@ -139,13 +144,17 @@ export function StatusTransitionDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={handleTransition}
             disabled={!targetStatus || transition.isPending}
           >
-            {transition.isPending ? "Updating..." : "Confirm Update"}
+            {transition.isPending
+              ? t("common.loading")
+              : language === "es"
+              ? "Confirmar Cambio"
+              : "Confirm Update"}
           </Button>
         </DialogFooter>
       </DialogContent>

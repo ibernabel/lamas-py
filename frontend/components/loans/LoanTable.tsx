@@ -1,14 +1,12 @@
 "use client";
 
 /**
- * LoanTable — DataTable for the loan application list.
+ * LoanTable — DataTable for the loan application list with i18n support.
  */
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  MoreHorizontal,
   Eye,
-  Trash2,
   ChevronLeft,
   ChevronRight,
   ClipboardList,
@@ -21,18 +19,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LoanStatusBadge } from "./LoanStatusBadge";
 import type { LoanApplicationListItem, PaginatedResponse } from "@/lib/api/types";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 interface LoanTableProps {
   data: PaginatedResponse<LoanApplicationListItem> | undefined;
@@ -42,19 +34,20 @@ interface LoanTableProps {
   onDelete: (id: number) => void;
 }
 
-/** Format currency */
-function formatCurrency(amount: number | null): string {
+/** Format currency DOP */
+function formatCurrency(amount: number | null, locale: string): string {
   if (amount === null) return "—";
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(locale === "es" ? "es-DO" : "en-US", {
     style: "currency",
-    currency: "USD",
+    currency: "DOP",
+    maximumFractionDigits: 2,
   }).format(amount);
 }
 
 /** Format date */
-function formatDate(iso: string | null): string {
+function formatDate(iso: string | null, locale: string): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-US", {
+  return new Date(iso).toLocaleDateString(locale === "es" ? "es-DO" : "en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -77,9 +70,9 @@ export function LoanTable({
   isLoading,
   currentPage,
   onPageChange,
-  onDelete,
 }: LoanTableProps) {
   const router = useRouter();
+  const { t, language } = useTranslation();
 
   if (isLoading) {
     return (
@@ -95,8 +88,7 @@ export function LoanTable({
     return (
       <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-md border border-dashed text-muted-foreground">
         <ClipboardList className="h-8 w-8 opacity-20" />
-        <p className="text-sm font-medium">No loan applications found</p>
-        <p className="text-xs">Try adjusting your filters or create a new application.</p>
+        <p className="text-sm font-medium">{t("common.noData")}</p>
       </div>
     );
   }
@@ -108,11 +100,11 @@ export function LoanTable({
           <TableHeader>
             <TableRow>
               <TableHead className="w-16">ID</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead className="w-32">Status</TableHead>
-              <TableHead className="hidden lg:table-cell w-32">Created</TableHead>
-              <TableHead className="w-12" />
+              <TableHead>{t("customers.title")}</TableHead>
+              <TableHead>{t("loans.amount")}</TableHead>
+              <TableHead className="w-32">{t("common.status")}</TableHead>
+              <TableHead className="hidden lg:table-cell w-32">{t("common.created")}</TableHead>
+              <TableHead className="w-12 text-right">{t("common.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -135,7 +127,7 @@ export function LoanTable({
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="font-medium text-sm">
-                        {loan.customer_name ?? "Unknown Customer"}
+                        {loan.customer_name ?? t("common.noData")}
                       </span>
                       {loan.customer_nid && (
                         <span className="text-[10px] text-muted-foreground font-mono">
@@ -148,7 +140,7 @@ export function LoanTable({
 
                 {/* Amount */}
                 <TableCell className="font-medium">
-                  {formatCurrency(loan.amount)}
+                  {formatCurrency(loan.amount, language)}
                 </TableCell>
 
                 {/* Status */}
@@ -158,39 +150,22 @@ export function LoanTable({
 
                 {/* Date */}
                 <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
-                  {formatDate(loan.created_at)}
+                  {formatDate(loan.created_at, language)}
                 </TableCell>
 
                 {/* Actions */}
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        aria-label="Loan actions"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/loans/${loan.id}`}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View Details
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onClick={() => onDelete(loan.id)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                <TableCell onClick={(e) => e.stopPropagation()} className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                    asChild
+                    title={t("common.view")}
+                  >
+                    <Link href={`/loans/${loan.id}`} aria-label={t("common.viewDetails")}>
+                      <Eye className="h-4 w-4" />
+                    </Link>
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -202,8 +177,8 @@ export function LoanTable({
       {data.pages > 1 && (
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <p>
-            Showing {(currentPage - 1) * data.per_page + 1}–
-            {Math.min(currentPage * data.per_page, data.total)} of {data.total} loans
+            {t("common.view")} {(currentPage - 1) * data.per_page + 1}–
+            {Math.min(currentPage * data.per_page, data.total)} / {data.total}
           </p>
           <div className="flex gap-1">
             <Button
@@ -212,7 +187,7 @@ export function LoanTable({
               className="h-7 w-7"
               disabled={currentPage <= 1}
               onClick={() => onPageChange(currentPage - 1)}
-              aria-label="Previous page"
+              aria-label={t("common.previous")}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -222,7 +197,7 @@ export function LoanTable({
               className="h-7 w-7"
               disabled={currentPage >= data.pages}
               onClick={() => onPageChange(currentPage + 1)}
-              aria-label="Next page"
+              aria-label={t("common.next")}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

@@ -4,9 +4,9 @@
  * Customer detail page — /customers/[id]
  * Client component to use useCustomer hook for data fetching.
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   PencilLine,
@@ -35,6 +35,7 @@ import { CreditGraphSummaryCard } from "@/components/customers/CreditGraphSummar
 import { CustomerCreditGraphAnalysis } from "@/components/customers/CustomerCreditGraphAnalysis";
 import { CustomerLegacyView } from "@/components/customers/CustomerLegacyView";
 import { useCustomer } from "@/hooks/use-customers";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 // ── Helper components ──────────────────────────────────────────────────────
 
@@ -50,18 +51,9 @@ function InfoRow({ label, value, className }: { label: string; value: string | R
 function DetailSkeleton() {
   return (
     <div className="space-y-6">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <Card key={i}>
-          <CardHeader>
-            <Skeleton className="h-5 w-32" />
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 gap-4">
-            {Array.from({ length: 4 }).map((_, j) => (
-              <Skeleton key={j} className="h-8 w-full" />
-            ))}
-          </CardContent>
-        </Card>
-      ))}
+      <Skeleton className="h-9 w-32" />
+      <Skeleton className="h-8 w-64" />
+      <Skeleton className="h-[400px] w-full rounded-xl" />
     </div>
   );
 }
@@ -71,19 +63,28 @@ function DetailSkeleton() {
 export default function CustomerDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const id = Number(params.id);
   const { data: customer, isLoading, isError } = useCustomer(id);
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam && ["overview", "documents", "analysis", "legacy"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   if (isLoading) return <DetailSkeleton />;
 
   if (isError || !customer) {
     return (
       <div className="flex h-48 flex-col items-center justify-center gap-2 text-muted-foreground">
-        <p className="font-medium">Customer not found</p>
+        <p className="font-medium">{t("customers.notFound")}</p>
         <Button variant="ghost" size="sm" onClick={() => router.push("/customers")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Customers
+          {t("customers.backToCustomers")}
         </Button>
       </div>
     );
@@ -91,7 +92,7 @@ export default function CustomerDetailPage() {
 
   const fullName = customer.detail
     ? `${customer.detail.first_name} ${customer.detail.last_name}`
-    : `Customer #${customer.id}`;
+    : `${t("customers.title")} #${customer.id}`;
 
   return (
     <div className="space-y-6">
@@ -101,23 +102,23 @@ export default function CustomerDetailPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/customers">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Clientes
+              {t("nav.customers")}
             </Link>
           </Button>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold tracking-tight">{fullName}</h1>
               <Badge variant={customer.is_active ? "default" : "secondary"}>
-                {customer.is_active ? "Activo" : "Inactivo"}
+                {customer.is_active ? t("status.active") : t("status.inactive")}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground font-mono">Cédula: {customer.nid}</p>
+            <p className="text-sm text-muted-foreground font-mono">{t("customers.fields.nid")}: {customer.nid}</p>
           </div>
         </div>
         <Button asChild id="edit-customer-btn">
           <Link href={`/customers/${customer.id}/edit`}>
             <PencilLine className="mr-2 h-4 w-4" />
-            Editar Cliente
+            {t("customers.editCustomer")}
           </Link>
         </Button>
       </div>

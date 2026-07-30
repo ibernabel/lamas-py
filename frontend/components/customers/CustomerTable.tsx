@@ -1,16 +1,14 @@
 "use client";
 
 /**
- * CustomerTable — DataTable for the customer list.
+ * CustomerTable — DataTable for the customer list with i18n support.
  * Displays paginated rows with action menu per row.
  */
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  MoreHorizontal,
   Eye,
   PencilLine,
-  Trash2,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -22,18 +20,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { CustomerListItem, PaginatedResponse } from "@/lib/api/types";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 interface CustomerTableProps {
   data: PaginatedResponse<CustomerListItem> | undefined;
@@ -44,8 +36,8 @@ interface CustomerTableProps {
 }
 
 /** Format an ISO date string as a short human-readable date */
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", {
+function formatDate(iso: string, locale: string): string {
+  return new Date(iso).toLocaleDateString(locale === "es" ? "es-DO" : "en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -67,9 +59,9 @@ export function CustomerTable({
   isLoading,
   currentPage,
   onPageChange,
-  onDelete,
 }: CustomerTableProps) {
   const router = useRouter();
+  const { t, language } = useTranslation();
 
   if (isLoading) {
     return (
@@ -84,8 +76,8 @@ export function CustomerTable({
   if (!data || data.items.length === 0) {
     return (
       <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-md border border-dashed text-muted-foreground">
-        <p className="text-sm font-medium">No customers found</p>
-        <p className="text-xs">Try adjusting your filters or create a new customer.</p>
+        <p className="text-sm font-medium">{t("customers.notFound")}</p>
+        <p className="text-xs">{t("common.noData")}</p>
       </div>
     );
   }
@@ -96,13 +88,12 @@ export function CustomerTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-32.5">NID</TableHead>
-              <TableHead>Full Name</TableHead>
-              <TableHead className="hidden md:table-cell">Email</TableHead>
-              <TableHead className="w-25">Status</TableHead>
-              <TableHead className="hidden lg:table-cell w-25">Assigned</TableHead>
-              <TableHead className="hidden lg:table-cell w-30">Created</TableHead>
-              <TableHead className="w-12.5" />
+              <TableHead className="w-32.5">{t("customers.fields.nid")}</TableHead>
+              <TableHead>{t("customers.fields.fullName")}</TableHead>
+              <TableHead className="hidden md:table-cell">{t("customers.fields.email")}</TableHead>
+              <TableHead className="w-25">{t("common.status")}</TableHead>
+              <TableHead className="hidden lg:table-cell w-30">{t("common.created")}</TableHead>
+              <TableHead className="text-right w-28 sm:w-36" />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -143,60 +134,44 @@ export function CustomerTable({
                 {/* Status badge */}
                 <TableCell>
                   <Badge variant={customer.is_active ? "default" : "secondary"}>
-                    {customer.is_active ? "Active" : "Inactive"}
+                    {customer.is_active ? t("status.active") : t("status.inactive")}
                   </Badge>
-                </TableCell>
-
-                {/* Assigned */}
-                <TableCell className="hidden lg:table-cell text-sm">
-                  {customer.is_assigned ? (
-                    <span className="text-green-600">Yes</span>
-                  ) : (
-                    <span className="text-muted-foreground">No</span>
-                  )}
                 </TableCell>
 
                 {/* Created date */}
                 <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
-                  {formatDate(customer.created_at)}
+                  {formatDate(customer.created_at, language)}
                 </TableCell>
 
-                {/* Action menu */}
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        aria-label="Customer actions"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/customers/${customer.id}`}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/customers/${customer.id}/edit`}>
-                          <PencilLine className="mr-2 h-4 w-4" />
-                          Edit
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onClick={() => onDelete(customer.id)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                {/* Actions: Grouped Ver|Editar buttons */}
+                <TableCell onClick={(e) => e.stopPropagation()} className="text-right">
+                  <div className="inline-flex items-center justify-end rounded-md border border-input bg-background p-0.5 shadow-xs">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-xs font-medium gap-1 hover:bg-accent hover:text-accent-foreground"
+                      asChild
+                      title={t("common.view")}
+                    >
+                      <Link href={`/customers/${customer.id}`} aria-label={t("common.viewDetails")}>
+                        <Eye className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">{t("common.view")}</span>
+                      </Link>
+                    </Button>
+                    <div className="h-3.5 w-px bg-border shrink-0" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-xs font-medium gap-1 hover:bg-accent hover:text-accent-foreground"
+                      asChild
+                      title={t("common.edit")}
+                    >
+                      <Link href={`/customers/${customer.id}/edit`} aria-label={t("common.edit")}>
+                        <PencilLine className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">{t("common.edit")}</span>
+                      </Link>
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -208,8 +183,8 @@ export function CustomerTable({
       {data.pages > 1 && (
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <p>
-            Showing {(currentPage - 1) * data.per_page + 1}–
-            {Math.min(currentPage * data.per_page, data.total)} of {data.total} customers
+            {t("common.view")} {(currentPage - 1) * data.per_page + 1}–
+            {Math.min(currentPage * data.per_page, data.total)} / {data.total}
           </p>
           <div className="flex gap-1">
             <Button
@@ -218,7 +193,7 @@ export function CustomerTable({
               className="h-7 w-7"
               disabled={currentPage <= 1}
               onClick={() => onPageChange(currentPage - 1)}
-              aria-label="Previous page"
+              aria-label={t("common.previous")}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -228,7 +203,7 @@ export function CustomerTable({
               className="h-7 w-7"
               disabled={currentPage >= data.pages}
               onClick={() => onPageChange(currentPage + 1)}
-              aria-label="Next page"
+              aria-label={t("common.next")}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

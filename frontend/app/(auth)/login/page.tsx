@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Login page with email/password form and SoliPres shadcn/ui styling.
+ * Login page with email/password form and SoliPres shadcn/ui styling with full i18n support.
  * Uses NextAuth.js v5 signIn with Credentials provider.
- * Includes ThemeToggle for switching between light and dark modes.
+ * Includes LanguageSwitcher and ThemeToggle.
  */
 import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
@@ -20,12 +20,15 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2, LogIn } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { APP_VERSION } from "@/lib/version";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,13 +48,13 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        setError("Invalid email or password. Please try again.");
+        setError(t("auth.invalidCredentials"));
       } else {
         router.push(callbackUrl);
         router.refresh();
       }
     } catch {
-      setError("An unexpected error occurred. Please try again.");
+      setError(t("auth.invalidCredentials"));
     } finally {
       setLoading(false);
     }
@@ -60,21 +63,21 @@ function LoginForm() {
   return (
     <Card className="border-border bg-card shadow-md">
       <CardHeader>
-        <CardTitle className="text-xl font-bold">Sign in</CardTitle>
+        <CardTitle className="text-xl font-bold">{t("auth.title")}</CardTitle>
         <CardDescription>
-          Enter your credentials to access the dashboard.
+          {t("auth.subtitle")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4" id="login-form">
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium leading-none">
-              Email
+              {t("auth.emailLabel")}
             </label>
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder="correo@ejemplo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -89,7 +92,7 @@ function LoginForm() {
               htmlFor="password"
               className="text-sm font-medium leading-none"
             >
-              Password
+              {t("auth.passwordLabel")}
             </label>
             <Input
               id="password"
@@ -122,12 +125,12 @@ function LoginForm() {
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing in…
+                {t("common.loading")}
               </>
             ) : (
               <>
                 <LogIn className="mr-2 h-4 w-4" />
-                Sign in
+                {t("auth.signIn")}
               </>
             )}
           </Button>
@@ -156,8 +159,9 @@ function LoginFormSkeleton() {
 export default function LoginPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background p-4 transition-colors">
-      {/* Absolute Theme Toggle at top right */}
-      <div className="absolute top-4 right-4">
+      {/* Absolute Language Switcher & Theme Toggle at top right */}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <LanguageSwitcher />
         <ThemeToggle />
       </div>
 

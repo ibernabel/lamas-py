@@ -2,8 +2,9 @@
 
 /**
  * Top header bar component.
- * Shows page title, theme toggle, and user avatar dropdown with sign-out option.
+ * Shows page title, language switcher, theme toggle, and user avatar dropdown with sign-out option.
  */
+import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { LogOut, User, Settings } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -17,6 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 interface HeaderProps {
   title?: string;
@@ -33,6 +36,7 @@ function getInitials(name: string): string {
 
 export function Header({ title = "Dashboard" }: HeaderProps) {
   const { data: session } = useSession();
+  const { t } = useTranslation();
   const userName = session?.user?.name ?? "User";
   const userEmail = session?.user?.email ?? "";
 
@@ -42,7 +46,8 @@ export function Header({ title = "Dashboard" }: HeaderProps) {
       <h1 className="text-lg font-semibold text-foreground">{title}</h1>
 
       {/* Header controls & User menu */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <LanguageSwitcher />
         <ThemeToggle />
 
         <DropdownMenu>
@@ -64,15 +69,13 @@ export function Header({ title = "Dashboard" }: HeaderProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{userName}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled>
-              <User className="mr-2 h-4 w-4" />
-              Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem disabled>
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link href="/settings" className="flex items-center">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>{t("nav.settings")}</span>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -81,7 +84,7 @@ export function Header({ title = "Dashboard" }: HeaderProps) {
               onClick={() => signOut({ callbackUrl: "/login" })}
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Sign out
+              <span>{t("nav.logout")}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

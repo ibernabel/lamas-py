@@ -207,4 +207,21 @@ describe("CustomerTable", () => {
       expect(onPageChange).toHaveBeenCalledWith(2);
     }
   });
+
+  it("renders grouped action buttons ('Ver' and 'Editar') with correct titles and links", () => {
+    render(
+      <CustomerTable
+        {...defaultProps}
+        data={makePaginatedResponse([makeCustomer({ id: 99 })])}
+      />
+    );
+
+    const viewBtn = screen.getByTitle("Ver");
+    const editBtn = screen.getByTitle("Editar");
+
+    expect(viewBtn).toBeInTheDocument();
+    expect(editBtn).toBeInTheDocument();
+    expect(viewBtn.closest("a")).toHaveAttribute("href", "/customers/99");
+    expect(editBtn.closest("a")).toHaveAttribute("href", "/customers/99/edit");
+  });
 });

@@ -28,11 +28,12 @@ import { EvaluateLoanButton } from "@/components/loans/EvaluateLoanButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DocumentsSection } from "@/components/documents/DocumentsSection";
 import { useCustomer } from "@/hooks/use-customers";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 export default function LoanDetailPage() {
   const { id } = useParams();
   const loanId = parseInt(id as string);
-
+  const { t, language } = useTranslation();
 
   const { data: loan, isLoading } = useLoanApplication(loanId);
   const { data: customer, isLoading: isCustomerLoading } = useCustomer(loan?.customer_id ?? 0);
@@ -59,17 +60,21 @@ export default function LoanDetailPage() {
   if (!loan) {
     return (
       <div className="flex flex-col items-center justify-center min-h-100 text-center">
-        <h2 className="text-xl font-bold">Loan Application Not Found</h2>
-        <p className="text-muted-foreground mt-2">The application you are looking for does not exist or has been removed.</p>
+        <h2 className="text-xl font-bold">{t("common.noData")}</h2>
+        <p className="text-muted-foreground mt-2">{t("common.notFound")}</p>
         <Button asChild className="mt-4">
-          <Link href="/loans">Back to Loans</Link>
+          <Link href="/loans">{t("common.back")}</Link>
         </Button>
       </div>
     );
   }
 
   const formatCurrency = (val: number | undefined) => 
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(val ?? 0);
+    new Intl.NumberFormat(language === "es" ? "es-DO" : "en-US", {
+      style: "currency",
+      currency: "DOP",
+      maximumFractionDigits: 2,
+    }).format(val ?? 0);
 
   return (
     <div className="space-y-6">
@@ -81,14 +86,14 @@ export default function LoanDetailPage() {
             className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors mb-2"
           >
             <ChevronLeft className="mr-1 h-4 w-4" />
-            Back to Loans
+            {t("common.back")}
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight">Loan Application #{loan.id}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{t("loans.loanDetails")} #{loan.id}</h1>
             <LoanStatusBadge status={loan.status} />
           </div>
           <p className="text-muted-foreground text-sm mt-1">
-            Registered on {new Date(loan.created_at!).toLocaleDateString()}
+            {t("common.created")}: {new Date(loan.created_at!).toLocaleDateString(language === "es" ? "es-DO" : "en-US")}
           </p>
         </div>
 
@@ -96,10 +101,10 @@ export default function LoanDetailPage() {
           <EvaluateLoanButton loanId={loanId} />
           <Button variant="outline" onClick={() => setNoteOpen(true)}>
             <MessageSquare className="mr-2 h-4 w-4" />
-            Add Note
+            {t("loans.addNote")}
           </Button>
           <Button onClick={() => setStatusOpen(true)}>
-            Update Status
+            {t("loans.changeStatus")}
           </Button>
         </div>
       </div>
@@ -109,34 +114,34 @@ export default function LoanDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Financial Information</CardTitle>
-              <CardDescription>Core terms and conditions of the requested loan.</CardDescription>
+              <CardTitle>{t("loans.loanDetails")}</CardTitle>
+              <CardDescription>{t("loans.subtitle")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground uppercase flex items-center gap-1">
-                    <DollarSign className="h-3 w-3" /> Amount
+                    <DollarSign className="h-3 w-3" /> {t("loans.amount")}
                   </p>
                   <p className="text-lg font-bold">{formatCurrency(loan.detail?.amount)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground uppercase flex items-center gap-1">
-                    <Clock className="h-3 w-3" /> Term
+                    <Clock className="h-3 w-3" /> {t("loans.term")}
                   </p>
-                  <p className="text-lg font-bold">{loan.detail?.term} Months</p>
+                  <p className="text-lg font-bold">{loan.detail?.term} {language === "es" ? "Meses" : "Months"}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground uppercase flex items-center gap-1">
-                    <Percent className="h-3 w-3" /> Rate
+                    <Percent className="h-3 w-3" /> Tasa
                   </p>
                   <p className="text-lg font-bold">{loan.detail?.rate}%</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground uppercase flex items-center gap-1">
-                    <Calendar className="h-3 w-3" /> Frequency
+                    <Calendar className="h-3 w-3" /> {t("loans.frequency")}
                   </p>
-                  <p className="text-lg font-bold capitalize">{loan.detail?.frequency ?? "Monthly"}</p>
+                  <p className="text-lg font-bold capitalize">{loan.detail?.frequency ?? "—"}</p>
                 </div>
               </div>
 
@@ -144,15 +149,15 @@ export default function LoanDetailPage() {
 
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-sm font-semibold mb-1">Purpose</h4>
+                  <h4 className="text-sm font-semibold mb-1">{t("loans.purpose")}</h4>
                   <p className="text-sm text-muted-foreground italic">
-                    {loan.detail?.purpose || "No purpose specified by customer."}
+                    {loan.detail?.purpose || t("common.noData")}
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold mb-1">Customer Comment</h4>
+                  <h4 className="text-sm font-semibold mb-1">Comentario del Cliente</h4>
                   <p className="text-sm text-muted-foreground">
-                    {loan.detail?.customer_comment || "No comments provided."}
+                    {loan.detail?.customer_comment || t("common.noData")}
                   </p>
                 </div>
               </div>
@@ -163,16 +168,16 @@ export default function LoanDetailPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-lg flex items-center gap-2">
-                <History className="h-5 w-5" /> Timeline & Notes
+                <History className="h-5 w-5" /> LÍnea de Tiempo y Notas
               </CardTitle>
               <Button variant="ghost" size="sm" onClick={() => setNoteOpen(true)}>
-                <Plus className="h-4 w-4 mr-1" /> Add
+                <Plus className="h-4 w-4 mr-1" /> {t("common.create")}
               </Button>
             </CardHeader>
             <CardContent>
               {loan.notes.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  <p className="text-sm italic">No internal notes yet.</p>
+                  <p className="text-sm italic">{t("common.noData")}</p>
                 </div>
               ) : (
                 <div className="space-y-6 relative pl-8 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:bg-linear-to-b before:from-indigo-500 before:to-purple-500">
@@ -189,7 +194,7 @@ export default function LoanDetailPage() {
                             <div className="bg-slate-50 p-4 rounded-lg border dark:bg-slate-900/50">
                               <p className="text-sm mb-1">{note.note}</p>
                               <p className="text-[10px] text-muted-foreground">
-                                {new Date(note.created_at!).toLocaleString()}
+                                {new Date(note.created_at!).toLocaleString(language === "es" ? "es-DO" : "en-US")}
                               </p>
                             </div>
                           </div>
@@ -217,17 +222,17 @@ export default function LoanDetailPage() {
           {/* Documents Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Documents & Proofs</CardTitle>
-              <CardDescription>Upload bank statements and credit reports for this application.</CardDescription>
+              <CardTitle>Documentos y Comprobantes</CardTitle>
+              <CardDescription>Gestión de estados de cuenta y reporte de crédito de la solicitud.</CardDescription>
             </CardHeader>
             <CardContent>
               <DocumentsSection 
                 entityType="loan" 
                 entityId={loan.id} 
                 requiredTypes={[
-                  { type: "bank_statement", label: "Bank Statement (Popular)", bankName: "popular" },
-                  { type: "bank_statement", label: "Bank Statement (BHD)", bankName: "bhd" },
-                  { type: "credit_report", label: "Credit Report (TransUnion/DataCrédito)" }
+                  { type: "bank_statement", label: "Estado de Cuenta (Popular)", bankName: "popular" },
+                  { type: "bank_statement", label: "Estado de Cuenta (BHD)", bankName: "bhd" },
+                  { type: "credit_report", label: "Reporte de Crédito (TransUnion/DataCrédito)" }
                 ]}
               />
             </CardContent>
@@ -238,7 +243,7 @@ export default function LoanDetailPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-md">Customer Summary</CardTitle>
+              <CardTitle className="text-md">{t("customers.customerDetails")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
@@ -247,91 +252,79 @@ export default function LoanDetailPage() {
                     <User className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                   </div>
                   <div className="space-y-0.5">
-                    <p className="text-[10px] text-muted-foreground uppercase font-medium">Full Name</p>
+                    <p className="text-[10px] text-muted-foreground uppercase font-medium">{t("customers.fields.fullName")}</p>
                     <div className="text-sm font-semibold whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]">
                       {isCustomerLoading ? (
                         <Skeleton className="h-4 w-24" />
                       ) : (
-                        `${customer?.detail?.first_name ?? "Unknown"} ${customer?.detail?.last_name ?? ""}`
+                        `${customer?.detail?.first_name ?? t("common.noData")} ${customer?.detail?.last_name ?? ""}`
                       )}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-                    <Phone className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <p className="text-[10px] text-muted-foreground uppercase font-medium">Phone</p>
-                    <div className="text-sm">
-                      {isCustomerLoading ? (
-                        <Skeleton className="h-4 w-20" />
-                      ) : (
-                        customer?.phones?.[0]?.number || "—"
-                      )}
+                {customer?.nid && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                      <User className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] text-muted-foreground uppercase font-medium">{t("customers.fields.nid")}</p>
+                      <p className="text-sm font-semibold font-mono">{customer.nid}</p>
                     </div>
                   </div>
-                </div>
+                )}
 
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-                    <Mail className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <p className="text-[10px] text-muted-foreground uppercase font-medium">Email</p>
-                    <div className="text-sm truncate max-w-[180px]">
-                      {isCustomerLoading ? (
-                        <Skeleton className="h-4 w-32" />
-                      ) : (
-                        customer?.detail?.email || "—"
-                      )}
+                {customer?.email && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                      <Mail className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] text-muted-foreground uppercase font-medium">{t("customers.fields.email")}</p>
+                      <p className="text-xs font-semibold text-muted-foreground truncate max-w-[180px]">
+                        {customer.email}
+                      </p>
                     </div>
                   </div>
-                </div>
+                )}
 
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-                    <Briefcase className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <p className="text-[10px] text-muted-foreground uppercase font-medium">Employment</p>
-                    <div className="text-sm font-medium">
-                      {isCustomerLoading ? (
-                        <Skeleton className="h-4 w-28" />
-                      ) : (
-                        customer?.job_info?.role 
-                          ? `${customer.job_info.role}${customer.company?.name ? ` at ${customer.company.name}` : ""}`
-                          : customer?.company?.name || "—"
-                      )}
+                {customer?.phones && customer.phones.length > 0 && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                      <Phone className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] text-muted-foreground uppercase font-medium">{t("customers.fields.phone")}</p>
+                      <p className="text-xs font-semibold text-muted-foreground">
+                        {customer.phones[0].number}
+                      </p>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {customer?.company?.name && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                      <Briefcase className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-[10px] text-muted-foreground uppercase font-medium">{t("customers.fields.companyName")}</p>
+                      <p className="text-xs font-semibold text-muted-foreground truncate max-w-[180px]">
+                        {customer.company.name}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className="pt-2">
-                <Button asChild variant="outline" className="w-full h-9 text-xs">
-                  <Link href={`/customers/${loan.customer_id}`}>
-                    View Full Profile
+              {customer && (
+                <Button variant="outline" size="sm" asChild className="w-full mt-4">
+                  <Link href={`/customers/${customer.id}`}>
+                    {t("customers.customerDetails")}
                   </Link>
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-slate-100 border-slate-300 dark:bg-slate-900/30">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-md flex items-center gap-2">
-                Workflow State
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-xs space-y-2">
-              <p>Current Status: <strong className="capitalize">{loan.status}</strong></p>
-              <p>Last Activity: {loan.changed_status_at ? new Date(loan.changed_status_at).toLocaleString() : "First registration"}</p>
-              <Separator className="my-2" />
-              <p className="text-muted-foreground leading-relaxed">
-                Updating the status triggers internal validation and prepares the application for final credit decision.
-              </p>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -339,12 +332,12 @@ export default function LoanDetailPage() {
 
       {/* Dialogs */}
       <AddNoteDialog
-        loanId={loan.id}
+        loanId={loanId}
         open={noteOpen}
         onOpenChange={setNoteOpen}
       />
       <StatusTransitionDialog
-        loanId={loan.id}
+        loanId={loanId}
         currentStatus={loan.status}
         open={statusOpen}
         onOpenChange={setStatusOpen}
