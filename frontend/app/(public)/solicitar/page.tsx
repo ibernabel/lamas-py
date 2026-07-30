@@ -146,7 +146,7 @@ export default function SolicitarPage() {
         },
       };
 
-      const response = await api.post("/api/v1/loan-applications/submit", payload);
+      const response = await api.post("/loan-applications/submit", payload);
 
       if (response.data && response.data.loan_application_id) {
         const appId = response.data.loan_application_id;

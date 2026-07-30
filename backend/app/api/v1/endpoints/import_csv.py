@@ -42,6 +42,12 @@ async def import_solipres_csv(
             detail=f"Error reading uploaded file: {str(exc)}"
         )
 
-    importer = SoliPresCSVImporter(session)
-    result = importer.import_csv_content(content_str)
-    return result
+    try:
+        importer = SoliPresCSVImporter(session)
+        result = importer.import_csv_content(content_str)
+        return result
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Error al procesar el archivo CSV de SoliPres: {str(exc)}"
+        )

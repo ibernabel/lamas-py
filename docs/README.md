@@ -47,6 +47,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 ### Fixes
 
 - [Fix: SelectItem Empty Value Runtime Error](./fixes/fix_2026_07_30_select_item_empty_value.md) - 2026-07-30
+- [Fix: Importación CSV SoliPres (Duplicación Ruta, Savepoints y CORS)](./fixes/fix_2026_07_30_solipres_csv_import_500_cors.md) - 2026-07-30
 
 ### Knowledges & Issues
 

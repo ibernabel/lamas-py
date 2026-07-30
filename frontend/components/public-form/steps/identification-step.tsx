@@ -47,7 +47,7 @@ export function IdentificationStep({ onNext }: IdentificationStepProps) {
     try {
       // Clean NID for API lookup
       const cleaned = nidValue.replace(/\D/g, "");
-      const response = await api.get(`/api/v1/nid-validation/${cleaned}`).catch(() => null);
+      const response = await api.get(`/nid-validation/${cleaned}`).catch(() => null);
 
       if (response?.data) {
         if (response.data.first_name) {
