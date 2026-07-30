@@ -83,7 +83,7 @@ export function DocumentList({ documents, onDeleteSuccess }: DocumentListProps) 
   }
 
   return (
-    <div className="rounded-md border bg-card">
+    <div className="rounded-lg border border-border/80 shadow-2xs bg-card overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow>
@@ -99,12 +99,12 @@ export function DocumentList({ documents, onDeleteSuccess }: DocumentListProps) 
             <TableRow key={doc.id} className={!doc.is_latest ? "opacity-60 bg-secondary/5" : ""}>
               <TableCell className="font-medium">
                 <div className="flex items-center space-x-2">
-                  <FileText className="w-4 h-4 text-blue-500 shrink-0" />
-                  <span className="truncate max-w-37.5 md:max-w-50" title={doc.file_name}>
+                  <FileText className="w-4 h-4 text-primary shrink-0" />
+                  <span className="truncate max-w-37.5 md:max-w-50 text-foreground" title={doc.file_name}>
                     {doc.file_name}
                   </span>
                   {doc.is_latest && (
-                    <Badge variant="outline" className="text-[10px] py-0 px-1 border-green-500 text-green-600 bg-green-50">
+                    <Badge variant="outline" className="text-[10px] py-0 px-1 border-[var(--success-fg)]/30 text-[var(--success-fg)] bg-[var(--success-bg)]">
                       Actual
                     </Badge>
                   )}
@@ -112,7 +112,7 @@ export function DocumentList({ documents, onDeleteSuccess }: DocumentListProps) 
               </TableCell>
               <TableCell>
                 <div className="flex flex-col">
-                  <span className="text-xs">{getDocTypeName(doc.document_type)}</span>
+                  <span className="text-xs text-foreground font-medium">{getDocTypeName(doc.document_type)}</span>
                   {doc.bank_name && (
                     <span className="text-[10px] uppercase font-bold text-muted-foreground">
                       {doc.bank_name}
@@ -127,34 +127,38 @@ export function DocumentList({ documents, onDeleteSuccess }: DocumentListProps) 
                 {formatSize(doc.file_size_bytes)}
               </TableCell>
               <TableCell className="text-right">
-                <div className="flex justify-end space-x-1">
+                <div className="inline-flex items-center justify-end rounded-full border border-slate-200 dark:border-slate-700 bg-card px-3 py-1 shadow-2xs gap-1.5">
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-primary"
+                    size="sm"
+                    className="h-6 px-1.5 text-xs font-semibold gap-1.5 text-[#0284c7] dark:text-[#38bdf8] hover:bg-transparent hover:text-[#0369a1] transition-colors"
                     onClick={() => setViewingDoc(doc)}
                     title="Visualizar"
                   >
-                    <Eye className="h-4 w-4" />
+                    <Eye className="h-3.5 w-3.5 text-[#0284c7] dark:text-[#38bdf8]" />
+                    <span>Ver</span>
                   </Button>
+                  <div className="h-3.5 w-px bg-slate-200 dark:bg-slate-700 shrink-0" />
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-primary"
+                    size="sm"
+                    className="h-6 px-1.5 text-xs font-semibold gap-1.5 text-[#0284c7] dark:text-[#38bdf8] hover:bg-transparent hover:text-[#0369a1] transition-colors"
                     onClick={() => window.open(resolveDocumentUrl(doc.download_url), "_blank")}
                     title="Descargar"
                   >
-                    <Download className="h-4 w-4" />
+                    <Download className="h-3.5 w-3.5 text-[#0284c7] dark:text-[#38bdf8]" />
+                    <span className="hidden sm:inline">Descargar</span>
                   </Button>
+                  <div className="h-3.5 w-px bg-slate-200 dark:bg-slate-700 shrink-0" />
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-destructive"
+                    size="sm"
+                    className="h-6 px-1.5 text-xs font-semibold gap-1.5 text-destructive hover:bg-transparent hover:text-destructive transition-colors"
                     onClick={() => handleDelete(doc.id)}
                     disabled={isDeleting === doc.id}
                     title="Eliminar"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </TableCell>

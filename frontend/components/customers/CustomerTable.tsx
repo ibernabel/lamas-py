@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Eye,
-  PencilLine,
+  FilePenLine,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -21,7 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { CustomerStatusBadge } from "./CustomerStatusBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { CustomerListItem, PaginatedResponse } from "@/lib/api/types";
@@ -75,7 +75,7 @@ export function CustomerTable({
 
   if (!data || data.items.length === 0) {
     return (
-      <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-md border border-dashed text-muted-foreground">
+      <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-muted-foreground bg-card">
         <p className="text-sm font-medium">{t("customers.notFound")}</p>
         <p className="text-xs">{t("common.noData")}</p>
       </div>
@@ -84,28 +84,28 @@ export function CustomerTable({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border">
+      <div className="rounded-lg border border-border/80 shadow-2xs bg-card overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-32.5">{t("customers.fields.nid")}</TableHead>
               <TableHead>{t("customers.fields.fullName")}</TableHead>
               <TableHead className="hidden md:table-cell">{t("customers.fields.email")}</TableHead>
-              <TableHead className="w-25">{t("common.status")}</TableHead>
-              <TableHead className="hidden lg:table-cell w-30">{t("common.created")}</TableHead>
-              <TableHead className="text-right w-28 sm:w-36" />
+              <TableHead className="w-28">{t("common.status")}</TableHead>
+              <TableHead className="hidden lg:table-cell w-32">{t("common.created")}</TableHead>
+              <TableHead className="text-right w-28 sm:w-36">{t("common.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.items.map((customer) => (
               <TableRow
                 key={customer.id}
-                className="cursor-pointer hover:bg-muted/50"
+                className="cursor-pointer hover:bg-muted/40"
                 onClick={() => router.push(`/customers/${customer.id}`)}
               >
                 {/* NID */}
                 <TableCell
-                  className="font-mono text-xs"
+                  className="font-mono text-xs font-medium text-primary"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Link
@@ -118,11 +118,11 @@ export function CustomerTable({
 
                 {/* Full Name + avatar */}
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-7 w-7 text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <Avatar className="h-7 w-7 text-xs bg-muted">
                       <AvatarFallback>{getInitials(customer.full_name)}</AvatarFallback>
                     </Avatar>
-                    <span className="font-medium text-sm">{customer.full_name}</span>
+                    <span className="font-medium text-sm text-foreground">{customer.full_name}</span>
                   </div>
                 </TableCell>
 
@@ -133,9 +133,7 @@ export function CustomerTable({
 
                 {/* Status badge */}
                 <TableCell>
-                  <Badge variant={customer.is_active ? "default" : "secondary"}>
-                    {customer.is_active ? t("status.active") : t("status.inactive")}
-                  </Badge>
+                  <CustomerStatusBadge isActive={customer.is_active} />
                 </TableCell>
 
                 {/* Created date */}
@@ -145,30 +143,30 @@ export function CustomerTable({
 
                 {/* Actions: Grouped Ver|Editar buttons */}
                 <TableCell onClick={(e) => e.stopPropagation()} className="text-right">
-                  <div className="inline-flex items-center justify-end rounded-md border border-input bg-background p-0.5 shadow-xs">
+                  <div className="inline-flex items-center justify-end rounded-full border border-slate-200 dark:border-slate-700 bg-card px-3 py-1 shadow-2xs gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 px-2 text-xs font-medium gap-1 hover:bg-accent hover:text-accent-foreground"
+                      className="h-6 px-1.5 text-xs font-semibold gap-1.5 text-[#0284c7] dark:text-[#38bdf8] hover:bg-transparent hover:text-[#0369a1] transition-colors"
                       asChild
                       title={t("common.view")}
                     >
                       <Link href={`/customers/${customer.id}`} aria-label={t("common.viewDetails")}>
-                        <Eye className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">{t("common.view")}</span>
+                        <Eye className="h-3.5 w-3.5 text-[#0284c7] dark:text-[#38bdf8]" />
+                        <span>{t("common.view")}</span>
                       </Link>
                     </Button>
-                    <div className="h-3.5 w-px bg-border shrink-0" />
+                    <div className="h-3.5 w-px bg-slate-200 dark:bg-slate-700 shrink-0" />
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 px-2 text-xs font-medium gap-1 hover:bg-accent hover:text-accent-foreground"
+                      className="h-6 px-1.5 text-xs font-semibold gap-1.5 text-slate-800 dark:text-slate-100 hover:bg-transparent hover:text-primary transition-colors"
                       asChild
                       title={t("common.edit")}
                     >
                       <Link href={`/customers/${customer.id}/edit`} aria-label={t("common.edit")}>
-                        <PencilLine className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">{t("common.edit")}</span>
+                        <FilePenLine className="h-3.5 w-3.5 text-slate-700 dark:text-slate-200" />
+                        <span>{t("common.edit")}</span>
                       </Link>
                     </Button>
                   </div>

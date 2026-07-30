@@ -5,7 +5,7 @@
 
 ## 1. Resumen Ejecutivo
 
-El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.0.0`**. En las sesiones recientes se logró la refactorización arquitectónica del contrato de datos Zero-PII con CreditGraph AI, la auditoría del formulario de clientes admin (`CustomerForm.tsx`), y en la sesión del 30 de julio se completó la **unificación de enums del formulario público (`/solicitar`)** bajo la Opción B. El backend FastAPI actúa como fuente de verdad y todas las interfaces utilizan valores en minúsculas totalmente alineados.
+El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.0.0`**. En las sesiones recientes se logró la refactorización arquitectónica del contrato de datos Zero-PII con CreditGraph AI, la auditoría del formulario de clientes admin (`CustomerForm.tsx`), la unificación de enums del formulario público (`/solicitar`) y, en la sesión del 30 de julio, la **aplicación de los estilos de tabla SoliPres** (encabezados en gradiente azul horizontal `bg-gradient-to-l`, botonera de acciones en píldora redondeada con ícono `FilePenLine` e integración de `CustomerStatusBadge`). Esta continuidad de diseño garantiza un entorno completamente familiar para los usuarios operativos de SoliPres durante la transición a LAMaS.
 
 ## 2. Estado de Componentes
 

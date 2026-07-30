@@ -86,7 +86,7 @@ export function LoanTable({
 
   if (!data || data.items.length === 0) {
     return (
-      <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-md border border-dashed text-muted-foreground">
+      <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-muted-foreground bg-card">
         <ClipboardList className="h-8 w-8 opacity-20" />
         <p className="text-sm font-medium">{t("common.noData")}</p>
       </div>
@@ -95,7 +95,7 @@ export function LoanTable({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border">
+      <div className="rounded-lg border border-border/80 shadow-2xs bg-card overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -104,29 +104,29 @@ export function LoanTable({
               <TableHead>{t("loans.amount")}</TableHead>
               <TableHead className="w-32">{t("common.status")}</TableHead>
               <TableHead className="hidden lg:table-cell w-32">{t("common.created")}</TableHead>
-              <TableHead className="w-12 text-right">{t("common.actions")}</TableHead>
+              <TableHead className="w-24 sm:w-28 text-right">{t("common.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.items.map((loan) => (
               <TableRow
                 key={loan.id}
-                className="cursor-pointer hover:bg-muted/50"
+                className="cursor-pointer hover:bg-muted/40"
                 onClick={() => router.push(`/loans/${loan.id}`)}
               >
                 {/* ID */}
-                <TableCell className="font-mono text-xs text-muted-foreground">
+                <TableCell className="font-mono text-xs font-medium text-muted-foreground">
                   #{loan.id}
                 </TableCell>
 
                 {/* Customer Info */}
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-7 w-7 text-[10px]">
+                  <div className="flex items-center gap-2.5">
+                    <Avatar className="h-7 w-7 text-[10px] bg-muted">
                       <AvatarFallback>{getInitials(loan.customer_name)}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm text-foreground">
                         {loan.customer_name ?? t("common.noData")}
                       </span>
                       {loan.customer_nid && (
@@ -139,7 +139,7 @@ export function LoanTable({
                 </TableCell>
 
                 {/* Amount */}
-                <TableCell className="font-medium">
+                <TableCell className="font-medium text-foreground">
                   {formatCurrency(loan.amount, language)}
                 </TableCell>
 
@@ -155,17 +155,20 @@ export function LoanTable({
 
                 {/* Actions */}
                 <TableCell onClick={(e) => e.stopPropagation()} className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                    asChild
-                    title={t("common.view")}
-                  >
-                    <Link href={`/loans/${loan.id}`} aria-label={t("common.viewDetails")}>
-                      <Eye className="h-4 w-4" />
-                    </Link>
-                  </Button>
+                  <div className="inline-flex items-center justify-end rounded-full border border-slate-200 dark:border-slate-700 bg-card px-3 py-1 shadow-2xs">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-1.5 text-xs font-semibold gap-1.5 text-[#0284c7] dark:text-[#38bdf8] hover:bg-transparent hover:text-[#0369a1] transition-colors"
+                      asChild
+                      title={t("common.view")}
+                    >
+                      <Link href={`/loans/${loan.id}`} aria-label={t("common.viewDetails")}>
+                        <Eye className="h-3.5 w-3.5 text-[#0284c7] dark:text-[#38bdf8]" />
+                        <span>{t("common.view")}</span>
+                      </Link>
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

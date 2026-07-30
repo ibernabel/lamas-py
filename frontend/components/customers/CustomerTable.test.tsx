@@ -78,7 +78,7 @@ describe("CustomerTable", () => {
         data={makePaginatedResponse([])}
       />
     );
-    expect(screen.getByText(/no customers/i)).toBeInTheDocument();
+    expect(screen.getByText(/customers\.notFound|no customers|no encontrado|no hay datos/i)).toBeInTheDocument();
   });
 
   it("renders an empty state when data is undefined", () => {

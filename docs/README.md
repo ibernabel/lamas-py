@@ -11,6 +11,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [CreditGraph UI Technical Spec](./planning/creditgraph-ui-technical-spec.md) - Technical Specification & UI/UX Data Contract for CreditGraph AI
 - [**REQ: Auditoría LoanApplication Enums**](./planning/req-loan-application-enum-audit.md) - 📋 Requerimientos para corrección de enums en formulario público
 - [**REQ: Vista de Configuración e i18n Multi-Idioma**](./planning/req-settings-view-and-i18n.md) - 📋 Requerimientos y especificación técnica de i18n y /settings
+- [**REQ: Personalización Apariencia de Tablas**](./planning/req-table-appearance-customization.md) - 📋 Requerimientos de apariencia dinámica de tablas en /settings (Fondo, Gradiente y Texto)
 - [Status Report (Jul 2026)](./status-report.md) - Current projects health and progress
 
 ### Implementation Phases
@@ -30,12 +31,14 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Customer Form Enum Audit & Restoration](./implementation/2026-07-30-customer-form-enum-audit-restoration.md) - ✅ (2026-07-30)
 - [**Multi-Language i18n & Settings View**](./implementation/2026-07-30-multi-language-i18n-and-settings-view.md) - ✅ (2026-07-30)
 - [**Public Form Enum Unification (Opción B)**](./implementation/2026-07-30-public-form-enum-unification.md) - ✅ (2026-07-30)
+- [**SoliPres Table Styling & Unified Status Badges**](./implementation/2026-07-30-solipres-table-styling-and-status-badges.md) - ✅ (2026-07-30)
 
 ### Decisions & Architecture (ADRs)
 
 - [ADR 002: Document Proxy Authentication](./decisions/002-document-proxy-auth.md)
 - [ADR 003: Zero-PII Data Contract for CreditGraph AI](./decisions/003-zero-pii-data-contract.md)
 - [ADR 004: Restauración de Enum Semánticos en CustomerForm](./decisions/004-enum-restoration-customer-fields.md)
+- [ADR 005: Preservación de Identidad Visual y Familiaridad de UI (SoliPres ➔ LAMaS)](./decisions/005-solipres-ui-familiarity-and-table-design.md)
 
 ### Testing
 

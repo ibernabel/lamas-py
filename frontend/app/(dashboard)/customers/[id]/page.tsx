@@ -34,6 +34,7 @@ import { CustomerLoansTable } from "@/components/loans/CustomerLoansTable";
 import { CreditGraphSummaryCard } from "@/components/customers/CreditGraphSummaryCard";
 import { CustomerCreditGraphAnalysis } from "@/components/customers/CustomerCreditGraphAnalysis";
 import { CustomerLegacyView } from "@/components/customers/CustomerLegacyView";
+import { CustomerStatusBadge } from "@/components/customers/CustomerStatusBadge";
 import { useCustomer } from "@/hooks/use-customers";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
@@ -108,9 +109,7 @@ export default function CustomerDetailPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold tracking-tight">{fullName}</h1>
-              <Badge variant={customer.is_active ? "default" : "secondary"}>
-                {customer.is_active ? t("status.active") : t("status.inactive")}
-              </Badge>
+              <CustomerStatusBadge isActive={customer.is_active} />
             </div>
             <p className="text-sm text-muted-foreground font-mono">{t("customers.fields.nid")}: {customer.nid}</p>
           </div>
