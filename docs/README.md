@@ -24,6 +24,12 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Phase 8: CreditGraph AI Integration](./implementation/phase-8-creditgraph.md) - ✅
 - [Version Bump & Frontend Sync](./implementation/2026-07-27-version-bump-and-frontend-sync.md) - ✅ (Version 1.0.0)
 - [Customer Detail Redesign & CreditGraph Spec](./implementation/2026-07-28-customer-detail-redesign-and-creditgraph-spec.md) - ✅ (2026-07-28)
+- [Zero-PII Data Contract Integration](./implementation/2026-07-29-zero-pii-data-contract.md) - ✅ (2026-07-29)
+
+### Decisions & Architecture (ADRs)
+
+- [ADR 002: Document Proxy Authentication](./decisions/002-document-proxy-auth.md)
+- [ADR 003: Zero-PII Data Contract for CreditGraph AI](./decisions/003-zero-pii-data-contract.md)
 
 ### Testing
 

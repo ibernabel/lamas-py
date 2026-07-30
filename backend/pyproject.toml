@@ -1,6 +1,6 @@
 [project]
 name = "lamas-backend"
-version = "1.1.0"
+version = "1.1.1"
 description = "LAMaS Backend API - Loan Applications Management System"
 requires-python = ">=3.11"
 dependencies = [

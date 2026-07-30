@@ -27,11 +27,11 @@ Este documento establece la especificación técnica para consumir los datos rea
 
 ## 📊 3. Especificación del Contrato de Datos (API Payload & Response)
 
-### A. Datos Enviados al Análisis (`AnalysisRequest`)
-Desde LAMaS hacia CreditGraph:
-- **Cliente:** Cédula (`nid`), Nombre completo, Salario declarado, Dirección, Empresa, Dependientes, Email, Teléfono.
+### A. Datos Enviados al Análisis (`AnalysisRequest` - Zero-PII Contract)
+Desde LAMaS hacia CreditGraph (Garantía de Cero Datos PII):
+- **Cliente Anonimizado:** `applicant_hash` (Pseudónimo Hashed SHA-256), `declared_salary` (Salario declarado en DOP), `dependents_count` (Número de dependientes), `employer_sector` (Sector económico de la empresa), `employment_tenure_months` (Antigüedad laboral en meses), `residence_type` (Tipo de residencia: `OWNED`, `RENTED`), `geo_zone` (Zona geográfica/macroprovincia). *Nota: Se excluye rigurosamente Cédula, Nombre completo, Correo, Teléfono y Dirección exacta.*
 - **Solicitud:** Monto solicitado (`requested_amount`), Plazo en meses (`term_months`), Tipo de producto (`product_type`: `PERSONAL_LOAN`, `AUTO`, etc.).
-- **Documentos Cargados:** PDFs de Extractos Bancarios (`bank_statement`), Cartas de Trabajo (`labor_letter`), Cédula (`id_card`).
+- **Métricas Financieras Extraídas (Sin PII):** Ingresos bancarios consolidados (`detected_bank_income`), promedio de balance mensual (`average_balance`), total de obligaciones detectadas (`monthly_obligations`). *Nota: Se envían métricas numéricas agregadas previamente desinfectadas de PII.*
 
 ### B. Objeto Devuelto por el Servicio (`AnalysisResponse / CreditGraphAnalysis`)
 

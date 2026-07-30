@@ -56,6 +56,15 @@ def test_analyze_triggers_creditgraph_and_stores_result(
         assert data["decision"] == "APPROVED"
         assert data["irs_score"] == 85
 
+        # Verify Zero-PII payload sent to CreditGraph
+        mock_analyze.assert_called_once()
+        _, kwargs = mock_analyze.call_args
+        applicant_payload = kwargs.get("applicant") or mock_analyze.call_args[0][0] if mock_analyze.call_args[0] else kwargs["applicant"]
+        assert "full_name" not in applicant_payload
+        assert "cedula" not in applicant_payload
+        assert "email" not in applicant_payload
+        assert "applicant_hash" in applicant_payload
+
         # Check DB
         analysis = session.query(CreditGraphAnalysis).filter_by(
             loan_application_id=test_loan.id).first()

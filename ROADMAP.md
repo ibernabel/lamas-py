@@ -243,6 +243,7 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 ### Key Features
 
 - Headless AI credit risk analysis
+- Zero-PII Data Contract Architecture (Strict privacy, SHA-256 pseudonymization, Pydantic ingestion validation)
 - Full response storage for audit trail
 - Interactive dashboard with charts
 - Decision workflow management (APPROVED, REJECTED, MANUAL_REVIEW)

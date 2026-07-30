@@ -1,33 +1,36 @@
 # Informe de Estado del Proyecto (Proyecto LAMaS)
 
-**Fecha**: 28 de julio de 2026  
+**Fecha**: 29 de julio de 2026  
 **Preparado por**: Antigravity (AI Architect)
 
 ## 1. Resumen Ejecutivo
 
-El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.0.0`**. En la sesión reciente se rediseñó la vista de detalle de cliente `/customers/[id]` integrando un layout apilado de 1 sola columna en pares `Clave: Valor` para evitar sobrecarga cognitiva, un sidebar asimétrico de evaluación rápida CreditGraph AI, una estructura de 4 pestañas (`Resumen`, `Documentos`, `Análisis CreditGraph`, `Legacy SoliPres`) y la especificación técnica completa para la integración oficial de datos reales con el motor CreditGraph AI.
+El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.0.0`**. En la sesión reciente se logró la refactorización arquitectónica del contrato de datos de integración con el motor **CreditGraph AI**, implementando un modelo **Zero-PII** estricto donde la identidad del cliente (Cédula, Nombre, Contactos, Dirección) permanece aislada en LAMaS y la IA procesa exclusivamente métricas anonimizadas mediante `applicant_hash` (SHA-256) y validadores de seguridad en ingestión.
 
 ## 2. Estado de Componentes
 
-### A. Migración Backend (`lamas-py`)
+### A. Migración Backend & Seguridad (`lamas-py`)
 
-**Estado**: ✅ Fase 1 Completada (Backend Foundation)
+**Estado**: ✅ Contrato Zero-PII e Integración CreditGraph Completada (2026-07-29)
 
 - **Logros**:
+  - Implementación del contrato **Zero-PII** en `creditgraph_service.py` con generación de `applicant_hash` (SHA-256).
+  - Eliminación de transmisiones PII a APIs/LLMs externas.
+  - Aserciones automatizadas en suite de pruebas `test_creditgraph_api.py`.
   - Migración de **19 modelos de datos** de Laravel a SQLModel/FastAPI.
   - Implementación de **JWT Authentication** (python-jose + bcrypt).
   - Configuración de entorno **Docker** (FastAPI en puerto 8001, PostgreSQL 15 en puerto 5433).
   - Infraestructura de pruebas con **pytest** y CI/CD mediante **GitHub Actions**.
-  - Servidor operativo con endpoints de salud (`/health`) y documentación OpenAPI activa.
 
 ### B. Motor de IA en CreditGraph AI (`aisa`)
 
-**Estado**: ✅ Fase 7 & Especificación UI Completada (2026-07-28)
+**Estado**: ✅ Especificación & Contrato Zero-PII Completado (2026-07-29)
 
 - **Logros**:
+  - **Refactorización de `ApplicantData`**: Eliminación de PII y adopción de `applicant_hash`, `declared_salary`, `dependents_count`, `housing_type`, `is_self_employed`, `employer_sector`, `geo_zone`.
+  - **Validador de Seguridad**: Rechazo en ingestión HTTP 422 ante presencia de formatos de Cédula o Email.
   - **Matriz de Decisión**: Umbrales de riesgo IRS (IRS ≥85 Aprobado, <60 Rechazado).
   - **Lógica de Escalamiento (HITL)**: Derivación a revisión humana para préstamos >50,000 DOP o baja confianza.
-  - **Especificación de Integración UI/UX**: Elaboración del requerimiento técnico (`creditgraph-ui-technical-spec.md`) que define los 5 pilares IRS, el comparador de discrepancia de ingresos bancarios y los indicadores OSINT.
 
 ### C. Frontend Foundation & UI (`lamas-py/frontend`)
 

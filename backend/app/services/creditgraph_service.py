@@ -49,21 +49,31 @@ def trigger_analysis(
     if existing and not force_reanalyze:
         return existing
 
-    # 3. Prepare payload (simplified for Phase 8)
-    customer_name = "Unknown"
-    customer_nid = "Unknown"
-    customer_email = None
+    # 3. Prepare Zero-PII payload (Strictly anonymized)
+    import hashlib
+
+    applicant_hash = "anon_applicant_0000"
+    declared_salary = 0.0
+    housing_type = None
+    is_self_employed = False
 
     if loan_app.customer:
-        customer_nid = loan_app.customer.nid
+        if loan_app.customer.nid:
+            applicant_hash = f"anon_app_{hashlib.sha256(loan_app.customer.nid.encode()).hexdigest()[:16]}"
+        if loan_app.customer.job_info and loan_app.customer.job_info.salary:
+            declared_salary = float(loan_app.customer.job_info.salary)
+        elif loan_app.customer.financial_info and loan_app.customer.financial_info.total_incomes:
+            declared_salary = float(loan_app.customer.financial_info.total_incomes)
         if loan_app.customer.detail:
-            customer_name = f"{loan_app.customer.detail.first_name} {loan_app.customer.detail.last_name}"
-            customer_email = loan_app.customer.detail.email
+            housing_type = loan_app.customer.detail.housing_type
+        if loan_app.customer.job_info:
+            is_self_employed = loan_app.customer.job_info.is_self_employed
 
     applicant_data = {
-        "full_name": customer_name,
-        "cedula": customer_nid,
-        "email": customer_email,
+        "applicant_hash": applicant_hash,
+        "declared_salary": declared_salary,
+        "housing_type": housing_type or "OTHER",
+        "is_self_employed": is_self_employed,
     }
 
     loan_data = {
