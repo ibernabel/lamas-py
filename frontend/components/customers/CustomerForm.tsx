@@ -49,6 +49,14 @@ import { Separator } from "@/components/ui/separator";
 import {
   customerFormSchema,
   type CustomerFormValues,
+  GENDER_OPTIONS,
+  EDUCATION_LEVEL_OPTIONS,
+  MODE_OF_TRANSPORT_OPTIONS,
+  HOUSING_TYPE_OPTIONS,
+  HOUSING_POSSESSION_TYPE_OPTIONS,
+  PAYMENT_TYPE_OPTIONS,
+  PAYMENT_FREQUENCY_OPTIONS,
+  VEHICLE_TYPE_OPTIONS,
 } from "@/lib/validations/customer.schema";
 import { customersApi } from "@/lib/api/customers";
 import { useCreateCustomer, useUpdateCustomer } from "@/hooks/use-customers";
@@ -97,14 +105,14 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
         email: customer?.detail?.email ?? "",
         nickname: customer?.detail?.nickname ?? "",
         birthday: customer?.detail?.birthday ?? "",
-        gender: customer?.detail?.gender ?? undefined,
+        gender: (customer?.detail?.gender as CustomerFormValues["detail"]["gender"]) ?? undefined,
         marital_status: (customer?.detail?.marital_status as CustomerFormValues["detail"]["marital_status"]) ?? undefined,
-        education_level: customer?.detail?.education_level ?? "",
+        education_level: (customer?.detail?.education_level as CustomerFormValues["detail"]["education_level"]) ?? undefined,
         nationality: customer?.detail?.nationality ?? "",
-        housing_type: customer?.detail?.housing_type ?? "",
-        housing_possession_type: customer?.detail?.housing_possession_type ?? "",
+        housing_type: (customer?.detail?.housing_type as CustomerFormValues["detail"]["housing_type"]) ?? undefined,
+        housing_possession_type: (customer?.detail?.housing_possession_type as CustomerFormValues["detail"]["housing_possession_type"]) ?? undefined,
         move_in_date: customer?.detail?.move_in_date ?? "",
-        mode_of_transport: customer?.detail?.mode_of_transport ?? "",
+        mode_of_transport: (customer?.detail?.mode_of_transport as CustomerFormValues["detail"]["mode_of_transport"]) ?? undefined,
       },
       phones: customer?.phones?.length
         ? customer.phones.map((p) => ({
@@ -123,8 +131,8 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
         role: customer?.job_info?.role ?? "",
         salary: customer?.job_info?.salary ?? 0,
         start_date: customer?.job_info?.start_date ?? "",
-        payment_type: customer?.job_info?.payment_type ?? "",
-        payment_frequency: customer?.job_info?.payment_frequency ?? "",
+        payment_type: (customer?.job_info?.payment_type as CustomerFormValues["job_info"] extends object ? CustomerFormValues["job_info"]["payment_type"] : never) ?? undefined,
+        payment_frequency: (customer?.job_info?.payment_frequency as CustomerFormValues["job_info"] extends object ? CustomerFormValues["job_info"]["payment_frequency"] : never) ?? undefined,
         payment_bank: customer?.job_info?.payment_bank ?? "",
         other_incomes: customer?.job_info?.other_incomes ?? 0,
         other_incomes_source: customer?.job_info?.other_incomes_source ?? "",
@@ -138,17 +146,19 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
         address: customer?.company?.address ?? "",
         phone: customer?.company?.phone ?? "",
       },
-      vehicle: {
-        vehicle_type: customer?.vehicle?.vehicle_type ?? "",
-        vehicle_brand: customer?.vehicle?.vehicle_brand ?? "",
-        vehicle_model: customer?.vehicle?.vehicle_model ?? "",
-        vehicle_year: customer?.vehicle?.vehicle_year ?? 0,
-        vehicle_color: customer?.vehicle?.vehicle_color ?? "",
-        vehicle_plate_number: customer?.vehicle?.vehicle_plate_number ?? "",
-        is_owned: customer?.vehicle?.is_owned ?? false,
-        is_financed: customer?.vehicle?.is_financed ?? false,
-        is_leased: customer?.vehicle?.is_leased ?? false,
-      },
+      vehicle: customer?.vehicle
+        ? {
+            vehicle_type: (customer.vehicle.vehicle_type as CustomerFormValues["vehicle"] extends object ? CustomerFormValues["vehicle"]["vehicle_type"] : never) ?? undefined,
+            vehicle_brand: customer.vehicle.vehicle_brand ?? "",
+            vehicle_model: customer.vehicle.vehicle_model ?? "",
+            vehicle_year: customer.vehicle.vehicle_year ?? 0,
+            vehicle_color: customer.vehicle.vehicle_color ?? "",
+            vehicle_plate_number: customer.vehicle.vehicle_plate_number ?? "",
+            is_owned: customer.vehicle.is_owned ?? false,
+            is_financed: customer.vehicle.is_financed ?? false,
+            is_leased: customer.vehicle.is_leased ?? false,
+          }
+        : undefined,
       references: customer?.references?.map((r) => ({
         id: r.id,
         name: r.name,
@@ -403,12 +413,12 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                     <FormLabel>Género</FormLabel>
                     <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v || undefined)}>
                       <SelectTrigger id="gender-select">
-                        <SelectValue placeholder="Seleccionar…" />
+                        <SelectValue placeholder="— Seleccione —" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="M">Masculino</SelectItem>
-                        <SelectItem value="F">Femenino</SelectItem>
-                        <SelectItem value="O">Otro</SelectItem>
+                        <SelectItem value="male">Masculino</SelectItem>
+                        <SelectItem value="female">Femenino</SelectItem>
+                        <SelectItem value="other">Otro</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -424,13 +434,14 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                     <FormLabel>Estado Civil</FormLabel>
                     <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v || undefined)}>
                       <SelectTrigger id="marital-status-select">
-                        <SelectValue placeholder="Seleccionar…" />
+                        <SelectValue placeholder="— Seleccione —" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="single">Soltero/a</SelectItem>
                         <SelectItem value="married">Casado/a</SelectItem>
                         <SelectItem value="divorced">Divorciado/a</SelectItem>
                         <SelectItem value="widowed">Viudo/a</SelectItem>
+                        <SelectItem value="other">Otro</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -475,9 +486,21 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nivel Educativo</FormLabel>
-                    <FormControl>
-                      <Input id="education-input" placeholder="Universitario, Bachiller..." {...field} value={field.value ?? ""} />
-                    </FormControl>
+                    <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v || undefined)}>
+                      <SelectTrigger id="education-select">
+                        <SelectValue placeholder="— Seleccione —" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="primary">Primaria</SelectItem>
+                        <SelectItem value="secondary">Secundaria</SelectItem>
+                        <SelectItem value="high_school">Bachillerato</SelectItem>
+                        <SelectItem value="bachelor">Universitario/Licenciatura</SelectItem>
+                        <SelectItem value="postgraduate">Postgrado</SelectItem>
+                        <SelectItem value="master">Maestría</SelectItem>
+                        <SelectItem value="doctorate">Doctorado</SelectItem>
+                        <SelectItem value="other">Otro</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -488,9 +511,18 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Medio de Transporte</FormLabel>
-                    <FormControl>
-                      <Input id="transport-input" placeholder="Vehículo propio, Público..." {...field} value={field.value ?? ""} />
-                    </FormControl>
+                    <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v || undefined)}>
+                      <SelectTrigger id="transport-select">
+                        <SelectValue placeholder="— Seleccione —" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="public_transportation">Transporte público</SelectItem>
+                        <SelectItem value="own_car">Vehículo propio</SelectItem>
+                        <SelectItem value="own_motorcycle">Motocicleta propia</SelectItem>
+                        <SelectItem value="bicycle">Bicicleta</SelectItem>
+                        <SelectItem value="other">Otro</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -588,9 +620,16 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipo de Vivienda</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej. Casa, Apartamento" {...field} value={field.value ?? ""} />
-                    </FormControl>
+                    <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v || undefined)}>
+                      <SelectTrigger id="housing-type-select">
+                        <SelectValue placeholder="— Seleccione —" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="house">Casa</SelectItem>
+                        <SelectItem value="apartment">Apartamento</SelectItem>
+                        <SelectItem value="other">Otro</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -601,9 +640,17 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Posesión de Vivienda</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej. Propia, Alquilada" {...field} value={field.value ?? ""} />
-                    </FormControl>
+                    <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v || undefined)}>
+                      <SelectTrigger id="housing-possession-select">
+                        <SelectValue placeholder="— Seleccione —" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="owned">Propia</SelectItem>
+                        <SelectItem value="rented">Alquilada</SelectItem>
+                        <SelectItem value="mortgaged">Hipotecada</SelectItem>
+                        <SelectItem value="other">Otro</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -826,13 +873,46 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Método de Pago</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Transferencia, Efectivo..." {...field} value={field.value ?? ""} />
-                    </FormControl>
+                    <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v || undefined)}>
+                      <SelectTrigger id="payment-type-select">
+                        <SelectValue placeholder="— Seleccione —" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cash">Efectivo</SelectItem>
+                        <SelectItem value="bank_transfer">Transferencia bancaria / Nómina</SelectItem>
+                        <SelectItem value="check">Cheque</SelectItem>
+                        <SelectItem value="other">Otro</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="job_info.payment_frequency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Frecuencia de Pago</FormLabel>
+                    <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v || undefined)}>
+                      <SelectTrigger id="payment-frequency-select">
+                        <SelectValue placeholder="— Seleccione —" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Diaria</SelectItem>
+                        <SelectItem value="weekly">Semanal</SelectItem>
+                        <SelectItem value="bi-weekly">Quincenal</SelectItem>
+                        <SelectItem value="fortnightly">Bisemanal</SelectItem>
+                        <SelectItem value="monthly">Mensual</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="job_info.payment_bank"
@@ -913,156 +993,203 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
             </div>
           </TabsContent>
 
-          {/* ── Tab 5: Vehicle ── */}
+          {/* ── Tab 5: Vehicle (Opción B: empty state when no vehicle) ── */}
           <TabsContent value="vehicle" className="space-y-4 pt-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="vehicle.vehicle_brand"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Marca</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Toyota, Honda..." {...field} value={field.value ?? ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="vehicle.vehicle_model"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Modelo</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Camry, Civic..." {...field} value={field.value ?? ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {!customer?.vehicle && mode === "edit" ? (
+              // Empty state — customer has no vehicle registered
+              <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12 text-center space-y-4">
+                <div className="rounded-full bg-muted p-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 17a1 1 0 100 2 1 1 0 000-2zM16 17a1 1 0 100 2 1 1 0 000-2zM3 9l1-4h16l1 4M3 9h18M3 9l-.5 5.5A2 2 0 004.5 17h15a2 2 0 002-1.5L21 9" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Sin vehículo registrado</p>
+                  <p className="text-sm text-muted-foreground mt-1">Este cliente no tiene vehículo registrado aún.</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Para registrar un vehículo, guarde el formulario con los campos de vehículo completos.</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="vehicle.vehicle_type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo de Vehículo</FormLabel>
+                        <Select value={field.value ?? ""} onValueChange={(v) => field.onChange(v || undefined)}>
+                          <SelectTrigger id="vehicle-type-select">
+                            <SelectValue placeholder="— Seleccione —" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="sedan">Sedán</SelectItem>
+                            <SelectItem value="suv">SUV</SelectItem>
+                            <SelectItem value="truck">Camioneta / Pickup</SelectItem>
+                            <SelectItem value="van">Van / Furgoneta</SelectItem>
+                            <SelectItem value="coupe">Coupé</SelectItem>
+                            <SelectItem value="bike">Bicicleta</SelectItem>
+                            <SelectItem value="motorcycle">Motocicleta</SelectItem>
+                            <SelectItem value="other">Otro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="vehicle.vehicle_brand"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Marca</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Toyota, Honda..." {...field} value={field.value ?? ""} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <FormField
-                control={form.control}
-                name="vehicle.vehicle_year"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Año</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="2020" 
-                        {...field} 
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                        value={field.value ?? 0}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="vehicle.vehicle_color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Color</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Blanco, Negro..." {...field} value={field.value ?? ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="vehicle.vehicle_plate_number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Placa</FormLabel>
-                    <FormControl>
-                      <Input placeholder="A000000" {...field} value={field.value ?? ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="vehicle.vehicle_model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Modelo</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Camry, Civic..." {...field} value={field.value ?? ""} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="vehicle.vehicle_color"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Color</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Blanco, Negro..." {...field} value={field.value ?? ""} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <FormField
-                control={form.control}
-                name="vehicle.is_owned"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <FormLabel>Propio</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value ? "yes" : "no"}
-                        onValueChange={(v) => field.onChange(v === "yes")}
-                      >
-                        <SelectTrigger className="w-20">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="no">No</SelectItem>
-                          <SelectItem value="yes">Sí</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="vehicle.is_financed"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <FormLabel>Financiado</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value ? "yes" : "no"}
-                        onValueChange={(v) => field.onChange(v === "yes")}
-                      >
-                        <SelectTrigger className="w-20">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="no">No</SelectItem>
-                          <SelectItem value="yes">Sí</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="vehicle.is_leased"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <FormLabel>Leasing</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value ? "yes" : "no"}
-                        onValueChange={(v) => field.onChange(v === "yes")}
-                      >
-                        <SelectTrigger className="w-20">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="no">No</SelectItem>
-                          <SelectItem value="yes">Sí</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="vehicle.vehicle_year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Año</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            id="vehicle-year-input"
+                            placeholder="2020"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            value={field.value ?? 0}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="vehicle.vehicle_plate_number"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Placa</FormLabel>
+                        <FormControl>
+                          <Input placeholder="A000000" {...field} value={field.value ?? ""} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <FormField
+                    control={form.control}
+                    name="vehicle.is_owned"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <FormLabel>Propio</FormLabel>
+                        <FormControl>
+                          <Select
+                            value={field.value ? "yes" : "no"}
+                            onValueChange={(v) => field.onChange(v === "yes")}
+                          >
+                            <SelectTrigger className="w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="no">No</SelectItem>
+                              <SelectItem value="yes">Sí</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="vehicle.is_financed"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <FormLabel>Financiado</FormLabel>
+                        <FormControl>
+                          <Select
+                            value={field.value ? "yes" : "no"}
+                            onValueChange={(v) => field.onChange(v === "yes")}
+                          >
+                            <SelectTrigger className="w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="no">No</SelectItem>
+                              <SelectItem value="yes">Sí</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="vehicle.is_leased"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <FormLabel>Leasing</FormLabel>
+                        <FormControl>
+                          <Select
+                            value={field.value ? "yes" : "no"}
+                            onValueChange={(v) => field.onChange(v === "yes")}
+                          >
+                            <SelectTrigger className="w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="no">No</SelectItem>
+                              <SelectItem value="yes">Sí</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </>
+            )}
           </TabsContent>
 
           {/* ── Tab 6: References ── */}

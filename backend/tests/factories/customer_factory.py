@@ -68,7 +68,7 @@ class CustomerDetailFactory(factory.Factory):
         minimum_age=18,
         maximum_age=80
     )
-    gender = fuzzy.FuzzyChoice(["M", "F", "O"])
+    gender = fuzzy.FuzzyChoice(["male", "female", "other"])
     marital_status = fuzzy.FuzzyChoice(
         ["single", "married", "divorced", "widowed"])
     education_level = fuzzy.FuzzyChoice(

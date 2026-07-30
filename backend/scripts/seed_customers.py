@@ -39,7 +39,7 @@ CUSTOMERS = [
             "last_name": "Ramírez",
             "email": "carlos.ramirez@gmail.com",
             "birthday": "1985-03-12",
-            "gender": "M",
+            "gender": "male",
             "marital_status": "married",
         },
         "phones": [
@@ -65,7 +65,7 @@ CUSTOMERS = [
             "last_name": "González",
             "email": "maria.gonzalez@hotmail.com",
             "birthday": "1992-07-25",
-            "gender": "F",
+            "gender": "female",
             "marital_status": "single",
         },
         "phones": [
@@ -90,7 +90,7 @@ CUSTOMERS = [
             "last_name": "Hernández",
             "email": "jose.hernandez@yahoo.com",
             "birthday": "1978-11-03",
-            "gender": "M",
+            "gender": "male",
             "marital_status": "divorced",
         },
         "phones": [
@@ -123,7 +123,7 @@ CUSTOMERS = [
             "last_name": "Martínez",
             "email": "ana.martinez@outlook.com",
             "birthday": "2000-01-18",
-            "gender": "F",
+            "gender": "female",
             "marital_status": "single",
         },
         "phones": [
@@ -140,7 +140,7 @@ CUSTOMERS = [
             "last_name": "Díaz",
             "email": "pedro.diaz@gmail.com",
             "birthday": "1969-09-30",
-            "gender": "M",
+            "gender": "male",
             "marital_status": "widowed",
         },
         "phones": [

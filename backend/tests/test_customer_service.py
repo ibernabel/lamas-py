@@ -76,7 +76,7 @@ async def test_create_customer_with_nested_data(session: Session):
             last_name="Doe",
             email="john@example.com",
             birthday="1990-01-01",
-            gender="M",
+            gender="male",
             marital_status="single"
         ),
         phones=[
@@ -115,7 +115,7 @@ async def test_create_customer_simple(session: Session):
             last_name="Smith",
             email="jane@example.com",
             birthday="1992-05-15",
-            gender="F",
+            gender="female",
             marital_status="single"
         ),
         phones=[

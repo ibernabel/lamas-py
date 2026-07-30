@@ -48,7 +48,7 @@ def test_create_customer_full_success(client: TestClient, session: Session, auth
             "last_name": "Doe",
             "email": "john.doe@example.com",
             "birthday": "1990-01-15",
-            "gender": "M",
+            "gender": "male",
             "marital_status": "single"
         },
         "phones": [
@@ -82,7 +82,7 @@ def test_create_customer_simple_success(client: TestClient, session: Session, au
             "last_name": "Smith",
             "email": "jane.smith@example.com",
             "birthday": "1992-05-20",
-            "gender": "F",
+            "gender": "female",
             "marital_status": "single"
         },
         "phones": [
@@ -109,7 +109,7 @@ def test_create_customer_invalid_nid_format(client: TestClient, session: Session
             "last_name": "User",
             "email": "test@example.com",
             "birthday": "1990-01-01",
-            "gender": "M",
+            "gender": "male",
             "marital_status": "single"
         },
         "phones": [{"number": "8091234567", "type": "mobile"}],
@@ -152,7 +152,7 @@ def test_create_customer_duplicate_nid(client: TestClient, session: Session, aut
             "last_name": "User",
             "email": "duplicate@example.com",
             "birthday": "1990-01-01",
-            "gender": "M",
+            "gender": "male",
             "marital_status": "single"
         },
         "phones": [{"number": "8091234567", "type": "mobile"}],

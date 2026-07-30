@@ -9,6 +9,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Migration PRD](./planning/migration-prd.md) - Product Requirements Document
 - [LAMaS Integration Requirements](./planning/lamas-integration-requirements.md) - CreditGraph & API Integration Requirements
 - [CreditGraph UI Technical Spec](./planning/creditgraph-ui-technical-spec.md) - Technical Specification & UI/UX Data Contract for CreditGraph AI
+- [**REQ: Auditoría LoanApplication Enums**](./planning/req-loan-application-enum-audit.md) - 📋 Requerimientos para corrección de enums en formulario público
 - [Status Report (Jul 2026)](./status-report.md) - Current projects health and progress
 
 ### Implementation Phases
@@ -25,19 +26,26 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Version Bump & Frontend Sync](./implementation/2026-07-27-version-bump-and-frontend-sync.md) - ✅ (Version 1.0.0)
 - [Customer Detail Redesign & CreditGraph Spec](./implementation/2026-07-28-customer-detail-redesign-and-creditgraph-spec.md) - ✅ (2026-07-28)
 - [Zero-PII Data Contract Integration](./implementation/2026-07-29-zero-pii-data-contract.md) - ✅ (2026-07-29)
+- [**Customer Form Enum Audit & Restoration**](./implementation/2026-07-30-customer-form-enum-audit-restoration.md) - ✅ (2026-07-30)
 
 ### Decisions & Architecture (ADRs)
 
 - [ADR 002: Document Proxy Authentication](./decisions/002-document-proxy-auth.md)
 - [ADR 003: Zero-PII Data Contract for CreditGraph AI](./decisions/003-zero-pii-data-contract.md)
+- [ADR 004: Restauración de Enum Semánticos en CustomerForm](./decisions/004-enum-restoration-customer-fields.md)
 
 ### Testing
 
 - [Document Viewer Verification](./testing/document-viewer-manual-verification.md) - 2026-03-10
 
+### Fixes
+
+- [Fix: SelectItem Empty Value Runtime Error](./fixes/fix_2026_07_30_select_item_empty_value.md) - 2026-07-30
+
 ### Knowledges & Issues
 
 - [Known Issue: Document Viewer 404](./knowledges/known_issue-document-viewer-404.md) - Identified 2026-03-10
+- [**Known Issue: Public Form Enum Mismatch**](./knowledges/known-issue-public-form-enum-mismatch.md) - ⚠️ Detected 2026-07-30 — Pendiente de corrección
 
 ## Quick Start
 

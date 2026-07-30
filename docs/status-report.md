@@ -1,11 +1,11 @@
 # Informe de Estado del Proyecto (Proyecto LAMaS)
 
-**Fecha**: 29 de julio de 2026  
+**Fecha**: 30 de julio de 2026  
 **Preparado por**: Antigravity (AI Architect)
 
 ## 1. Resumen Ejecutivo
 
-El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.0.0`**. En la sesión reciente se logró la refactorización arquitectónica del contrato de datos de integración con el motor **CreditGraph AI**, implementando un modelo **Zero-PII** estricto donde la identidad del cliente (Cédula, Nombre, Contactos, Dirección) permanece aislada en LAMaS y la IA procesa exclusivamente métricas anonimizadas mediante `applicant_hash` (SHA-256) y validadores de seguridad en ingestión.
+El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.0.0`**. En las sesiones recientes se logró la refactorización arquitectónica del contrato de datos Zero-PII con CreditGraph AI, y en la sesión del 30 de julio se completó una **auditoría exhaustiva del formulario de clientes**, restaurando la semántica de 9 campos enum degradados durante la migración desde Laravel. El formulario admin (`CustomerForm.tsx`) está ahora completamente alineado con el modelo de datos del legacy y el backend FastAPI.
 
 ## 2. Estado de Componentes
 
@@ -34,16 +34,19 @@ El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión
 
 ### C. Frontend Foundation & UI (`lamas-py/frontend`)
 
-**Estado**: ✅ Rediseño de Vista Cliente & Multipestañas Completado (2026-07-28)
+**Estado**: ✅ Auditoría Enum CustomerForm Completada (2026-07-30)
 
 - **Logros**:
   - Configuración de **Next.js 16.1 (App Router)** con **Tailwind 4** y **shadcn/ui**.
-  - **Vista Detalle de Cliente `/customers/[id]`**:
-    - Layout de 1 columna limpia con datos apilados en pares `Clave: Valor`.
-    - Componente de extracto sidebar `CreditGraphSummaryCard`.
-    - Pestaña de análisis con gráfico de radar Recharts (`CustomerCreditGraphAnalysis`).
-    - Pestaña legacy de expediente tradicional SoliPres (`CustomerLegacyView`).
-    - Componente UI reusable `progress.tsx` con soporte para colores de indicador personalizados.
+  - **Vista Detalle de Cliente `/customers/[id]`**: Layout multipestañas con CreditGraph analysis, gráfico radar, y vista legacy.
+  - **Auditoría y Restauración de Campos Enum** (2026-07-30):
+    - 5 campos `<Input>` convertidos a `<Select>` con valores controlados: `education_level`, `mode_of_transport`, `housing_type`, `housing_possession_type`, `payment_type`.
+    - Campo `payment_frequency` agregado (estaba ausente del formulario).
+    - Campo `vehicle_type` agregado como primer campo en la pestaña Vehículo.
+    - **Pestaña Vehículo — Opción B**: Estado vacío cuando `customer.vehicle === null`.
+    - Valores `gender` migrados de `M/F/O` → `male/female/other` en backend, frontend, seeds y tests.
+    - Fix runtime: eliminadas 9 instancias de `<SelectItem value="">` incompatibles con Radix UI.
+  - **Schemas actualizados**: Pydantic `Literal`, Zod `z.enum()` y TypeScript union types sincronizados.
 
 ---
 
@@ -63,8 +66,10 @@ El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión
 
 ## 4. Próximos Pasos (Roadmap)
 
-1. **Integración Frontend ↔ CreditGraph Client**: Conectar los hooks de React Query con los endpoints reales de análisis de CreditGraph (`/loan-applications/{id}/creditgraph`).
-2. **Sincronización Git (`/sync-repo`)**: Crear el commit convencional y actualizar versión SemVer del repositorio.
+1. **⚠️ [ALTA] Corrección formulario público `solicitar/page.tsx`**: Los enums de `marital_status`, `housing_type` y `education_level` usan MAYÚSCULAS incompatibles con el backend. Requiere sesión dedicada. Ver [Requerimientos](./planning/req-loan-application-enum-audit.md).
+2. **Integración Frontend ↔ CreditGraph Client**: Conectar los hooks de React Query con los endpoints reales de análisis de CreditGraph (`/loan-applications/{id}/creditgraph`).
+3. **Migración SQL gender**: Si la BD tiene datos legacy con `gender = 'M'/'F'/'O'`, ejecutar script de actualización.
+4. **Sincronización Git (`/sync-repo`)**: Crear el commit convencional y actualizar versión SemVer del repositorio.
 
 ---
 

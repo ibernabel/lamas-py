@@ -26,15 +26,22 @@ class CustomerDetailCreate(BaseModel):
     email: EmailStr | None = None
     nickname: str | None = Field(None, max_length=255)
     birthday: date | None = None
-    gender: Literal["M", "F", "O"] | None = None
+    # Restored enum values matching legacy DB (male/female/other more explicit)
+    gender: Literal["male", "female", "other"] | None = None
     marital_status: Literal["single", "married",
-                            "divorced", "widowed"] | None = None
-    education_level: str | None = Field(None, max_length=100)
+                            "divorced", "widowed", "other"] | None = None
+    # Restored to legacy DB enum values
+    education_level: Literal[
+        "primary", "secondary", "high_school", "bachelor",
+        "postgraduate", "master", "doctorate", "other"
+    ] | None = None
     nationality: str | None = Field(None, max_length=100)
-    housing_type: str | None = Field(None, max_length=100)
-    housing_possession_type: str | None = Field(None, max_length=100)
+    housing_type: Literal["house", "apartment", "other"] | None = None
+    housing_possession_type: Literal["owned", "rented", "mortgaged", "other"] | None = None
     move_in_date: date | None = None
-    mode_of_transport: str | None = Field(None, max_length=100)
+    mode_of_transport: Literal[
+        "public_transportation", "own_car", "own_motorcycle", "bicycle", "other"
+    ] | None = None
 
     @field_validator(
         "email", "nickname", "birthday", "gender", "marital_status",
@@ -57,15 +64,22 @@ class CustomerDetailUpdate(BaseModel):
     email: EmailStr | None = None
     nickname: str | None = Field(None, max_length=255)
     birthday: date | None = None
-    gender: Literal["M", "F", "O"] | None = None
+    # Restored enum values matching legacy DB (male/female/other more explicit)
+    gender: Literal["male", "female", "other"] | None = None
     marital_status: Literal["single", "married",
-                            "divorced", "widowed"] | None = None
-    education_level: str | None = Field(None, max_length=100)
+                            "divorced", "widowed", "other"] | None = None
+    # Restored to legacy DB enum values
+    education_level: Literal[
+        "primary", "secondary", "high_school", "bachelor",
+        "postgraduate", "master", "doctorate", "other"
+    ] | None = None
     nationality: str | None = Field(None, max_length=100)
-    housing_type: str | None = Field(None, max_length=100)
-    housing_possession_type: str | None = Field(None, max_length=100)
+    housing_type: Literal["house", "apartment", "other"] | None = None
+    housing_possession_type: Literal["owned", "rented", "mortgaged", "other"] | None = None
     move_in_date: date | None = None
-    mode_of_transport: str | None = Field(None, max_length=100)
+    mode_of_transport: Literal[
+        "public_transportation", "own_car", "own_motorcycle", "bicycle", "other"
+    ] | None = None
 
     @field_validator(
         "first_name", "last_name", "email", "nickname", "birthday", "gender",
@@ -143,8 +157,10 @@ class CustomerJobInfoCreate(BaseModel):
     salary: Decimal | None = Field(None, gt=0, description="Monthly salary")
     other_incomes: Decimal | None = Field(None, ge=0)
     other_incomes_source: str | None = Field(None, max_length=255)
-    payment_type: str | None = Field(None, max_length=100)
-    payment_frequency: str | None = Field(None, max_length=100)
+    payment_type: Literal["cash", "bank_transfer", "check", "other"] | None = None
+    payment_frequency: Literal[
+        "daily", "weekly", "bi-weekly", "fortnightly", "monthly"
+    ] | None = None
     payment_bank: str | None = Field(None, max_length=255)
     payment_account_number: str | None = Field(None, max_length=100)
     schedule: str | None = Field(None, max_length=255)
@@ -202,7 +218,9 @@ class CustomerReferenceCreate(BaseModel):
 class CustomerVehicleCreate(BaseModel):
     """Customer vehicle information schema."""
 
-    vehicle_type: str | None = Field(None, max_length=100)
+    vehicle_type: Literal[
+        "sedan", "suv", "truck", "van", "coupe", "bike", "motorcycle", "other"
+    ] | None = None
     vehicle_brand: str | None = Field(None, max_length=100)
     vehicle_model: str | None = Field(None, max_length=100)
     vehicle_year: int | None = Field(None, ge=1900, le=2100)
