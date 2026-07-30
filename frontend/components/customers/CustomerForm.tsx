@@ -9,10 +9,12 @@
  * payload based on the mode prop.
  *
  * Tabs:
- *   1. Identity — NID (create only), lead channel, is_referred
- *   2. Personal — first/last name, email, birthday, gender, marital status
- *   3. Phones   — dynamic list, at least 1 required
- *   4. Addresses — dynamic optional list
+ *   1. Personal  — NID (create only), first/last name, email, birthday, gender, marital status
+ *   2. Phones    — dynamic list, at least 1 required
+ *   3. Addresses — housing type, possession type, dynamic optional list
+ *   4. Laboral   — job info, company
+ *   5. Vehicle   — vehicle details
+ *   6. References — lead channel, is_referred, dynamic list
  */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -288,9 +290,8 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6">
-        <Tabs defaultValue="identity" className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="identity">Identidad</TabsTrigger>
+        <Tabs defaultValue="personal" className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="personal">Personal</TabsTrigger>
             <TabsTrigger value="phones">Teléfonos</TabsTrigger>
             <TabsTrigger value="addresses">Dirección</TabsTrigger>
@@ -299,8 +300,8 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
             <TabsTrigger value="references">Referencias</TabsTrigger>
           </TabsList>
 
-          {/* ── Tab 1: Identity ── */}
-          <TabsContent value="identity" className="space-y-4 pt-4">
+          {/* ── Tab 1: Personal ── */}
+          <TabsContent value="personal" className="space-y-4 pt-4">
             {mode === "create" && (
               <FormField
                 control={form.control}
@@ -336,95 +337,6 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                 )}
               />
             )}
-
-            <FormField
-              control={form.control}
-              name="lead_channel"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Canal de Captación</FormLabel>
-                  <FormControl>
-                    <Input id="lead-channel-input" placeholder="Ej. referido, redes sociales…" {...field} value={field.value ?? ""} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="detail.housing_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo de Vivienda</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej. Casa, Apartamento" {...field} value={field.value ?? ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="detail.housing_possession_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Posesión de Vivienda</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej. Propia, Alquilada" {...field} value={field.value ?? ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="is_referred"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel>¿Viene referido?</FormLabel>
-                  </div>
-                  <FormControl>
-                    <Select
-                      value={field.value ? "yes" : "no"}
-                      onValueChange={(v) => field.onChange(v === "yes")}
-                    >
-                      <SelectTrigger id="is-referred-select" className="w-24">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="no">No</SelectItem>
-                        <SelectItem value="yes">Sí</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            {form.watch("is_referred") && (
-              <FormField
-                control={form.control}
-                name="referred_by"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cédula del Referidor</FormLabel>
-                    <FormControl>
-                      <Input placeholder="00000000000" maxLength={11} {...field} value={field.value ?? ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-          </TabsContent>
-
-          {/* ── Tab 2: Personal ── */}
-          <TabsContent value="personal" className="space-y-4 pt-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
@@ -586,7 +498,7 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
             </div>
           </TabsContent>
 
-          {/* ── Tab 3: Phones ── */}
+          {/* ── Tab 2: Phones ── */}
           <TabsContent value="phones" className="space-y-4 pt-4">
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
@@ -667,8 +579,39 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
             </Button>
           </TabsContent>
 
-          {/* ── Tab 4: Addresses ── */}
+          {/* ── Tab 3: Addresses ── */}
           <TabsContent value="addresses" className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="detail.housing_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Vivienda</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej. Casa, Apartamento" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="detail.housing_possession_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Posesión de Vivienda</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej. Propia, Alquilada" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Separator className="my-2" />
+
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
                 Addresses are optional in this phase.
@@ -767,7 +710,7 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
             </Button>
           </TabsContent>
 
-          {/* ── Tab 5: Laboral ── */}
+          {/* ── Tab 4: Laboral ── */}
           <TabsContent value="laboral" className="space-y-4 pt-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FormField
@@ -970,7 +913,7 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
             </div>
           </TabsContent>
 
-          {/* ── Tab 6: Vehicle ── */}
+          {/* ── Tab 5: Vehicle ── */}
           <TabsContent value="vehicle" className="space-y-4 pt-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FormField
@@ -1122,8 +1065,70 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
             </div>
           </TabsContent>
 
-          {/* ── Tab 7: References ── */}
+          {/* ── Tab 6: References ── */}
           <TabsContent value="references" className="space-y-4 pt-4">
+            <div className="space-y-4 rounded-lg border p-4 bg-muted/20">
+              <h4 className="text-sm font-semibold text-foreground">Origen / Referencia del Cliente</h4>
+              
+              <FormField
+                control={form.control}
+                name="lead_channel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Canal de Captación</FormLabel>
+                    <FormControl>
+                      <Input id="lead-channel-input" placeholder="Ej. referido, redes sociales…" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="is_referred"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-background">
+                    <div className="space-y-0.5">
+                      <FormLabel>¿Viene referido?</FormLabel>
+                    </div>
+                    <FormControl>
+                      <Select
+                        value={field.value ? "yes" : "no"}
+                        onValueChange={(v) => field.onChange(v === "yes")}
+                      >
+                        <SelectTrigger id="is-referred-select" className="w-24">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="no">No</SelectItem>
+                          <SelectItem value="yes">Sí</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {form.watch("is_referred") && (
+                <FormField
+                  control={form.control}
+                  name="referred_by"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cédula del Referidor</FormLabel>
+                      <FormControl>
+                        <Input placeholder="00000000000" maxLength={11} {...field} value={field.value ?? ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+
+            <Separator className="my-2" />
+
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
                 Agregue referencias personales o comerciales.
