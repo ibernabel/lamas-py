@@ -26,6 +26,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LoanStatusBadge } from "./LoanStatusBadge";
 import type { LoanApplicationListItem, PaginatedResponse } from "@/lib/api/types";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { formatNid } from "@/lib/utils/format-nid";
 
 interface LoanTableProps {
   data: PaginatedResponse<LoanApplicationListItem> | undefined;
@@ -133,7 +134,7 @@ export function LoanTable({
                       </span>
                       {loan.customer_nid && (
                         <span className="text-[10px] text-muted-foreground font-mono">
-                          {loan.customer_nid}
+                          {formatNid(loan.customer_nid)}
                         </span>
                       )}
                     </div>

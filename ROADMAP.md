@@ -24,6 +24,7 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 | [Table Appearance Customization](./docs/planning/req-table-appearance-customization.md) | Dynamic Table Styling in /settings | 📋 Pending    |
 | [PRD Document Upload UX Redesign](./docs/planning/prd-document-upload-ux-redesign.md) | Document Business Rules & UX       | 🟢 2026-07-31 |
 | [Loans Table Structure Redesign](./docs/planning/req-loans-table-structure-redesign.md) | Rediseño de Tabla en /loans (7 cols + subtextos + Editar) | ✅ 2026-07-31 |
+| [Universal NID Formatting](./docs/implementation/2026-07-31-nid-mask-formatting-and-flexible-inputs.md) | Formateo Universal de Cédula (000-0000000-0) | ✅ 2026-07-31 |
 
 ---
 
@@ -60,6 +61,7 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 | 12    | Table Appearance Custom    | 📋 Pending     | -          | 2-3 days |
 | 13    | Document Upload UX Redesign| 🟢 Approved    | -          | 3-4 days |
 | 14    | Loans Table Structure Redesign| ✅ Complete | 2026-07-31 | 1 day    |
+| 15    | Universal NID Formatting   | ✅ Complete    | 2026-07-31 | < 1 day  |
 
 **Legend:** ✅ Complete | 🟢 Approved / Ready | 🟡 In Progress | 📋 Pending | ⚪ Not Started
 

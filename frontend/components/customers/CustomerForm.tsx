@@ -61,8 +61,9 @@ import {
 } from "@/lib/validations/customer.schema";
 import { customersApi } from "@/lib/api/customers";
 import { useCreateCustomer, useUpdateCustomer } from "@/hooks/use-customers";
-import type { Customer } from "@/lib/api/types";
+import { Customer } from "@/lib/api/types";
 import { sanitizeCustomerUpdatePayload } from "@/lib/utils/payload-sanitizer";
+import { formatNid, cleanNid } from "@/lib/utils/format-nid";
 
 
 // ============================================================================
@@ -199,10 +200,11 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
   // ── NID async validation ───────────────────────────────────────────────────
 
   const handleNidBlur = async (nid: string) => {
-    if (!/^\d{11}$/.test(nid)) return; // Zod will catch the format
+    const cleaned = cleanNid(nid);
+    if (cleaned.length !== 11) return; // Zod will catch the format
     setNidState("loading");
     try {
-      const result = await customersApi.validateNid(nid);
+      const result = await customersApi.validateNid(cleaned);
       if (!result.is_valid) setNidState("invalid");
       else if (!result.is_unique) setNidState("taken");
       else setNidState("valid");
@@ -222,21 +224,22 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
 
   const onSubmit = (values: CustomerFormValues) => {
     if (mode === "create") {
+      const cleanedNid = cleanNid(values.NID);
       // NID is required in create mode — validate presence before submitting
-      if (!values.NID || !/^\d{11}$/.test(values.NID)) {
-        form.setError("NID", { message: "National ID must be exactly 11 digits" });
+      if (!values.NID || cleanedNid.length !== 11) {
+        form.setError("NID", { message: "National ID must be 11 digits" });
         return;
       }
 
       createMutation.mutate(
         {
-          NID: values.NID,
+          NID: cleanedNid,
           detail: values.detail,
           phones: values.phones,
           addresses: values.addresses,
           lead_channel: values.lead_channel || undefined,
           is_referred: values.is_referred,
-          referred_by: values.referred_by || undefined,
+          referred_by: values.referred_by ? cleanNid(values.referred_by) : undefined,
         },
         {
           onSuccess: (data) => {
@@ -325,11 +328,12 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                       <FormControl>
                         <Input
                           id="nid-input"
-                          placeholder="00000000000"
-                          maxLength={11}
+                          placeholder="000-0000000-0"
+                          maxLength={13}
                           className="font-mono pr-10"
                           {...field}
                           value={field.value ?? ""}
+                          onChange={(e) => field.onChange(formatNid(e.target.value))}
                           onBlur={(e) => {
                             field.onBlur();
                             handleNidBlur(e.target.value);
@@ -1247,7 +1251,13 @@ export function CustomerForm({ mode, customer }: CustomerFormProps) {
                     <FormItem>
                       <FormLabel>Cédula del Referidor</FormLabel>
                       <FormControl>
-                        <Input placeholder="00000000000" maxLength={11} {...field} value={field.value ?? ""} />
+                        <Input
+                          placeholder="000-0000000-0"
+                          maxLength={13}
+                          {...field}
+                          value={field.value ?? ""}
+                          onChange={(e) => field.onChange(formatNid(e.target.value))}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

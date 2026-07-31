@@ -27,6 +27,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { CustomerListItem, PaginatedResponse } from "@/lib/api/types";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
+import { formatNid } from "@/lib/utils/format-nid";
+
 interface CustomerTableProps {
   data: PaginatedResponse<CustomerListItem> | undefined;
   isLoading: boolean;
@@ -112,7 +114,7 @@ export function CustomerTable({
                     href={`/customers/${customer.id}`}
                     className="hover:underline"
                   >
-                    {customer.nid}
+                    {formatNid(customer.nid)}
                   </Link>
                 </TableCell>
 

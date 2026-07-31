@@ -15,7 +15,6 @@ import {
   Briefcase,
   Users,
   Car,
-  BrainCircuit,
   FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,6 +30,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DocumentsSection } from "@/components/documents/DocumentsSection";
 import { CustomerLoansTable } from "@/components/loans/CustomerLoansTable";
+import { formatNid } from "@/lib/utils/format-nid";
 import { CreditGraphSummaryCard } from "@/components/customers/CreditGraphSummaryCard";
 import { CustomerCreditGraphAnalysis } from "@/components/customers/CustomerCreditGraphAnalysis";
 import { CustomerLegacyView } from "@/components/customers/CustomerLegacyView";
@@ -111,7 +111,7 @@ export default function CustomerDetailPage() {
               <h1 className="text-2xl font-bold tracking-tight">{fullName}</h1>
               <CustomerStatusBadge isActive={customer.is_active} />
             </div>
-            <p className="text-sm text-muted-foreground font-mono">{t("customers.fields.nid")}: {customer.nid}</p>
+            <p className="text-sm text-muted-foreground font-mono">{t("customers.fields.nid")}: {formatNid(customer.nid)}</p>
           </div>
         </div>
         <Button asChild id="edit-customer-btn">
@@ -138,10 +138,9 @@ export default function CustomerDetailPage() {
           </TabsTrigger>
           <TabsTrigger 
             value="analysis" 
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none h-11 px-4 font-medium flex items-center gap-1.5"
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none h-11 px-4 font-medium"
           >
-            <BrainCircuit className="h-4 w-4 text-primary" />
-            Análisis CreditGraph
+            Análisis de Crédito
           </TabsTrigger>
           <TabsTrigger 
             value="legacy" 
@@ -157,17 +156,17 @@ export default function CustomerDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             {/* Left/Center Column: Stacked Cards (Single Column) */}
             <div className="lg:col-span-2 space-y-6">
-              {/* 1. Información del Socio */}
+              {/* 1. Información del Cliente */}
               <Card>
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-primary" />
-                    <CardTitle className="text-base">Información del Socio</CardTitle>
+                    <CardTitle className="text-base">Información del Cliente</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-0">
                   <InfoRow label="Nombre Completo" value={`${customer.detail?.first_name ?? ""} ${customer.detail?.last_name ?? ""}`} />
-                  <InfoRow label="Cédula de Identidad" value={customer.nid} />
+                  <InfoRow label="Cédula de Identidad" value={formatNid(customer.nid)} />
                   <InfoRow label="Fecha de Nacimiento" value={customer.detail?.birthday} />
                   <InfoRow 
                     label="Celular" 

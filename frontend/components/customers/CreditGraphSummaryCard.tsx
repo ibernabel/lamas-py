@@ -41,7 +41,7 @@ export function CreditGraphSummaryCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BrainCircuit className="h-5 w-5 text-primary" />
-            <CardTitle className="text-base font-semibold">CreditGraph AI</CardTitle>
+            <CardTitle className="text-base font-semibold">Perfil de Crédito</CardTitle>
           </div>
           {getRiskBadge()}
         </div>

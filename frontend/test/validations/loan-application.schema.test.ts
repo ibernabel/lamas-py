@@ -22,7 +22,7 @@ describe("identitySchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("should fail on invalid Dominican NID format (no dashes)", () => {
+  it("should accept valid Dominican NID without dashes", () => {
     const result = identitySchema.safeParse({
       nid: "00100000011",
       first_name: "Juan",
@@ -30,7 +30,7 @@ describe("identitySchema", () => {
       mobile_phone: "8095550001",
       email: "juan@example.com",
     });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 });
 

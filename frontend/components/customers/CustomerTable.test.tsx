@@ -174,7 +174,7 @@ describe("CustomerTable", () => {
       />
     );
 
-    const nidCell = screen.getByText("00112345678");
+    const nidCell = screen.getByText("001-1234567-8");
     const row = nidCell.closest("tr");
     if (row) {
       await user.click(row);

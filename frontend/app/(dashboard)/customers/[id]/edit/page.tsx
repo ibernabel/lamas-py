@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CustomerForm } from "@/components/customers/CustomerForm";
 import { useCustomer } from "@/hooks/use-customers";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { formatNid } from "@/lib/utils/format-nid";
 
 export default function EditCustomerPage() {
   const params = useParams<{ id: string }>();
@@ -77,7 +78,7 @@ export default function EditCustomerPage() {
         <CardHeader>
           <CardTitle>{t("customers.editCustomer")}</CardTitle>
           <CardDescription>
-            {fullName} — {customer.nid}
+            {fullName} — {formatNid(customer.nid)}
           </CardDescription>
         </CardHeader>
         <CardContent>

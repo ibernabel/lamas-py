@@ -38,7 +38,7 @@ export function CustomerCreditGraphAnalysis({ customerId }: CustomerCreditGraphA
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold tracking-tight">Evaluación de Crédito AI</h2>
+                <h2 className="text-xl font-bold tracking-tight">Resultado de Evaluación de Crédito</h2>
                 <Badge variant="default" className="bg-emerald-600 hover:bg-emerald-700">
                   Score: 780 / 900
                 </Badge>

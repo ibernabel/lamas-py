@@ -5,6 +5,8 @@ import { Customer } from "@/types/customer";
 import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { formatNid } from "@/lib/utils/format-nid";
+
 interface CustomerLegacyViewProps {
   customer: Customer;
 }
@@ -54,7 +56,7 @@ export function CustomerLegacyView({ customer }: CustomerLegacyViewProps) {
         </CardHeader>
         <CardContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
           <LegacyDetailRow label="Nombre Completo" value={fullName} />
-          <LegacyDetailRow label="Cédula de Identidad" value={customer.nid} />
+          <LegacyDetailRow label="Cédula de Identidad" value={formatNid(customer.nid)} />
           <LegacyDetailRow label="Fecha Nacimiento" value={customer.detail?.birthday} />
           <LegacyDetailRow label="Teléfono Celular" value={mobilePhone} />
           <LegacyDetailRow label="Teléfono Residencia" value={homePhone} />

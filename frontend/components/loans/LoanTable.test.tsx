@@ -52,7 +52,7 @@ describe("LoanTable", () => {
     );
 
     expect(screen.getByText("John Doe")).toBeDefined();
-    expect(screen.getByText("12345678901")).toBeDefined();
+    expect(screen.getByText("123-4567890-1")).toBeDefined();
     expect(screen.getByText(/50,000/)).toBeDefined();
     expect(screen.getByText("Acme Corp")).toBeDefined();
     expect(screen.getByText("Banco Popular")).toBeDefined();

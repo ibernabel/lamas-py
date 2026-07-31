@@ -5,7 +5,7 @@
 
 ## 1. Resumen Ejecutivo
 
-El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.2.7`**. En las sesiones recientes se logró la refactorización arquitectónica del contrato de datos Zero-PII con CreditGraph AI, la auditoría del formulario de clientes admin (`CustomerForm.tsx`), la unificación de enums del formulario público (`/solicitar`), la **aplicación de los estilos de tabla SoliPres**, la **corrección del módulo de Importación CSV de SoliPres**, y en la sesión del 31 de julio de 2026, el **rediseño completo de la tabla de solicitudes en la vista `/loans` (7 columnas compuestas, subtextos reducidos mini para cédula, banco y asesor, celda de notas y acción de Editar junto a Ver)**, logrando una tasa de éxito del 100% en las pruebas unitarias de backend y frontend (23/23 tests backend y 4/4 tests frontend).
+El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.2.8`**. En las sesiones recientes se logró la refactorización arquitectónica del contrato de datos Zero-PII con CreditGraph AI, la auditoría del formulario de clientes admin (`CustomerForm.tsx`), la unificación de enums del formulario público (`/solicitar`), la **aplicación de los estilos de tabla SoliPres**, la **corrección del módulo de Importación CSV de SoliPres**, el **rediseño completo de la tabla de solicitudes en la vista `/loans`**, y en la sesión del 31 de julio de 2026, el **formateo universal de Cédulas de Identidad (`000-0000000-0`) en toda la interfaz de usuario con soporte de entradas flexibles (con/sin guiones) y persistencia limpia de 11 dígitos**, manteniendo una tasa de éxito del 100% en la suite de pruebas del sistema.
 
 ## 2. Estado de Componentes
 

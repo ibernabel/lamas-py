@@ -20,7 +20,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useLoanApplication } from "@/hooks/use-loan-applications";
+import { useLoanApplication, useDeleteLoan } from "@/hooks/use-loan-applications";
+import { formatNid } from "@/lib/utils/format-nid";
 import { LoanStatusBadge } from "@/components/loans/LoanStatusBadge";
 import { AddNoteDialog } from "@/components/loans/AddNoteDialog";
 import { StatusTransitionDialog } from "@/components/loans/StatusTransitionDialog";
@@ -109,9 +110,9 @@ export default function LoanDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Loan Details Card */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 lg:col-start-1">
           <Card>
             <CardHeader>
               <CardTitle>{t("loans.loanDetails")}</CardTitle>
@@ -163,84 +164,10 @@ export default function LoanDetailPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Notes Timeline */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <History className="h-5 w-5" /> LÍnea de Tiempo y Notas
-              </CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => setNoteOpen(true)}>
-                <Plus className="h-4 w-4 mr-1" /> {t("common.create")}
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {loan.notes.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p className="text-sm italic">{t("common.noData")}</p>
-                </div>
-              ) : (
-                <div className="space-y-6 relative pl-8 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:bg-linear-to-b before:from-indigo-500 before:to-purple-500">
-                  {(() => {
-                    const sortedNotes = [...loan.notes].sort((a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime());
-                    const visibleNotes = notesExpanded ? sortedNotes : sortedNotes.slice(0, 5);
-                    return (
-                      <>
-                        {visibleNotes.map((note) => (
-                          <div key={note.id} className="relative pl-12">
-                            <div className="absolute left-0 top-1 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 border-4 border-white shadow-sm ring-1 ring-slate-300">
-                              <MessageSquare className="h-4 w-4 text-slate-500" />
-                            </div>
-                            <div className="bg-slate-50 p-4 rounded-lg border dark:bg-slate-900/50">
-                              <p className="text-sm mb-1">{note.note}</p>
-                              <p className="text-[10px] text-muted-foreground">
-                                {new Date(note.created_at!).toLocaleString(language === "es" ? "es-DO" : "en-US")}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                        {sortedNotes.length > 5 && (
-                          <div className="relative pl-12 pt-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => setNotesExpanded(!notesExpanded)}
-                              className="w-full text-muted-foreground text-xs hover:bg-slate-100"
-                            >
-                              {notesExpanded ? "Ver menos" : `Ver más (${sortedNotes.length - 5})`}
-                            </Button>
-                          </div>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Documents Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Documentos y Comprobantes</CardTitle>
-              <CardDescription>Gestión de estados de cuenta y reporte de crédito de la solicitud.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DocumentsSection 
-                entityType="loan" 
-                entityId={loan.id} 
-                requiredTypes={[
-                  { type: "bank_statement", label: "Estado de Cuenta (Popular)", bankName: "popular" },
-                  { type: "bank_statement", label: "Estado de Cuenta (BHD)", bankName: "bhd" },
-                  { type: "credit_report", label: "Reporte de Crédito (TransUnion/DataCrédito)" }
-                ]}
-              />
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Sidebar Context */}
-        <div className="space-y-6">
+        {/* Customer Details Card (Appears 2nd on small screens, right column on lg screens) */}
+        <div className="lg:col-span-1 lg:col-start-3 lg:row-start-1 lg:row-span-3">
           <Card>
             <CardHeader>
               <CardTitle className="text-md">{t("customers.customerDetails")}</CardTitle>
@@ -270,7 +197,7 @@ export default function LoanDetailPage() {
                     </div>
                     <div className="space-y-0.5">
                       <p className="text-[10px] text-muted-foreground uppercase font-medium">{t("customers.fields.nid")}</p>
-                      <p className="text-sm font-semibold font-mono">{customer.nid}</p>
+                      <p className="text-sm font-semibold font-mono">{formatNid(customer.nid)}</p>
                     </div>
                   </div>
                 )}
@@ -327,6 +254,84 @@ export default function LoanDetailPage() {
                   </Link>
                 </Button>
               )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Notes Timeline Card */}
+        <div className="lg:col-span-2 lg:col-start-1">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <History className="h-5 w-5" /> LÍnea de Tiempo y Notas
+              </CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => setNoteOpen(true)}>
+                <Plus className="h-4 w-4 mr-1" /> {t("common.create")}
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {loan.notes.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p className="text-sm italic">{t("common.noData")}</p>
+                </div>
+              ) : (
+                <div className="space-y-6 relative pl-8 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:bg-linear-to-b before:from-indigo-500 before:to-purple-500">
+                  {(() => {
+                    const sortedNotes = [...loan.notes].sort((a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime());
+                    const visibleNotes = notesExpanded ? sortedNotes : sortedNotes.slice(0, 5);
+                    return (
+                      <>
+                        {visibleNotes.map((note) => (
+                          <div key={note.id} className="relative pl-12">
+                            <div className="absolute left-0 top-1 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 border-4 border-white shadow-sm ring-1 ring-slate-300">
+                              <MessageSquare className="h-4 w-4 text-slate-500" />
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg border dark:bg-slate-900/50">
+                              <p className="text-sm mb-1">{note.note}</p>
+                              <p className="text-[10px] text-muted-foreground">
+                                {new Date(note.created_at!).toLocaleString(language === "es" ? "es-DO" : "en-US")}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                        {sortedNotes.length > 5 && (
+                          <div className="relative pl-12 pt-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => setNotesExpanded(!notesExpanded)}
+                              className="w-full text-muted-foreground text-xs hover:bg-slate-100"
+                            >
+                              {notesExpanded ? "Ver menos" : `Ver más (${sortedNotes.length - 5})`}
+                            </Button>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Documents Section Card */}
+        <div className="lg:col-span-2 lg:col-start-1">
+          <Card>
+            <CardHeader>
+              <CardTitle>Documentos y Comprobantes</CardTitle>
+              <CardDescription>Gestión de estados de cuenta y reporte de crédito de la solicitud.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DocumentsSection 
+                entityType="loan" 
+                entityId={loan.id} 
+                requiredTypes={[
+                  { type: "bank_statement", label: "Estado de Cuenta (Popular)", bankName: "popular" },
+                  { type: "bank_statement", label: "Estado de Cuenta (BHD)", bankName: "bhd" },
+                  { type: "credit_report", label: "Reporte de Crédito (TransUnion/DataCrédito)" }
+                ]}
+              />
             </CardContent>
           </Card>
         </div>

@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import type { CustomerFilters as CustomerFiltersType } from "@/lib/api/customers";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { cleanNid } from "@/lib/utils/format-nid";
 
 interface CustomerFiltersProps {
   filters: CustomerFiltersType;
@@ -33,11 +34,12 @@ export function CustomerFilters({
   // Debounce the name/NID search input (400ms)
   useEffect(() => {
     const timer = setTimeout(() => {
-      const isNumeric = /^\d+$/.test(search);
+      const cleanedDigits = cleanNid(search);
+      const isNidSearch = cleanedDigits.length > 0 && (/^\d+$/.test(search) || search.includes("-"));
       onFilterChange({
         ...filters,
-        name: !isNumeric && search ? search : undefined,
-        nid: isNumeric && search ? search : undefined,
+        name: !isNidSearch && search ? search : undefined,
+        nid: isNidSearch ? cleanedDigits : undefined,
         page: 1,
       });
     }, 400);

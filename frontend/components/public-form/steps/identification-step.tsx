@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, User } from "lucide-react";
-import { FullLoanApplicationFormValues, nidRegex } from "@/lib/validations/loan-application.schema";
+import { FullLoanApplicationFormValues } from "@/lib/validations/loan-application.schema";
 import { api } from "@/lib/api";
+import { formatNid, cleanNid } from "@/lib/utils/format-nid";
 
 interface IdentificationStepProps {
   onNext: () => void;
@@ -27,26 +28,19 @@ export function IdentificationStep({ onNext }: IdentificationStepProps) {
 
   const nidValue = watch("identity.nid");
 
-  const formatNidMask = (val: string) => {
-    const cleaned = val.replace(/\D/g, "").slice(0, 11);
-    if (cleaned.length <= 3) return cleaned;
-    if (cleaned.length <= 10) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 10)}-${cleaned.slice(10)}`;
-  };
-
   const handleNidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatNidMask(e.target.value);
+    const formatted = formatNid(e.target.value);
     setValue("identity.nid", formatted, { shouldValidate: true });
     setNidValidated(false);
   };
 
   const handleNidBlur = async () => {
-    if (!nidValue || !nidRegex.test(nidValue)) return;
+    const cleaned = cleanNid(nidValue);
+    if (cleaned.length !== 11) return;
 
     setIsValidatingNid(true);
     try {
       // Clean NID for API lookup
-      const cleaned = nidValue.replace(/\D/g, "");
       const response = await api.get(`/nid-validation/${cleaned}`).catch(() => null);
 
       if (response?.data) {

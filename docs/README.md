@@ -34,6 +34,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [**Public Form Enum Unification (Opción B)**](./implementation/2026-07-30-public-form-enum-unification.md) - ✅ (2026-07-30)
 - [**SoliPres Table Styling & Unified Status Badges**](./implementation/2026-07-30-solipres-table-styling-and-status-badges.md) - ✅ (2026-07-30)
 - [**Loans Table Structure Redesign (7 Cols, Mini Subtexts & Edit)**](./implementation/2026-07-31-loans-table-structure-redesign.md) - ✅ (2026-07-31)
+- [**Formateo de Cédula (000-0000000-0) e Entradas Flexibles**](./implementation/2026-07-31-nid-mask-formatting-and-flexible-inputs.md) - ✅ (2026-07-31)
 
 ### Decisions & Architecture (ADRs)
 
