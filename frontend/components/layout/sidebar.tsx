@@ -12,7 +12,6 @@ import {
   LayoutDashboard,
   Users,
   FileText,
-  BarChart3,
   Settings,
   ChevronRight,
   ChevronLeft,
@@ -46,14 +45,6 @@ export function Sidebar() {
       label: t("nav.loanApplications"),
       href: "/loans",
       icon: FileText,
-    },
-    {
-      key: "nav.creditAnalysis",
-      label: t("nav.creditAnalysis"),
-      href: "/analysis",
-      icon: BarChart3,
-      badge: "Phase 8",
-      disabled: true,
     },
   ];
 

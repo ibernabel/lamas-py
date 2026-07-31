@@ -33,7 +33,7 @@
 - **Action**: Verify redirection to `/` and UI elements.
 - **Result**: ✅ Redirected correctly.
 - **Components Observed**:
-  - **Sidebar**: Contains Dashboard, Customers, Loan Applications, and Credit Analysis (locked).
+  - **Sidebar**: Contains Dashboard, Customers, and Loan Applications (Credit Analysis moved contextually to Loan/Customer pages per ADR 006).
   - **Header**: Displays "Dashboard" title and user avatar placeholder.
   - **Main Content**: Welcome message "Welcome back, Test 👋" and stats summary grid.
 

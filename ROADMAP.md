@@ -13,12 +13,15 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ## Quick Links
 
-| Document                                                                            | Description                          |
+| Document                                                                            | Description                          | Status        |
 | ----------------------------------------------------------------------------------- | ------------------------------------ | ------------- |
-| [Migration PRD](./docs/planning/migration-prd.md)                                   | Product Requirements Document        |
-| [Phase 1: Backend Foundation](./docs/implementation/phase-1-backend-foundation.md)  | FastAPI + SQLModel setup             |
+| [Migration PRD](./docs/planning/migration-prd.md)                                   | Product Requirements Document        |               |
+| [Phase 1: Backend Foundation](./docs/implementation/phase-1-backend-foundation.md)  | FastAPI + SQLModel setup             |               |
 | [Phase 5: Frontend Customers](./docs/implementation/phase-5-frontend-customers.md)  | Customer management UI               | ✅ 2026-02-19 |
-| [LAMAS Integration Requirements](./docs/planning/lamas-integration-requirements.md) | CreditGraph AI Integration (Phase 8) |
+| [LAMAS Integration Requirements](./docs/planning/lamas-integration-requirements.md) | CreditGraph AI Integration (Phase 8) |               |
+| [PRD Data Audit & Versioning](./docs/planning/prd-audit-versioning.md)              | Field-level Audit & Temporal Log     | 🟢 2026-07-31 |
+| [Loan Application Enum Audit](./docs/planning/req-loan-application-enum-audit.md)  | Enum Audit & Alignment for Public    | 📋 Pending    |
+| [Table Appearance Customization](./docs/planning/req-table-appearance-customization.md) | Dynamic Table Styling in /settings | 📋 Pending    |
 
 ---
 
@@ -50,8 +53,11 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 | 8     | CreditGraph AI Integration | ✅ Complete    | 2026-03-08 | 2 weeks  |
 | 9     | Document Management        | ✅ Complete    | 2026-03-10 | 2 days   |
 | -     | Customer Edit & Detail Fix | ✅ Complete    | 2026-03-11 | < 1 day  |
+| 10    | Data Audit & Versioning    | 🟢 Approved    | -          | 2 weeks  |
+| 11    | Loan Application Enum Audit| 📋 Pending     | -          | 1-2 days |
+| 12    | Table Appearance Custom    | 📋 Pending     | -          | 2-3 days |
 
-**Legend:** ✅ Complete | 🟡 In Progress | ⚪ Not Started
+**Legend:** ✅ Complete | 🟢 Approved / Ready | 🟡 In Progress | 📋 Pending | ⚪ Not Started
 
 ---
 
@@ -285,3 +291,74 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 - ✅ Integrated document management in 3 key UI areas
 - ✅ 4 backend integration tests
 - ⚠️ **Known Issue**: Document preview modal currently fails in local dev due to routing mismatch (see [Known Issue](./docs/knowledges/known_issue-document-viewer-404.md))
+
+---
+
+## Phase 10: Data Audit & Versioning Module 🟢
+
+**Status**: Approved — Ready for Implementation  
+**Approved Date**: 2026-07-31  
+**Reference**: [PRD: Data Audit & Versioning](./docs/planning/prd-audit-versioning.md)
+
+### Steps
+
+- [ ] **Step 10.1**: Core Audit Model (`AuditLog`) & DDL Migration Script with PostgreSQL RLS
+- [ ] **Step 10.2**: `AuditContext` Dependency & `AuditService` with `diff_models()` helper
+- [ ] **Step 10.3**: Service Layer Integration (`CustomerService`, `LoanApplicationService`)
+- [ ] **Step 10.4**: Audit Query API (`GET /api/v1/audit/customers/{id}`, `/loan-applications/{id}`, `/users/{id}/activity`)
+- [ ] **Step 10.5**: Automatic Process Tracing (CSV Import & Public Form `AuditContext` propagation)
+- [ ] **Step 10.6**: Data Retention & Archival Strategy (10-year Ley 183-02 RD compliance, active vs. archive tables)
+- [ ] **Step 10.7**: Frontend Audit Timeline Component (Next.js UI for Supervisors & Admins)
+- [ ] **Step 10.8**: Unit & Integration Test Suite (`pytest`)
+
+### Key Features
+
+- **Field-level change tracking**: Captures `old_value`, `new_value`, actor (`user_id`), source, timestamp, and IP.
+- **Append-only integrity**: Enforced via PostgreSQL Row-Level Security (RLS) from MVP.
+- **Restricted access**: Read-only endpoints restricted exclusively to `admin` and `supervisor` roles.
+- **Regulatory compliance**: 10-year retention strategy compliant with Dominican Republic Ley 183-02 and AML regulations.
+- **Async performance**: Non-blocking audit log creation using FastAPI `BackgroundTask`.
+
+---
+
+## Phase 11: Loan Application Enum Audit & Alignment 📋
+
+**Status**: Pending Execution  
+**Reference**: [Loan Application Enum Audit](./docs/planning/req-loan-application-enum-audit.md)
+
+### Steps
+
+- [ ] **Step 11.1**: Corregir enums del wizard público (`solicitar/page.tsx` y `loan-application.schema.ts`)
+- [ ] **Step 11.2**: Resolver semántica de `housing_type` y mapeo de `COMMON_LAW` → `"other"`
+- [ ] **Step 11.3**: Mapear/agregar `TECHNICAL` en nivel educativo y resolver `occupation_type`
+- [ ] **Step 11.4**: Estandarizar valores de `purpose` y `payment_bank`
+- [ ] **Step 11.5**: Pruebas de integración E2E del wizard sin errores HTTP 422
+
+### Key Features
+
+- Alineación completa de enums entre wizard público y backend FastAPI.
+- Eliminación de errores HTTP 422 en la captación pública de clientes.
+- Garantía de integridad de datos PII para el motor de evaluación CreditGraph AI.
+
+---
+
+## Phase 12: Table Appearance Customization Module 📋
+
+**Status**: Pending Implementation  
+**Reference**: [Table Appearance Customization](./docs/planning/req-table-appearance-customization.md)
+
+### Steps
+
+- [ ] **Step 12.1**: Controles UI de Apariencia de Tablas en `/settings` (Fondo, Sentido del Degradado, Transformación de Texto)
+- [ ] **Step 12.2**: React Context `TableAppearanceProvider` y hook `useTableAppearance()`
+- [ ] **Step 12.3**: Consumo reactivo en `TableHeader` / `TableHead` (`frontend/components/ui/table.tsx`)
+- [ ] **Step 12.4**: Persistencia en `localStorage` (`'lamas_table_appearance_prefs'`)
+- [ ] **Step 12.5**: Modelo SQLModel `UserPreference` y endpoints FastAPI (`GET/PATCH /api/v1/users/me/preferences`)
+- [ ] **Step 12.6**: Pruebas unitarias de renderizado de tablas (`Vitest`)
+
+### Key Features
+
+- Personalización visual dinámica de tablas sin recargar la página.
+- Degradados horizontal/vertical y formato MAYÚSCULAS/normal para la tabla.
+- Persistencia dual cliente (`localStorage`) y backend (`UserPreference` en PostgreSQL).
+

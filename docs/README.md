@@ -39,6 +39,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [ADR 003: Zero-PII Data Contract for CreditGraph AI](./decisions/003-zero-pii-data-contract.md)
 - [ADR 004: Restauración de Enum Semánticos en CustomerForm](./decisions/004-enum-restoration-customer-fields.md)
 - [ADR 005: Preservación de Identidad Visual y Familiaridad de UI (SoliPres ➔ LAMaS)](./decisions/005-solipres-ui-familiarity-and-table-design.md)
+- [ADR 006: Remoción de la Entrada Inhabilitada "Credit Analysis" del Sidebar](./decisions/006-sidebar-credit-analysis-removal.md)
 
 ### Testing
 

@@ -5,8 +5,9 @@
 **Módulo**: `audit` (nuevo módulo transversal)  
 **Fecha**: 2026-07-31  
 **Autor**: Idequel Bernabel  
-**Estado**: 🟡 Borrador — Pendiente de aprobación  
-**Versión**: 1.0.0  
+**Estado**: 🟢 Aprobado — Listo para implementación  
+**Versión**: 1.1.0  
+**Última actualización**: 2026-07-31 (decisiones del PO incorporadas)  
 
 ---
 
@@ -420,17 +421,20 @@ Retorna la evolución histórica de un campo específico de un cliente.
 
 ### 5.7 Seguridad y Permisos
 
+> **Decisión (PO 2026-07-31)**: El acceso al audit log está restringido exclusivamente a roles de supervisión y administración. Los asesores **nunca** tienen acceso al historial de cambios, ni siquiera de sus propios clientes.
+
 | Endpoint | Roles permitidos |
 |---|---|
-| `GET /audit/customers/{id}` | `admin`, `supervisor`, `analyst` |
-| `GET /audit/loan-applications/{id}` | `admin`, `supervisor`, `analyst`, `advisor` (solo sus clientes) |
+| `GET /audit/customers/{id}` | `admin`, `supervisor` |
+| `GET /audit/loan-applications/{id}` | `admin`, `supervisor` |
 | `GET /audit/users/{id}/activity` | `admin`, `supervisor` |
 | `GET /audit/.../field-timeline/...` | `admin`, `supervisor` |
 
 **Protecciones adicionales:**
-- La tabla `audit_logs` tendrá una política RLS en PostgreSQL que solo permite `INSERT` y `SELECT`. Los roles de aplicación no tendrán `UPDATE` ni `DELETE`.
-- Los valores de campos financieros sensibles (ej. `salary`, `total_incomes`) pueden ser **ofuscados parcialmente** en la respuesta de la API para roles de baja confianza.
-- El `ip_address` solo se expone a roles `admin` y `supervisor`.
+- **RLS desde el MVP**: La tabla `audit_logs` tendrá una política Row-Level Security en PostgreSQL desde la primera iteración, permitiendo solo `INSERT` y `SELECT`. Los roles de aplicación (`lamas_app`) no tendrán permisos `UPDATE` ni `DELETE` sobre esta tabla.
+- Los valores de campos financieros sensibles (ej. `salary`, `total_incomes`) serán **ofuscados parcialmente** en la respuesta de la API para el rol `supervisor`; solo `admin` ve valores completos.
+- El `ip_address` solo se expone al rol `admin`.
+- Los endpoints de auditoría requieren autenticación JWT válida y verificación de rol en cada request (no solo en el middleware global).
 
 ---
 
@@ -439,8 +443,8 @@ Retorna la evolución histórica de un campo específico de un cliente.
 | Preocupación | Mitigación |
 |---|---|
 | Volumen de registros | Índices en `entity_type`, `entity_id`, `changed_at` y `changed_by_user_id` |
-| Tabla sin límite de crecimiento | Política de retención: archivar logs >2 años a tabla `audit_logs_archive` |
-| Costo de escritura en cada update | Escritura asíncrona en batch mediante `BackgroundTask` de FastAPI |
+| Retención obligatoria 10 años (Ley 183-02 RD) | Tabla `audit_logs` activa conserva registros de los últimos **5 años**. Registros de 5-10 años se mueven a `audit_logs_archive` (misma estructura, partición por año). Ambas tablas son consultables desde la API. |
+| Costo de escritura en cada update | Escritura asíncrona mediante `BackgroundTask` de FastAPI; la respuesta HTTP no espera la confirmación del audit log |
 | Consultas lentas en historial largo | Paginación obligatoria (max 100 items/página) + cursor-based pagination en v2 |
 
 ---
@@ -569,29 +573,26 @@ cd backend && uv run pytest tests/test_audit/ -v --cov=app/services/audit_servic
 
 | Riesgo | Probabilidad | Impacto | Mitigación |
 |---|---|---|---|
-| Crecimiento descontrolado de la tabla `audit_logs` | Alta | Medio | Implementar retención desde el inicio (archivado > 2 años) |
-| Degradación de rendimiento en imports masivos (CSV) | Media | Alto | Escritura de audit en `BackgroundTask` asíncrono |
-| Contexto de usuario no disponible en algunos flujos | Media | Alto | Establecer `AuditContext` como requisito obligatorio en todos los servicios antes del desarrollo |
-| Ausencia de Alembic dificulta la migración DDL | Baja | Medio | El script SQL manual es suficiente para el MVP; evaluar adopción de Alembic en paralelo |
-| Reversión de datos basada en historial (scope creep) | Alta (demanda) | Bajo | Dejar explícitamente fuera del MVP; documentar en roadmap como v2 |
+| Volumen acumulado de audit_logs en 10 años | Alta | Medio | Estrategia de particionamiento activo/archivo desde el primer deploy; job cron anual de migración |
+| Degradación de rendimiento en imports masivos (CSV) | Media | Alto | Escritura de audit en `BackgroundTask` asíncrono; la respuesta del import no bloquea en audit |
+| Contexto de usuario no disponible en algunos flujos | Media | Alto | `AuditContext` es requisito obligatorio en todos los servicios; error 500 si no se puede construir |
+| Ausencia de Alembic dificulta la migración DDL | Baja | Medio | Script SQL manual `add_audit_logs_table.sql` cubre el MVP; adoptar Alembic es deuda técnica pendiente |
+| Reversión de datos basada en historial (scope creep) | Alta (demanda) | Bajo | Explícitamente fuera del MVP; documentar en ROADMAP como feature v2 |
 
 ---
 
-## 12. Preguntas Abiertas
+## 12. Decisiones Tomadas (PO — 2026-07-31)
 
-> Las siguientes decisiones requieren revisión antes de iniciar la implementación.
+> Todas las preguntas abiertas han sido resueltas. El PRD está **aprobado** y listo para generar `implementation.md`.
 
-1. **¿Qué actores del sistema deben tener acceso de lectura al audit log?** ¿Los asesores pueden ver el historial de sus propios clientes o solo los supervisores y administradores?
-
-2. **¿Se requiere notificación en tiempo real** cuando se detecta una modificación en un campo crítico (ej. `email`, `salary`)? Esto implicaría integración con un sistema de notificaciones.
-
-3. **¿Se debe auditar la acción de creación inicial** (`action='create'`) además de las actualizaciones, o solo los cambios posteriores?
-
-4. **¿Los cambios de estado de `LoanApplication`** deben tener un campo de justificación obligatorio (`change_reason`) que el asesor deba llenar?
-
-5. **Política de retención de datos**: ¿Cuántos años se deben conservar los registros de auditoría en la tabla activa vs. archivados? (Considerar regulaciones financieras locales, ej. Ley 183-02 RD).
-
-6. **¿Se debe implementar la RLS de PostgreSQL desde el MVP** o es suficiente con restricciones a nivel de aplicación para la primera iteración?
+| # | Pregunta | Decisión | Impacto en Diseño |
+|---|---|---|---|
+| 1 | ¿Qué actores acceden al audit log? | Solo `admin` y `supervisor`. Los asesores **nunca** tienen acceso. | La tabla de permisos de la sección 5.7 fue actualizada. No se expone ningún endpoint de audit a rol `advisor`. |
+| 2 | ¿Notificaciones en tiempo real por cambios críticos? | **No** para el MVP. | Eliminar de scope. El campo `ip_address` y la tabla `audit_logs` son suficientes para revisión posterior. |
+| 3 | ¿Auditar `action='create'` (creación inicial)? | **No.** Solo se auditan actualizaciones (`action='update'`) y borrados lógicos (`action='soft_delete'`). | El helper `diff_models()` solo se invoca desde los endpoints `PUT`/`PATCH`. La creación inicial queda registrada en `created_at` del modelo. El `action` en el modelo solo acepta los valores: `update` \| `soft_delete`. |
+| 4 | ¿`change_reason` obligatorio en cambios de estado? | **No.** El campo `change_reason` permanece opcional en el modelo `AuditLog`. | No se requiere validación de campo obligatorio en los endpoints de cambio de estado de `LoanApplication`. |
+| 5 | Política de retención de datos | **10 años** según normativas complementarias de prevención de riesgos y debida diligencia en RD (Ley 183-02 y regulaciones ABA/AMLCO). Estrategia: 5 años en tabla activa `audit_logs` + 5 años en tabla de archivo `audit_logs_archive`. | La sección 5.8 fue actualizada con la estrategia de archivado por partición anual. |
+| 6 | ¿RLS de PostgreSQL desde el MVP? | **Sí.** La política RLS es un requisito de seguridad del MVP, no una mejora futura. | La Fase 1 (Sprint 1-2) incluye la creación de la política RLS como parte del script DDL `add_audit_logs_table.sql`. |
 
 ---
 
@@ -607,4 +608,5 @@ cd backend && uv run pytest tests/test_audit/ -v --cov=app/services/audit_servic
 ---
 
 *Este PRD fue generado a partir de una auditoría técnica del codebase realizada el 2026-07-31.*  
-*Para iniciar la implementación, este documento debe ser aprobado y convertido en `implementation.md`.*
+*Decisiones del PO incorporadas el 2026-07-31. Estado: **Aprobado**.*  
+*Siguiente paso: Generar `docs/implementation/impl-audit-versioning.md` con el plan técnico sprint a sprint.*
