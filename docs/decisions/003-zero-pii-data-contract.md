@@ -6,7 +6,7 @@
 
 ## Contexto
 
-El motor de inteligencia artificial **CreditGraph AI** (`financial-risk-agent-graph`) ejecuta análisis de riesgo crediticio basados en grafos de conocimiento y LLMs. En la implementación inicial, la payload `AnalysisRequest` incluía datos PII del cliente (`full_name`, `cedula`, `email`, `phone`, `declared_address`). La transmisión y procesamiento de datos de identificación personal directamente hacia modelos de lenguaje plantea riesgos de privacidad y cumplimiento normativo.
+El motor de inteligencia artificial **CreditGraph AI** (`creditgraph`) ejecuta análisis de riesgo crediticio basados en grafos de conocimiento y LLMs. En la implementación inicial, la payload `AnalysisRequest` incluía datos PII del cliente (`full_name`, `cedula`, `email`, `phone`, `declared_address`). La transmisión y procesamiento de datos de identificación personal directamente hacia modelos de lenguaje plantea riesgos de privacidad y cumplimiento normativo.
 
 ## Decisión
 

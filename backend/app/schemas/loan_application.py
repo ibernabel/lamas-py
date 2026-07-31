@@ -125,6 +125,10 @@ class LoanApplicationListItem(BaseModel):
     amount: float | None = None   # Pulled from detail for convenience
     customer_name: str | None = None
     customer_nid: str | None = None
+    company_name: str | None = None
+    bank_name: str | None = None
+    advisor_name: str | None = None
+    latest_note: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
 

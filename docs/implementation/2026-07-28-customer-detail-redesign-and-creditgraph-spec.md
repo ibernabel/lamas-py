@@ -30,7 +30,7 @@ Optimizar la experiencia de usuario (UX/UI) en la vista de detalle de cliente `/
 - [`frontend/components/ui/progress.tsx`](file:///z:/home/ibernabel/develop/consultor/technology/projects/aisa/lamas-py/frontend/components/ui/progress.tsx): Componente UI reutilizable de barra de progreso con propiedad `indicatorClassName` para personalización de colores de riesgo (amarillo/verde).
 
 ### 3. Documentación Técnica Creada (SSOT)
-- [`docs/planning/creditgraph-ui-technical-spec.md`](file:///z:/home/ibernabel/develop/consultor/technology/projects/aisa/lamas-py/docs/planning/creditgraph-ui-technical-spec.md): Especificación técnica de integración oficial basada en el análisis de `financial-risk-agent-graph` y `lamas-py/backend` (modelos Pydantic, 5 pilares IRS, discrepancia bancaria e indicadores OSINT).
+- [`docs/planning/creditgraph-ui-technical-spec.md`](file:///z:/home/ibernabel/develop/consultor/technology/projects/aisa/lamas-py/docs/planning/creditgraph-ui-technical-spec.md): Especificación técnica de integración oficial basada en el análisis de `creditgraph` y `lamas-py/backend` (modelos Pydantic, 5 pilares IRS, discrepancia bancaria e indicadores OSINT).
 
 ---
 

@@ -12,6 +12,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [**REQ: Auditoría LoanApplication Enums**](./planning/req-loan-application-enum-audit.md) - 📋 Requerimientos para corrección de enums en formulario público
 - [**REQ: Vista de Configuración e i18n Multi-Idioma**](./planning/req-settings-view-and-i18n.md) - 📋 Requerimientos y especificación técnica de i18n y /settings
 - [**REQ: Personalización Apariencia de Tablas**](./planning/req-table-appearance-customization.md) - 📋 Requerimientos de apariencia dinámica de tablas en /settings (Fondo, Gradiente y Texto)
+- [**REQ: Rediseño Estructura Tabla de Solicitudes**](./planning/req-loans-table-structure-redesign.md) - ✅ Especificación e implementación de 7 columnas, subtextos mini y botón Editar en /loans
 - [Status Report (Jul 2026)](./status-report.md) - Current projects health and progress
 
 ### Implementation Phases
@@ -32,6 +33,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [**Multi-Language i18n & Settings View**](./implementation/2026-07-30-multi-language-i18n-and-settings-view.md) - ✅ (2026-07-30)
 - [**Public Form Enum Unification (Opción B)**](./implementation/2026-07-30-public-form-enum-unification.md) - ✅ (2026-07-30)
 - [**SoliPres Table Styling & Unified Status Badges**](./implementation/2026-07-30-solipres-table-styling-and-status-badges.md) - ✅ (2026-07-30)
+- [**Loans Table Structure Redesign (7 Cols, Mini Subtexts & Edit)**](./implementation/2026-07-31-loans-table-structure-redesign.md) - ✅ (2026-07-31)
 
 ### Decisions & Architecture (ADRs)
 

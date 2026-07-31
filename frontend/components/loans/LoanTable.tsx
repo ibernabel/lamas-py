@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Eye,
+  Pencil,
   ChevronLeft,
   ChevronRight,
   ClipboardList,
@@ -31,7 +32,7 @@ interface LoanTableProps {
   isLoading: boolean;
   currentPage: number;
   onPageChange: (page: number) => void;
-  onDelete: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
 /** Format currency DOP */
@@ -99,12 +100,13 @@ export function LoanTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-16">ID</TableHead>
+              <TableHead className="w-28">{t("common.date")}</TableHead>
               <TableHead>{t("customers.title")}</TableHead>
               <TableHead>{t("loans.amount")}</TableHead>
-              <TableHead className="w-32">{t("common.status")}</TableHead>
-              <TableHead className="hidden lg:table-cell w-32">{t("common.created")}</TableHead>
-              <TableHead className="w-24 sm:w-28 text-right">{t("common.actions")}</TableHead>
+              <TableHead>{t("loans.companyBank")}</TableHead>
+              <TableHead>{t("loans.statusAdvisor")}</TableHead>
+              <TableHead className="hidden md:table-cell max-w-[200px]">{t("loans.notes")}</TableHead>
+              <TableHead className="w-36 text-right">{t("common.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -114,12 +116,12 @@ export function LoanTable({
                 className="cursor-pointer hover:bg-muted/40"
                 onClick={() => router.push(`/loans/${loan.id}`)}
               >
-                {/* ID */}
-                <TableCell className="font-mono text-xs font-medium text-muted-foreground">
-                  #{loan.id}
+                {/* 1. Fecha */}
+                <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                  {formatDate(loan.created_at, language)}
                 </TableCell>
 
-                {/* Customer Info */}
+                {/* 2. Nombre + Cédula (mini) */}
                 <TableCell>
                   <div className="flex items-center gap-2.5">
                     <Avatar className="h-7 w-7 text-[10px] bg-muted">
@@ -138,34 +140,64 @@ export function LoanTable({
                   </div>
                 </TableCell>
 
-                {/* Amount */}
-                <TableCell className="font-medium text-foreground">
+                {/* 3. Monto */}
+                <TableCell className="font-medium text-foreground whitespace-nowrap">
                   {formatCurrency(loan.amount, language)}
                 </TableCell>
 
-                {/* Status */}
+                {/* 4. Empresa + Banco (mini) */}
                 <TableCell>
-                  <LoanStatusBadge status={loan.status} />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-foreground">
+                      {loan.company_name ?? "—"}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {loan.bank_name ?? "—"}
+                    </span>
+                  </div>
                 </TableCell>
 
-                {/* Date */}
-                <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
-                  {formatDate(loan.created_at, language)}
+                {/* 5. Estatus + Asesor (mini) */}
+                <TableCell>
+                  <div className="flex flex-col items-start gap-1">
+                    <LoanStatusBadge status={loan.status} />
+                    <span className="text-xs text-muted-foreground">
+                      {loan.advisor_name ?? t("loans.unassignedAdvisor")}
+                    </span>
+                  </div>
                 </TableCell>
 
-                {/* Actions */}
-                <TableCell onClick={(e) => e.stopPropagation()} className="text-right">
-                  <div className="inline-flex items-center justify-end rounded-full border border-slate-200 dark:border-slate-700 bg-card px-3 py-1 shadow-2xs">
+                {/* 6. Notas */}
+                <TableCell className="hidden md:table-cell text-xs text-muted-foreground max-w-[200px] truncate">
+                  {loan.latest_note ?? "—"}
+                </TableCell>
+
+                {/* 7. Acciones (Ver + Editar) */}
+                <TableCell onClick={(e) => e.stopPropagation()} className="text-right whitespace-nowrap">
+                  <div className="inline-flex items-center justify-end gap-1 rounded-full border border-slate-200 dark:border-slate-700 bg-card px-2 py-1 shadow-2xs">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-6 px-1.5 text-xs font-semibold gap-1.5 text-[#0284c7] dark:text-[#38bdf8] hover:bg-transparent hover:text-[#0369a1] transition-colors"
+                      className="h-6 px-1.5 text-xs font-semibold gap-1 text-[#0284c7] dark:text-[#38bdf8] hover:bg-transparent hover:text-[#0369a1] transition-colors"
                       asChild
                       title={t("common.view")}
                     >
                       <Link href={`/loans/${loan.id}`} aria-label={t("common.viewDetails")}>
                         <Eye className="h-3.5 w-3.5 text-[#0284c7] dark:text-[#38bdf8]" />
                         <span>{t("common.view")}</span>
+                      </Link>
+                    </Button>
+                    <span className="text-slate-300 dark:text-slate-700">|</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-1.5 text-xs font-semibold gap-1 text-slate-600 dark:text-slate-300 hover:bg-transparent hover:text-foreground transition-colors"
+                      asChild
+                      title={t("common.edit")}
+                    >
+                      <Link href={`/loans/${loan.id}`} aria-label={t("common.edit")}>
+                        <Pencil className="h-3.5 w-3.5" />
+                        <span>{t("common.edit")}</span>
                       </Link>
                     </Button>
                   </div>

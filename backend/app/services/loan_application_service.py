@@ -21,7 +21,8 @@ from app.models.loan_application import (
     LoanStatus,
 )
 from app.models.credit_risk import CreditRisk
-from app.models.customer import Customer
+from app.models.customer import Customer, Company, CustomerJobInfo
+from app.models.user import User
 from app.schemas.loan_application import (
     LoanApplicationCreate,
     LoanApplicationUpdate,
@@ -253,7 +254,7 @@ async def list_loan_applications(
         .limit(pagination.per_page)
     ).all()
 
-    # Build list items (include amount from detail for convenience)
+    # Build list items (include amount from detail, customer, company, bank, advisor and latest note)
     items: list[LoanApplicationListItem] = []
     for loan in loans:
         detail = session.exec(
@@ -262,12 +263,47 @@ async def list_loan_applications(
             )
         ).first()
 
-        customer = session.get(Customer, loan.customer_id)
+        customer = session.get(Customer, loan.customer_id) if loan.customer_id else None
         customer_name = None
-        if customer and customer.detail:
-            first = customer.detail.first_name or ""
-            last = customer.detail.last_name or ""
-            customer_name = f"{first} {last}".strip() or None
+        company_name = None
+        bank_name = None
+
+        if customer:
+            if customer.detail:
+                first = customer.detail.first_name or ""
+                last = customer.detail.last_name or ""
+                customer_name = f"{first} {last}".strip() or None
+
+            # Company name
+            comp = session.exec(
+                select(Company).where(Company.customer_id == customer.id)
+            ).first()
+            if comp and comp.name:
+                company_name = comp.name
+
+            # Bank name from job_info
+            job = session.exec(
+                select(CustomerJobInfo).where(CustomerJobInfo.customer_id == customer.id)
+            ).first()
+            if job and job.payment_bank:
+                bank_name = job.payment_bank
+
+        # Advisor name
+        advisor_name = None
+        if loan.user_id:
+            user = session.get(User, loan.user_id)
+            if user:
+                advisor_name = user.name
+
+        # Latest note
+        latest_note = None
+        note_obj = session.exec(
+            select(LoanApplicationNote)
+            .where(LoanApplicationNote.loan_application_id == loan.id)
+            .order_by(LoanApplicationNote.created_at.desc())
+        ).first()
+        if note_obj:
+            latest_note = note_obj.note
 
         item = LoanApplicationListItem(
             id=loan.id,
@@ -282,6 +318,10 @@ async def list_loan_applications(
             amount=detail.amount if detail else None,
             customer_name=customer_name,
             customer_nid=customer.nid if customer else None,
+            company_name=company_name,
+            bank_name=bank_name,
+            advisor_name=advisor_name,
+            latest_note=latest_note,
             created_at=loan.created_at,
             updated_at=loan.updated_at,
         )

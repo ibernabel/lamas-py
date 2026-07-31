@@ -8,7 +8,7 @@
 
 ## 📌 1. Objetivo y Alcance
 
-Garantizar la protección total de Datos de Identificación Personal (PII) en la integración entre **LAMaS** (`lamas-py`) y el motor de IA **CreditGraph AI** (`financial-risk-agent-graph`), refactorizando el contrato de datos `AnalysisRequest` para operar bajo un esquema **Zero-PII**.
+Garantizar la protección total de Datos de Identificación Personal (PII) en la integración entre **LAMaS** (`lamas-py`) y el motor de IA **CreditGraph AI** (`creditgraph`), refactorizando el contrato de datos `AnalysisRequest` para operar bajo un esquema **Zero-PII**.
 
 ---
 
@@ -24,7 +24,7 @@ Garantizar la protección total de Datos de Identificación Personal (PII) en la
 - **`backend/tests/test_creditgraph_api.py`**:
   - Inclusión de aserciones automatizadas comprobando la ausencia de `full_name`, `cedula` y `email` en la llamada HTTP a CreditGraph.
 
-### B. Sistema CreditGraph AI (`financial-risk-agent-graph`)
+### B. Sistema CreditGraph AI (`creditgraph`)
 - **`app/api/models.py`**:
   - Refactorización de la clase `ApplicantData`: eliminación de `id`, `full_name`, `date_of_birth`, `declared_address`, `email`, `phone`.
   - Incorporación de `applicant_hash`, `declared_salary`, `dependents_count`, `housing_type`, `is_self_employed`, `employer_sector`, `geo_zone`.

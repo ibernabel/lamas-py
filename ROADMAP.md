@@ -22,6 +22,8 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 | [PRD Data Audit & Versioning](./docs/planning/prd-audit-versioning.md)              | Field-level Audit & Temporal Log     | 🟢 2026-07-31 |
 | [Loan Application Enum Audit](./docs/planning/req-loan-application-enum-audit.md)  | Enum Audit & Alignment for Public    | 📋 Pending    |
 | [Table Appearance Customization](./docs/planning/req-table-appearance-customization.md) | Dynamic Table Styling in /settings | 📋 Pending    |
+| [PRD Document Upload UX Redesign](./docs/planning/prd-document-upload-ux-redesign.md) | Document Business Rules & UX       | 🟢 2026-07-31 |
+| [Loans Table Structure Redesign](./docs/planning/req-loans-table-structure-redesign.md) | Rediseño de Tabla en /loans (7 cols + subtextos + Editar) | ✅ 2026-07-31 |
 
 ---
 
@@ -56,6 +58,8 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 | 10    | Data Audit & Versioning    | 🟢 Approved    | -          | 2 weeks  |
 | 11    | Loan Application Enum Audit| 📋 Pending     | -          | 1-2 days |
 | 12    | Table Appearance Custom    | 📋 Pending     | -          | 2-3 days |
+| 13    | Document Upload UX Redesign| 🟢 Approved    | -          | 3-4 days |
+| 14    | Loans Table Structure Redesign| ✅ Complete | 2026-07-31 | 1 day    |
 
 **Legend:** ✅ Complete | 🟢 Approved / Ready | 🟡 In Progress | 📋 Pending | ⚪ Not Started
 
@@ -361,4 +365,49 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 - Personalización visual dinámica de tablas sin recargar la página.
 - Degradados horizontal/vertical y formato MAYÚSCULAS/normal para la tabla.
 - Persistencia dual cliente (`localStorage`) y backend (`UserPreference` en PostgreSQL).
+
+---
+
+## Phase 13: Document Upload UX Redesign & Business Rules 🟢
+
+**Status**: Approved — Ready for Implementation
+**Approved Date**: 2026-07-31
+**Duration**: 3–4 días
+**Reference**: [PRD Document Upload UX Redesign](./docs/planning/prd-document-upload-ux-redesign.md)
+
+### Steps
+
+- [ ] **Step 13.1**: Agregar `collateral_type` a `LoanApplication` *(prerequisito Sección C de Garantías)*
+- [ ] **Step 13.2**: Crear `DocumentTypeEnum` con 13 tipos activos en `app/models/document.py`
+- [ ] **Step 13.3**: Actualizar `app/schemas/document.py` — enum + `file_size_bytes` en response
+- [ ] **Step 13.4**: Validar enum + MIME + tamaño (10 MB) en endpoints de upload → HTTP 422 / 413
+- [ ] **Step 13.5**: Agregar `CurrentUser` en endpoint `GET /customers/{customer_id}` (security fix)
+- [ ] **Step 13.6**: Implementar `GET /documents/loans/{loan_id}` (endpoint faltante)
+- [ ] **Step 13.7**: Tests backend pytest (8 tests)
+- [ ] **Step 13.8**: Crear `lib/config/document-types.ts` con catálogo centralizado y `SUPPORTED_BANKS`
+- [ ] **Step 13.9**: Agregar `listLoanDocuments()` en `lib/api/documents.ts`
+- [ ] **Step 13.10**: Actualizar `lib/api/types.ts` — `DocumentType` union + `collateral_type`
+- [ ] **Step 13.11**: Crear `DocumentSlot.tsx` — validación MIME, tamaño, selector de banco
+- [ ] **Step 13.12**: Crear `DocumentGroup.tsx` — agrupador de slots por sección
+- [ ] **Step 13.13**: Crear `DocumentProgress.tsx` — indicador de progreso del expediente
+- [ ] **Step 13.14**: Crear `CustomerDocumentsPanel.tsx` — secciones Identificación y Soporte Adicional
+- [ ] **Step 13.15**: Crear `LoanDocumentsPanel.tsx` — Secciones A, B, C (condicional)
+- [ ] **Step 13.16**: Actualizar `CustomerForm.tsx` — solo `nid` requerido en post-creación
+- [ ] **Step 13.17**: Actualizar `/customers/[id]/page.tsx` — reemplazar `DocumentsSection`
+- [ ] **Step 13.18**: Actualizar `/loans/[id]/page.tsx` — reemplazar bloque de documentos
+- [ ] **Step 13.19**: Tests unitarios frontend Vitest (12 tests nuevos)
+- [ ] **Step 13.20**: Documentar Known Issues (KI-DOC-001 al 010) en `docs/knowledges/`
+- [ ] **Step 13.21**: `docs/implementation/phase-13-document-upload-ux-redesign.md`
+- [ ] **Step 13.22**: Actualizar `ROADMAP.md` con deliverables completados
+
+### Key Features
+
+- **Catálogo centralizado**: `lib/config/document-types.ts` como Single Source of Truth de tipos, MIME y bancos
+- **13 tipos activos**: Todos con slot de carga en el contexto correcto (cliente vs. préstamo)
+- **Validación real de MIME y tamaño**: Backend (HTTP 422/413) + Frontend (UI error antes del submit)
+- **Selector de banco**: Para `bank_statement`, el banco es obligatorio antes de subir
+- **Sección C condicional**: Garantías (vehículo/propiedad) visibles solo cuando aplica `collateral_type`
+- **`DocumentProgress`**: Indicador de completitud del expediente por sección
+- **Bancos MVP**: BHD, Popular, Banreservas — configurables en código sin UI de settings
+- **Backlog documentado**: OCR de PDF, multi-bank CreditGraph, R2 async fix
 

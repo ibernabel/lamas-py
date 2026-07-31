@@ -2,7 +2,7 @@
 
 ## 📌 1. Contexto y Objetivos
 
-El motor de inteligencia artificial **CreditGraph** (`financial-risk-agent-graph`) ejecuta un análisis probabilístico y determinista basado en grafos de conocimiento y agentes inteligentes para la evaluación del riesgo crediticio en solicitudes de préstamos.
+El motor de inteligencia artificial **CreditGraph** (`creditgraph`) ejecuta un análisis probabilístico y determinista basado en grafos de conocimiento y agentes inteligentes para la evaluación del riesgo crediticio en solicitudes de préstamos.
 
 Este documento establece la especificación técnica para consumir los datos reales generados por el backend de CreditGraph y presentarlos en la plataforma **LAMaS (Frontend Next.js)** tanto en el **Sidebar de Resumen** como en la pestaña de **Análisis CreditGraph**, eliminando los datos de prueba (*mockdata*) e implementando una interfaz de usuario (*UI/UX*) de nivel empresarial.
 

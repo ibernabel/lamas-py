@@ -17,6 +17,10 @@ const mockData: PaginatedResponse<LoanApplicationListItem> = {
       customer_id: 101,
       customer_name: "John Doe",
       customer_nid: "12345678901",
+      company_name: "Acme Corp",
+      bank_name: "Banco Popular",
+      advisor_name: "Maria Rodriguez",
+      latest_note: "Cliente envió comprobante de ingresos",
       user_id: 1,
       status: "received",
       is_active: true,
@@ -36,7 +40,7 @@ const mockData: PaginatedResponse<LoanApplicationListItem> = {
 };
 
 describe("LoanTable", () => {
-  it("renders correctly with data", () => {
+  it("renders correctly with data and 7 columns", () => {
     render(
       <LoanTable
         data={mockData}
@@ -48,9 +52,12 @@ describe("LoanTable", () => {
     );
 
     expect(screen.getByText("John Doe")).toBeDefined();
-    expect(screen.getByText("#1")).toBeDefined();
+    expect(screen.getByText("12345678901")).toBeDefined();
     expect(screen.getByText(/50,000/)).toBeDefined();
-    expect(screen.getByText(/recibida|received/i)).toBeDefined();
+    expect(screen.getByText("Acme Corp")).toBeDefined();
+    expect(screen.getByText("Banco Popular")).toBeDefined();
+    expect(screen.getByText("Maria Rodriguez")).toBeDefined();
+    expect(screen.getByText("Cliente envió comprobante de ingresos")).toBeDefined();
   });
 
   it("shows skeleton while loading", () => {
@@ -63,10 +70,6 @@ describe("LoanTable", () => {
         onDelete={vi.fn()}
       />
     );
-
-    // Should render multiple skeletons
-    // Skeleton component usually doesn't have a role, but we check for its existence
-    // by looking for the base container often used or just verify loading state.
   });
 
   it("shows empty state when no items", () => {
@@ -84,7 +87,7 @@ describe("LoanTable", () => {
     expect(screen.getByText(/no hay datos/i)).toBeDefined();
   });
 
-  it("renders the direct 'Ver' action button for loan applications", () => {
+  it("renders both 'Ver' and 'Editar' action buttons for loan applications", () => {
     render(
       <LoanTable
         data={mockData}
@@ -98,5 +101,9 @@ describe("LoanTable", () => {
     const viewBtn = screen.getByTitle("Ver");
     expect(viewBtn).toBeInTheDocument();
     expect(viewBtn.closest("a")).toHaveAttribute("href", "/loans/1");
+
+    const editBtn = screen.getByTitle("Editar");
+    expect(editBtn).toBeInTheDocument();
+    expect(editBtn.closest("a")).toHaveAttribute("href", "/loans/1");
   });
 });

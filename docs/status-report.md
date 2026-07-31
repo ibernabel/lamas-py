@@ -5,7 +5,7 @@
 
 ## 1. Resumen Ejecutivo
 
-El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.0.0`**. En las sesiones recientes se logró la refactorización arquitectónica del contrato de datos Zero-PII con CreditGraph AI, la auditoría del formulario de clientes admin (`CustomerForm.tsx`), la unificación de enums del formulario público (`/solicitar`), la **aplicación de los estilos de tabla SoliPres** (encabezados en gradiente azul horizontal `bg-gradient-to-l`, botonera de acciones en píldora redondeada con ícono `FilePenLine` e integración de `CustomerStatusBadge`), la **corrección del módulo de Importación CSV de SoliPres**, y en la sesión del 31 de julio de 2026, la **reparación y optimización del 100% de la suite de pruebas unitarias del Frontend con Vitest (88/88 pruebas aprobadas en 10/10 archivos de test)**.
+El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión **`1.2.7`**. En las sesiones recientes se logró la refactorización arquitectónica del contrato de datos Zero-PII con CreditGraph AI, la auditoría del formulario de clientes admin (`CustomerForm.tsx`), la unificación de enums del formulario público (`/solicitar`), la **aplicación de los estilos de tabla SoliPres**, la **corrección del módulo de Importación CSV de SoliPres**, y en la sesión del 31 de julio de 2026, el **rediseño completo de la tabla de solicitudes en la vista `/loans` (7 columnas compuestas, subtextos reducidos mini para cédula, banco y asesor, celda de notas y acción de Editar junto a Ver)**, logrando una tasa de éxito del 100% en las pruebas unitarias de backend y frontend (23/23 tests backend y 4/4 tests frontend).
 
 ## 2. Estado de Componentes
 
@@ -71,10 +71,11 @@ El proyecto **LAMaS (FastAPI + SQLModel + Next.js 16)** ha alcanzado la versión
 
 ## 4. Próximos Pasos (Roadmap)
 
-1. **✅ Corrección formulario público `solicitar/page.tsx`**: Unificación de enums (Opción B) completada. Schemas Pydantic extendidos, componentes React y schemas Zod alineados en minúsculas, y migración DDL ejecutada en BD.
-2. **Integración Frontend ↔ CreditGraph Client**: Conectar los hooks de React Query con los endpoints reales de análisis de CreditGraph (`/loan-applications/{id}/creditgraph`).
-3. **Migración SQL gender**: Si la BD tiene datos legacy con `gender = 'M'/'F'/'O'`, ejecutar script de actualización.
-4. **Sincronización Git (`/sync-repo`)**: Crear el commit convencional y actualizar versión SemVer del repositorio.
+1. **✅ Rediseño de Tabla de Solicitudes (`/loans`) (Fase 14)**: Estructuración en 7 columnas compuestas, subtextos mini (Cédula, Banco, Asesor), celda de notas y acción de Editar junto a Ver completada e integrada con 100% de tests aprobados.
+2. **✅ Corrección formulario público `solicitar/page.tsx`**: Unificación de enums (Opción B) completada. Schemas Pydantic extendidos, componentes React y schemas Zod alineados en minúsculas, y migración DDL ejecutada en BD.
+3. **Integración Frontend ↔ CreditGraph Client**: Conectar los hooks de React Query con los endpoints reales de análisis de CreditGraph (`/loan-applications/{id}/creditgraph`).
+4. **Migración SQL gender**: Si la BD tiene datos legacy con `gender = 'M'/'F'/'O'`, ejecutar script de actualización.
+5. **Sincronización Git (`/sync-repo`)**: Crear el commit convencional y actualizar versión SemVer del repositorio.
 
 ---
 
