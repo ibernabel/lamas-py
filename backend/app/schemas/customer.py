@@ -706,3 +706,4 @@ class NIDValidationResponse(BaseModel):
     is_valid: bool
     is_unique: bool
     message: str | None = None
+    existing_customer: dict | None = None

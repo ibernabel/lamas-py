@@ -5,10 +5,10 @@ import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2, User } from "lucide-react";
+import { Loader2, CheckCircle2, User, AlertCircle, Info } from "lucide-react";
 import { FullLoanApplicationFormValues } from "@/lib/validations/loan-application.schema";
-import { api } from "@/lib/api";
-import { formatNid, cleanNid } from "@/lib/utils/format-nid";
+import { customersApi } from "@/lib/api/customers";
+import { formatNid, cleanNid, validateDominicanNid } from "@/lib/utils/format-nid";
 
 interface IdentificationStepProps {
   onNext: () => void;
@@ -24,36 +24,68 @@ export function IdentificationStep({ onNext }: IdentificationStepProps) {
   } = useFormContext<FullLoanApplicationFormValues>();
 
   const [isValidatingNid, setIsValidatingNid] = useState(false);
-  const [nidValidated, setNidValidated] = useState(false);
+  const [nidStatus, setNidStatus] = useState<"idle" | "valid" | "invalid" | "existing">("idle");
+  const [statusMessage, setStatusMessage] = useState<string>("");
 
   const nidValue = watch("identity.nid");
 
   const handleNidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatNid(e.target.value);
     setValue("identity.nid", formatted, { shouldValidate: true });
-    setNidValidated(false);
+    setNidStatus("idle");
+    setStatusMessage("");
   };
 
   const handleNidBlur = async () => {
     const cleaned = cleanNid(nidValue);
-    if (cleaned.length !== 11) return;
+    if (!cleaned) {
+      setNidStatus("idle");
+      setStatusMessage("");
+      return;
+    }
+
+    // 1. Local JCE Modulo 10 algorithm check (SoliPres parity)
+    const isLuhnValid = validateDominicanNid(cleaned);
+    if (!isLuhnValid) {
+      setNidStatus("invalid");
+      setStatusMessage("✗ Cédula no válida (dígito verificador incorrecto)");
+      return;
+    }
 
     setIsValidatingNid(true);
     try {
-      // Clean NID for API lookup
-      const response = await api.get(`/nid-validation/${cleaned}`).catch(() => null);
+      // 2. Query backend for NID validation and customer lookup
+      const result = await customersApi.validateNid(cleaned).catch(() => null);
 
-      if (response?.data) {
-        if (response.data.first_name) {
-          setValue("identity.first_name", response.data.first_name, { shouldValidate: true });
+      if (result) {
+        if (!result.is_valid) {
+          setNidStatus("invalid");
+          setStatusMessage("✗ Cédula no válida (dígito verificador incorrecto)");
+        } else if (!result.is_unique && result.existing_customer) {
+          // Existing customer found -> Autofill fields
+          setNidStatus("existing");
+          setStatusMessage("ℹ️ Cliente registrado — Datos completados automáticamente");
+
+          const cust = result.existing_customer;
+          if (cust.first_name) setValue("identity.first_name", cust.first_name, { shouldValidate: true });
+          if (cust.last_name) setValue("identity.last_name", cust.last_name, { shouldValidate: true });
+          if (cust.email) setValue("identity.email", cust.email, { shouldValidate: true });
+          if (cust.marital_status) setValue("profile.marital_status", cust.marital_status);
+          if (cust.housing_type) setValue("profile.housing_type", cust.housing_type);
+          if (cust.education_level) setValue("profile.education_level", cust.education_level);
+        } else {
+          // Valid NID for new customer
+          setNidStatus("valid");
+          setStatusMessage("✓ Cédula Dominicana válida");
         }
-        if (response.data.last_name) {
-          setValue("identity.last_name", response.data.last_name, { shouldValidate: true });
-        }
+      } else {
+        // Fallback to local Luhn check if API fails
+        setNidStatus("valid");
+        setStatusMessage("✓ Cédula Dominicana válida");
       }
-      setNidValidated(true);
     } catch {
-      // Silent fail fallback for manual entry
+      setNidStatus("valid");
+      setStatusMessage("✓ Cédula Dominicana válida");
     } finally {
       setIsValidatingNid(false);
     }
@@ -96,21 +128,56 @@ export function IdentificationStep({ onNext }: IdentificationStepProps) {
               value={nidValue || ""}
               onChange={handleNidChange}
               onBlur={handleNidBlur}
-              className={errors.identity?.nid ? "border-destructive" : ""}
+              className={
+                nidStatus === "invalid" || errors.identity?.nid
+                  ? "border-destructive focus-visible:ring-destructive"
+                  : nidStatus === "valid"
+                  ? "border-emerald-500"
+                  : nidStatus === "existing"
+                  ? "border-blue-500"
+                  : ""
+              }
             />
             {isValidatingNid && (
               <div className="absolute right-3 top-2.5">
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
             )}
-            {nidValidated && !isValidatingNid && (
+            {!isValidatingNid && nidStatus === "valid" && (
               <div className="absolute right-3 top-2.5">
                 <CheckCircle2 className="h-5 w-5 text-emerald-500" />
               </div>
             )}
+            {!isValidatingNid && nidStatus === "existing" && (
+              <div className="absolute right-3 top-2.5">
+                <Info className="h-5 w-5 text-blue-500" />
+              </div>
+            )}
+            {!isValidatingNid && nidStatus === "invalid" && (
+              <div className="absolute right-3 top-2.5">
+                <AlertCircle className="h-5 w-5 text-destructive" />
+              </div>
+            )}
           </div>
-          {errors.identity?.nid && (
-            <p className="text-xs text-destructive">{errors.identity.nid.message}</p>
+
+          {/* Inline Feedback Messages */}
+          {nidStatus === "valid" && (
+            <p className="text-xs font-semibold text-emerald-600 flex items-center gap-1 mt-1">
+              {statusMessage}
+            </p>
+          )}
+          {nidStatus === "existing" && (
+            <p className="text-xs font-semibold text-blue-600 flex items-center gap-1 mt-1">
+              {statusMessage}
+            </p>
+          )}
+          {nidStatus === "invalid" && (
+            <p className="text-xs font-semibold text-destructive flex items-center gap-1 mt-1">
+              {statusMessage}
+            </p>
+          )}
+          {errors.identity?.nid && nidStatus === "idle" && (
+            <p className="text-xs text-destructive mt-1">{errors.identity.nid.message}</p>
           )}
         </div>
 

@@ -97,6 +97,7 @@ export function RequestConsentStep({ onBack, onSubmit, isSubmitting }: RequestCo
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               {...register("loan_request.term_months", { valueAsNumber: true })}
             >
+              <option value="">Seleccione el plazo...</option>
               <option value="6">6 meses</option>
               <option value="12">12 meses</option>
               <option value="18">18 meses</option>

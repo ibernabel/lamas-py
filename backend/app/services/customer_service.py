@@ -44,21 +44,17 @@ from app.utils.validators import validate_dominican_nid
 
 async def validate_nid(session: Session, nid: str) -> NIDValidationResponse:
     """
-    Validate NID format and check uniqueness in database.
+    Validate NID format/checksum and check uniqueness in database.
+    If customer exists, returns prefillable profile data for public form.
 
     Args:
         session: Database session
         nid: National ID to validate
 
     Returns:
-        NIDValidationResponse with validation results
-
-    Examples:
-        >>> response = await validate_nid(session, "12345678901")
-        >>> response.is_valid  # True if format is correct
-        >>> response.is_unique  # True if not in database
+        NIDValidationResponse with validation results and optional customer details
     """
-    # Validate format
+    # Validate format and JCE Modulo 10 checksum
     is_valid = validate_dominican_nid(nid)
 
     if not is_valid:
@@ -66,18 +62,34 @@ async def validate_nid(session: Session, nid: str) -> NIDValidationResponse:
             nid=nid,
             is_valid=False,
             is_unique=False,
-            message="NID must be exactly 11 digits"
+            message="Cédula no válida (dígito verificador incorrecto)"
         )
 
-    # Check uniqueness
-    statement = select(Customer).where(Customer.nid == nid)
+    # Clean NID for database lookup
+    cleaned_nid = "".join(filter(str.isdigit, nid))
+
+    # Check uniqueness & fetch existing customer data
+    statement = select(Customer).where(Customer.nid == cleaned_nid)
     existing_customer = session.exec(statement).first()
 
+    customer_data = None
+    if existing_customer and existing_customer.detail:
+        detail = existing_customer.detail
+        customer_data = {
+            "first_name": detail.first_name or "",
+            "last_name": detail.last_name or "",
+            "email": detail.email or "",
+            "marital_status": detail.marital_status,
+            "housing_type": detail.housing_type,
+            "education_level": detail.education_level,
+        }
+
     return NIDValidationResponse(
-        nid=nid,
+        nid=cleaned_nid,
         is_valid=True,
         is_unique=existing_customer is None,
-        message=None if existing_customer is None else "NID already exists"
+        message=None if existing_customer is None else "Cliente ya registrado en el sistema",
+        existing_customer=customer_data,
     )
 
 

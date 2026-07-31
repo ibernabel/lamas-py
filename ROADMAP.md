@@ -25,6 +25,7 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 | [PRD Document Upload UX Redesign](./docs/planning/prd-document-upload-ux-redesign.md) | Document Business Rules & UX       | 🟢 2026-07-31 |
 | [Loans Table Structure Redesign](./docs/planning/req-loans-table-structure-redesign.md) | Rediseño de Tabla en /loans (7 cols + subtextos + Editar) | ✅ 2026-07-31 |
 | [Universal NID Formatting](./docs/implementation/2026-07-31-nid-mask-formatting-and-flexible-inputs.md) | Formateo Universal de Cédula (000-0000000-0) | ✅ 2026-07-31 |
+| [JCE NID Validation & Form Defaults](./docs/implementation/2026-07-31-local-nid-validation-autofill-and-defaults-cleanup.md) | Validación Local de Cédula JCE (Módulo 10), Autocompletado y Limpieza de Defectos | ✅ 2026-07-31 |
 
 ---
 
