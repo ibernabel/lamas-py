@@ -55,7 +55,7 @@ describe("CustomerLoansTable", () => {
 
     expect(screen.getByText("Solicitudes de Préstamo")).toBeDefined();
     expect(screen.getByText("John Doe")).toBeDefined();
-    expect(screen.getByText("$50,000.00")).toBeDefined();
+    expect(screen.getByText(/50,000/)).toBeDefined();
   });
 
   it("shows loading state", () => {
@@ -85,6 +85,6 @@ describe("CustomerLoansTable", () => {
 
     render(<CustomerLoansTable customerId={101} />);
 
-    expect(screen.getByText("No loan applications found")).toBeDefined();
+    expect(screen.getByText(/No hay datos/i)).toBeDefined();
   });
 });

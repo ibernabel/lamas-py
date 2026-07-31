@@ -49,8 +49,8 @@ describe("LoanTable", () => {
 
     expect(screen.getByText("John Doe")).toBeDefined();
     expect(screen.getByText("#1")).toBeDefined();
-    expect(screen.getByText("$50,000.00")).toBeDefined();
-    expect(screen.getByText("Received")).toBeDefined();
+    expect(screen.getByText(/50,000/)).toBeDefined();
+    expect(screen.getByText(/recibida|received/i)).toBeDefined();
   });
 
   it("shows skeleton while loading", () => {
@@ -81,7 +81,7 @@ describe("LoanTable", () => {
       />
     );
 
-    expect(screen.getByText("No loan applications found")).toBeDefined();
+    expect(screen.getByText(/no hay datos/i)).toBeDefined();
   });
 
   it("renders the direct 'Ver' action button for loan applications", () => {

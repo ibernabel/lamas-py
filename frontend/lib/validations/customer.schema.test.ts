@@ -126,7 +126,7 @@ describe("customerDetailSchema", () => {
       ...validDetail,
       email: "carlos@example.com",
       birthday: "1985-03-12",
-      gender: "M",
+      gender: "male",
       marital_status: "married",
     });
     expect(result.success).toBe(true);
@@ -154,7 +154,7 @@ describe("customerDetailSchema", () => {
   });
 
   it("accepts all valid gender values", () => {
-    for (const gender of ["M", "F", "O"] as const) {
+    for (const gender of ["male", "female", "other"] as const) {
       const result = customerDetailSchema.safeParse({ ...validDetail, gender });
       expect(result.success, `gender "${gender}" should be valid`).toBe(true);
     }

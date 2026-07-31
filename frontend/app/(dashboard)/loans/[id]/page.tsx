@@ -275,7 +275,7 @@ export default function LoanDetailPage() {
                   </div>
                 )}
 
-                {customer?.email && (
+                {customer?.detail?.email && (
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
                       <Mail className="h-4 w-4 text-slate-600 dark:text-slate-400" />
@@ -283,7 +283,7 @@ export default function LoanDetailPage() {
                     <div className="space-y-0.5">
                       <p className="text-[10px] text-muted-foreground uppercase font-medium">{t("customers.fields.email")}</p>
                       <p className="text-xs font-semibold text-muted-foreground truncate max-w-[180px]">
-                        {customer.email}
+                        {customer.detail.email}
                       </p>
                     </div>
                   </div>
@@ -303,7 +303,7 @@ export default function LoanDetailPage() {
                   </div>
                 )}
 
-                {customer?.company?.name && (
+                {(customer?.job_info?.role || customer?.company?.name) && (
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
                       <Briefcase className="h-4 w-4 text-slate-600 dark:text-slate-400" />
@@ -311,7 +311,9 @@ export default function LoanDetailPage() {
                     <div className="space-y-0.5">
                       <p className="text-[10px] text-muted-foreground uppercase font-medium">{t("customers.fields.companyName")}</p>
                       <p className="text-xs font-semibold text-muted-foreground truncate max-w-[180px]">
-                        {customer.company.name}
+                        {customer?.job_info?.role && customer?.company?.name
+                          ? `${customer.job_info.role} at ${customer.company.name}`
+                          : customer?.job_info?.role || customer?.company?.name}
                       </p>
                     </div>
                   </div>

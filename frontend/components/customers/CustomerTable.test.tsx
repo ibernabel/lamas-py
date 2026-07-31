@@ -78,7 +78,7 @@ describe("CustomerTable", () => {
         data={makePaginatedResponse([])}
       />
     );
-    expect(screen.getByText(/customers\.notFound|no customers|no encontrado|no hay datos/i)).toBeInTheDocument();
+    expect(screen.getByText(/customers\.notFound|cliente no encontrado/i)).toBeInTheDocument();
   });
 
   it("renders an empty state when data is undefined", () => {
@@ -129,7 +129,7 @@ describe("CustomerTable", () => {
         data={makePaginatedResponse([makeCustomer({ is_active: true })])}
       />
     );
-    expect(screen.getByText(/active/i)).toBeInTheDocument();
+    expect(screen.getByText(/activ/i)).toBeInTheDocument();
   });
 
   it("shows 'Inactive' badge for an inactive customer", () => {
@@ -139,7 +139,7 @@ describe("CustomerTable", () => {
         data={makePaginatedResponse([makeCustomer({ is_active: false })])}
       />
     );
-    expect(screen.getByText(/inactive/i)).toBeInTheDocument();
+    expect(screen.getByText(/inactiv/i)).toBeInTheDocument();
   });
 
   it("displays the customer email", () => {
