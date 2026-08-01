@@ -27,8 +27,8 @@ def init_db():
     """
     Initialize database tables.
     Note: We're using an existing PostgreSQL database from Laravel,
-    so this only creates new tables if needed.
+    so this only creates missing tables if needed.
     """
-    # Uncomment if creating new tables:
-    # SQLModel.metadata.create_all(engine)
-    pass
+    import app.models  # noqa: F401 - Register models in metadata
+    SQLModel.metadata.create_all(engine)
+
