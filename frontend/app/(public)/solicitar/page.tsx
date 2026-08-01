@@ -15,6 +15,7 @@ import { RequestConsentStep } from "@/components/public-form/steps/request-conse
 import { useFormTelemetry } from "@/hooks/use-form-telemetry";
 import { sendWidgetEvent } from "@/lib/embed/post-message";
 import { api } from "@/lib/api";
+import { cleanNid } from "@/lib/utils/format-nid";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CheckCircle, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
@@ -139,6 +140,10 @@ export default function SolicitarPage() {
 
       const payload = {
         ...formValues,
+        identity: {
+          ...formValues.identity,
+          nid: cleanNid(formValues.identity?.nid),
+        },
         telemetry,
         legal_consent: {
           ...formValues.legal_consent,

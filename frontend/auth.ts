@@ -27,29 +27,58 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!parsed.success) return null;
 
         try {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                email: parsed.data.email,
-                password: parsed.data.password,
-              }),
-            }
-          );
+          const apiBaseUrl =
+            process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8001/api/v1";
+          const res = await fetch(`${apiBaseUrl}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: parsed.data.email,
+              password: parsed.data.password,
+            }),
+          });
 
-          if (!res.ok) return null;
+          if (!res.ok) {
+            console.error(
+              `[NextAuth] Backend login failed with HTTP ${res.status}`
+            );
+            return null;
+          }
 
           const data = await res.json();
 
+          // Fetch user info from /auth/me using access_token
+          let userId = parsed.data.email;
+          let userName = parsed.data.email;
+          let userEmail = parsed.data.email;
+
+          try {
+            const meRes = await fetch(`${apiBaseUrl}/auth/me`, {
+              headers: {
+                Authorization: `Bearer ${data.access_token}`,
+              },
+            });
+            if (meRes.ok) {
+              const meData = await meRes.json();
+              userId = String(meData.id ?? userId);
+              userName = meData.name ?? userName;
+              userEmail = meData.email ?? userEmail;
+            }
+          } catch (meErr) {
+            console.warn(
+              "[NextAuth] Failed to fetch /auth/me profile:",
+              meErr
+            );
+          }
+
           return {
-            id: String(data.user?.id ?? ""),
-            name: data.user?.name ?? "",
-            email: data.user?.email ?? "",
+            id: userId,
+            name: userName,
+            email: userEmail,
             accessToken: data.access_token,
           };
-        } catch {
+        } catch (err) {
+          console.error("[NextAuth] Exception during authorize:", err);
           return null;
         }
       },

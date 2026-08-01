@@ -55,6 +55,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Fix: Importación CSV SoliPres (Duplicación Ruta, Savepoints y CORS)](./fixes/fix_2026_07_30_solipres_csv_import_500_cors.md) - 2026-07-30
 - [Fix: Importación Completa de Datos CSV SoliPress (Empresa, Dirección, Teléfonos y Notas)](./fixes/fix_2026_07_31_solipres_csv_full_data_import.md) - 2026-07-31
 - [Fix: Corrección de 19 Pruebas Unitarias de Vitest en Frontend](./fixes/fix_2026_07_31_frontend_vitest_unit_tests.md) - 2026-07-31
+- [**Fix: Crash en Backend (NameError: logging) y Autenticación NextAuth v5**](./fixes/fix_2026_07_31_authentication_crash_and_nextauth_id.md) - 2026-07-31
 
 ### Knowledges & Issues
 
