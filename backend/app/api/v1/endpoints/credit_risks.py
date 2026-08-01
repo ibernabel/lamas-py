@@ -25,7 +25,7 @@ async def list_credit_risk_categories(
     Returns the full catalog of credit risk categories.
     Use GET /credit-risks/{id} to get risks within a category.
     """
-    categories = session.exec(select(CreditRiskCategory)).all()
+    categories = session.exec(select(CreditRiskCategory).order_by(CreditRiskCategory.created_at.desc())).all()
     return [CreditRiskCategoryRead.model_validate(c) for c in categories]
 
 
@@ -41,7 +41,7 @@ async def list_credit_risks(
     before associating one with a loan application via
     PATCH /loan-applications/{id}/credit-risk.
     """
-    risks = session.exec(select(CreditRisk)).all()
+    risks = session.exec(select(CreditRisk).order_by(CreditRisk.created_at.desc())).all()
     result = []
     for risk in risks:
         category = session.get(

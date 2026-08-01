@@ -667,8 +667,8 @@ async def search_customers(
     count_statement = select(func.count()).select_from(statement.subquery())
     total = session.exec(count_statement).one()
 
-    # Apply pagination and sorting
-    statement = statement.order_by(Customer.created_at.desc())
+    # Apply pagination and sorting (ID DESC guarantees newest created record is first)
+    statement = statement.order_by(Customer.id.desc())
     statement = statement.offset((pagination.page - 1) * pagination.per_page)
     statement = statement.limit(pagination.per_page)
 

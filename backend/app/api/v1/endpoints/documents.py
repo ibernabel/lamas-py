@@ -168,7 +168,7 @@ async def list_customer_documents(
     if not include_history:
         query = query.where(CustomerDocument.is_latest == True)
 
-    query = query.order_by(CustomerDocument.uploaded_at.desc())
+    query = query.order_by(CustomerDocument.id.desc())
     results = session.exec(query)
     documents = results.all()
 

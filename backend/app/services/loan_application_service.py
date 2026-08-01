@@ -249,7 +249,7 @@ async def list_loan_applications(
     # Apply pagination
     offset = (pagination.page - 1) * pagination.per_page
     loans = session.exec(
-        query.order_by(LoanApplication.created_at.desc())
+        query.order_by(LoanApplication.id.desc())
         .offset(offset)
         .limit(pagination.per_page)
     ).all()
