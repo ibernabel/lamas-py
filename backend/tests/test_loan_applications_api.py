@@ -493,3 +493,79 @@ def test_unauthenticated_access_create(client: TestClient):
     """Create endpoint returns 401 without auth token."""
     response = client.post("/api/v1/loan-applications/", json={})
     assert response.status_code == 401
+
+
+# ============================================================================
+# Public Submission Endpoint Tests (/submit)
+# ============================================================================
+
+def test_submit_public_loan_application_success(client: TestClient, session: Session):
+    """Public endpoint submits loan successfully with formatted NID without auth."""
+    payload = {
+        "identity": {
+            "nid": "402-2018559-5",
+            "first_name": "Ana",
+            "last_name": "Gomez",
+            "mobile_phone": "8095551234",
+            "email": "ana.gomez@example.com",
+        },
+        "profile": {
+            "marital_status": "single",
+            "housing_type": "rented",
+            "housing_monthly_payment": 15000.0,
+            "education_level": "bachelor",
+        },
+        "job": {
+            "occupation_type": "employed",
+            "company_name": "Empresa Test SRL",
+            "role": "Desarrollador",
+            "salary": 60000.0,
+            "payment_bank": "Banreservas",
+        },
+        "financial": {
+            "other_income": 5000.0,
+            "has_vehicle": True,
+            "has_property": False,
+        },
+        "loan_request": {
+            "amount": 150000.0,
+            "term_months": 24,
+            "purpose": "Consolidación de Deuda",
+            "is_debt_consolidation": True,
+        },
+        "legal_consent": {
+            "privacy_consent_accepted": True,
+            "bureau_authorization_accepted": True,
+            "ai_processing_accepted": True,
+            "consent_timestamp": "2026-07-31T18:00:00Z",
+            "consent_ip_address": "127.0.0.1",
+        },
+        "telemetry": {
+            "clipboard_paste_detected": False,
+            "keystroke_latency_ms": 110.0,
+            "device_fingerprint": "fp_test_12345",
+            "step_timings_sec": {"step1": 12, "step2": 20},
+        },
+    }
+
+    response = client.post("/api/v1/loan-applications/submit", json=payload)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["status"] == "success"
+    assert "loan_application_id" in data
+    assert "customer_id" in data
+    assert "core_task_id" in data
+
+
+def test_submit_public_loan_application_requires_legal_consents(client: TestClient):
+    """Public endpoint rejects submission when Law 172-13 consents are missing."""
+    payload = {
+        "identity": {"nid": "402-2018559-5"},
+        "legal_consent": {
+            "privacy_consent_accepted": False,
+            "bureau_authorization_accepted": True,
+        },
+    }
+    response = client.post("/api/v1/loan-applications/submit", json=payload)
+    assert response.status_code == 400
+    assert "Law 172-13" in response.json()["detail"]

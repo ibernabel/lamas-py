@@ -12,6 +12,8 @@ Implements:
 - POST   /loan-applications/{id}/notes    - Add note
 - POST   /loan-applications/{id}/evaluate - AI evaluation placeholder
 """
+import logging
+
 from app.schemas.creditgraph import CreditGraphAnalysisRead
 from fastapi import APIRouter, HTTPException, Query, status
 
@@ -42,6 +44,8 @@ from app.services.creditgraph_service import trigger_analysis
 
 from app.services.loan_submission_service import LoanSubmissionService
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 
@@ -65,16 +69,31 @@ async def submit_public_loan_application_endpoint(
             detail="Privacy consent and bureau authorization are required under Law 172-13.",
         )
 
-    service = LoanSubmissionService(session)
-    result = service.submit_loan(payload)
+    try:
+        service = LoanSubmissionService(session)
+        result = service.submit_loan(payload)
 
-    return {
-        "status": "success",
-        "message": "Loan application submitted successfully",
-        "loan_application_id": result["loan_application"].id,
-        "customer_id": result["customer"].id,
-        "core_task_id": result["core_task"].id,
-    }
+        return {
+            "status": "success",
+            "message": "Loan application submitted successfully",
+            "loan_application_id": result["loan_application"].id,
+            "customer_id": result["customer"].id,
+            "core_task_id": result["core_task"].id,
+        }
+    except ValueError as e:
+        session.rollback()
+        logger.warning(f"Validation error submitting public loan: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error submitting public loan application: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error submitting loan application: {str(e)}",
+        )
 
 
 

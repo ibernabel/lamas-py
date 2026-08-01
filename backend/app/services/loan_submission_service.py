@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from typing import Any, Dict
 from sqlmodel import Session, select
@@ -33,9 +34,17 @@ class LoanSubmissionService:
         legal = payload.get("legal_consent", {})
         telemetry = payload.get("telemetry", {})
 
-        nid = identity.get("nid")
-        if not nid:
+        raw_nid = identity.get("nid")
+        if not raw_nid:
             raise ValueError("Customer NID is required")
+
+        # Sanitize NID to remove non-digit characters (e.g. hyphens)
+        nid = re.sub(r"\D", "", str(raw_nid))
+        if not nid:
+            raise ValueError("Invalid NID provided")
+
+        raw_referred_by = identity.get("referred_by")
+        referred_by = re.sub(r"\D", "", str(raw_referred_by)) if raw_referred_by else None
 
         # 1. Customer deduplication or creation
         statement = select(Customer).where(Customer.nid == nid)
@@ -45,6 +54,8 @@ class LoanSubmissionService:
             customer = Customer(
                 nid=nid,
                 lead_channel="PUBLIC_FORM",
+                is_referred=bool(referred_by),
+                referred_by=referred_by,
                 is_active=True,
                 is_assigned=False,
             )
@@ -143,8 +154,8 @@ class LoanSubmissionService:
 
         loan_detail = LoanApplicationDetail(
             loan_application_id=loan_app.id,
-            amount=loan_req.get("amount", 0.0),
-            term=loan_req.get("term_months", 0),
+            amount=loan_req.get("amount") or 0.0,
+            term=loan_req.get("term_months") or 0,
             purpose=loan_req.get("purpose"),
             customer_comment=loan_req.get("notes"),
         )
@@ -182,6 +193,12 @@ class LoanSubmissionService:
                 step_timings_json=telemetry.get("step_timings_sec", {}),
                 shadow_risk_level=ShadowRiskLevel.NONE,
             )
+            self.session.add(shadow_risk)
+        else:
+            shadow_risk.clipboard_paste_detected = telemetry.get("clipboard_paste_detected", False)
+            shadow_risk.keystroke_latency_ms = telemetry.get("keystroke_latency_ms", 0.0)
+            shadow_risk.device_fingerprint = telemetry.get("device_fingerprint")
+            shadow_risk.step_timings_json = telemetry.get("step_timings_sec", {})
             self.session.add(shadow_risk)
 
         # 5. Enqueue Core Task Queue Item (HITL)

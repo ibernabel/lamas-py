@@ -50,10 +50,37 @@ def test_submit_loan_service_success(session: Session):
     service = LoanSubmissionService(session)
     result = service.submit_loan(payload)
 
-    assert result["customer"].nid == "001-0000001-1"
+    assert result["customer"].nid == "00100000011"
     assert result["loan_application"].id is not None
     assert result["legal_consent"].privacy_consent_accepted is True
     assert result["legal_consent"].consent_ip_address == "190.166.45.12"
     assert result["shadow_risk"].device_fingerprint == "fp_a8f9312b904c"
     assert result["core_task"].task_type == TaskType.CREATE_LOAN_IN_CORE
     assert result["core_task"].status == TaskStatus.PENDING
+
+
+def test_submit_loan_service_formats_and_deduplicates_nid(session: Session):
+    payload1 = {
+        "identity": {
+            "nid": "402-2018559-5",
+            "first_name": "Maria",
+            "last_name": "Rodriguez",
+        },
+        "loan_request": {"amount": 50000.0, "term_months": 12},
+    }
+    payload2 = {
+        "identity": {
+            "nid": "40220185595",
+            "first_name": "Maria",
+            "last_name": "Rodriguez",
+        },
+        "loan_request": {"amount": 75000.0, "term_months": 18},
+    }
+
+    service = LoanSubmissionService(session)
+    res1 = service.submit_loan(payload1)
+    res2 = service.submit_loan(payload2)
+
+    assert res1["customer"].nid == "40220185595"
+    assert res2["customer"].id == res1["customer"].id
+    assert res1["loan_application"].id != res2["loan_application"].id
