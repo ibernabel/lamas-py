@@ -31,7 +31,6 @@ export function PersonalStep({ onNext, onBack }: PersonalStepProps) {
       "profile.housing_type",
       "profile.housing_monthly_payment",
       "profile.time_at_residence_months",
-      "profile.dependents_count",
       "profile.education_level",
     ]);
 
@@ -48,7 +47,7 @@ export function PersonalStep({ onNext, onBack }: PersonalStepProps) {
           Paso 2: Perfil y Vivienda
         </h2>
         <p className="text-sm text-muted-foreground">
-          Indique su situación habitacional, estado civil y dependientes.
+          Indique su situación habitacional y estado civil.
         </p>
       </div>
 
@@ -59,15 +58,15 @@ export function PersonalStep({ onNext, onBack }: PersonalStepProps) {
             <Label htmlFor="marital-status">Estado Civil</Label>
             <select
               id="marital-status"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               {...register("profile.marital_status")}
             >
-              <option value="">Seleccione...</option>
-              <option value="single">Soltero(a)</option>
-              <option value="married">Casado(a)</option>
-              <option value="common_law">Unión Libre</option>
-              <option value="divorced">Divorciado(a)</option>
-              <option value="widowed">Viudo(a)</option>
+              <option value="" className="bg-background text-foreground">Seleccione...</option>
+              <option value="single" className="bg-background text-foreground">Soltero(a)</option>
+              <option value="married" className="bg-background text-foreground">Casado(a)</option>
+              <option value="common_law" className="bg-background text-foreground">Unión Libre</option>
+              <option value="divorced" className="bg-background text-foreground">Divorciado(a)</option>
+              <option value="widowed" className="bg-background text-foreground">Viudo(a)</option>
             </select>
             {errors.profile?.marital_status && (
               <p className="text-xs text-destructive">{errors.profile.marital_status.message}</p>
@@ -78,18 +77,18 @@ export function PersonalStep({ onNext, onBack }: PersonalStepProps) {
             <Label htmlFor="education-level">Nivel Educativo</Label>
             <select
               id="education-level"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               {...register("profile.education_level")}
             >
-              <option value="">Seleccione...</option>
-              <option value="primary">Primaria</option>
-              <option value="secondary">Secundaria</option>
-              <option value="high_school">Bachillerato</option>
-              <option value="technical">Técnico Superior</option>
-              <option value="bachelor">Universitario / Licenciatura</option>
-              <option value="postgraduate">Postgrado</option>
-              <option value="master">Maestría</option>
-              <option value="doctorate">Doctorado</option>
+              <option value="" className="bg-background text-foreground">Seleccione...</option>
+              <option value="primary" className="bg-background text-foreground">Primaria</option>
+              <option value="secondary" className="bg-background text-foreground">Secundaria</option>
+              <option value="high_school" className="bg-background text-foreground">Bachillerato</option>
+              <option value="technical" className="bg-background text-foreground">Técnico Superior</option>
+              <option value="bachelor" className="bg-background text-foreground">Universitario / Licenciatura</option>
+              <option value="postgraduate" className="bg-background text-foreground">Postgrado</option>
+              <option value="master" className="bg-background text-foreground">Maestría</option>
+              <option value="doctorate" className="bg-background text-foreground">Doctorado</option>
             </select>
             {errors.profile?.education_level && (
               <p className="text-xs text-destructive">{errors.profile.education_level.message}</p>
@@ -103,14 +102,14 @@ export function PersonalStep({ onNext, onBack }: PersonalStepProps) {
             <Label htmlFor="housing-type">Tipo de Vivienda</Label>
             <select
               id="housing-type"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               {...register("profile.housing_type")}
             >
-              <option value="">Seleccione...</option>
-              <option value="owned">Propia (Pagada)</option>
-              <option value="rented">Alquilada</option>
-              <option value="mortgaged">Propia (Hipotecada)</option>
-              <option value="family">Familiar</option>
+              <option value="" className="bg-background text-foreground">Seleccione...</option>
+              <option value="owned" className="bg-background text-foreground">Propia (Pagada)</option>
+              <option value="rented" className="bg-background text-foreground">Alquilada</option>
+              <option value="mortgaged" className="bg-background text-foreground">Propia (Hipotecada)</option>
+              <option value="family" className="bg-background text-foreground">Familiar</option>
             </select>
             {errors.profile?.housing_type && (
               <p className="text-xs text-destructive">{errors.profile.housing_type.message}</p>
@@ -137,7 +136,7 @@ export function PersonalStep({ onNext, onBack }: PersonalStepProps) {
           )}
         </div>
 
-        {/* Residence Time & Dependents */}
+        {/* Residence Time */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="residence-time">Tiempo en la Vivienda (Meses)</Label>
@@ -152,20 +151,6 @@ export function PersonalStep({ onNext, onBack }: PersonalStepProps) {
               <p className="text-xs text-destructive">
                 {errors.profile.time_at_residence_months.message}
               </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="dependents-count">Dependientes a Cargo</Label>
-            <Input
-              id="dependents-count"
-              type="number"
-              placeholder="2"
-              {...register("profile.dependents_count", { valueAsNumber: true })}
-              className={errors.profile?.dependents_count ? "border-destructive" : ""}
-            />
-            {errors.profile?.dependents_count && (
-              <p className="text-xs text-destructive">{errors.profile.dependents_count.message}</p>
             )}
           </div>
         </div>

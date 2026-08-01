@@ -46,6 +46,26 @@ class LoanSubmissionService:
         raw_referred_by = identity.get("referred_by")
         referred_by = re.sub(r"\D", "", str(raw_referred_by)) if raw_referred_by else None
 
+        # Also import Phone model
+        from app.models.phone import Phone
+        from datetime import date, timedelta
+
+        # Parse move_in_date from time_at_residence_months if provided
+        move_in_date_val = None
+        time_months = profile.get("time_at_residence_months")
+        if time_months and isinstance(time_months, (int, float)) and time_months > 0:
+            move_in_date_val = date.today() - timedelta(days=int(time_months * 30))
+
+        # Parse employment start date
+        start_date_val = None
+        if job.get("employment_start_date"):
+            try:
+                start_date_val = datetime.strptime(str(job.get("employment_start_date")), "%Y-%m-%d").date()
+            except Exception:
+                pass
+
+        occupation = job.get("occupation_type")
+
         # 1. Customer deduplication or creation
         statement = select(Customer).where(Customer.nid == nid)
         customer = self.session.exec(statement).first()
@@ -74,19 +94,21 @@ class LoanSubmissionService:
                 education_level=profile.get("education_level"),
                 housing_type=None,  # Physical type not captured in public wizard
                 housing_possession_type=profile.get("housing_type"),  # Wizard sends possession
+                move_in_date=move_in_date_val,
             )
             self.session.add(detail)
 
             # Customer Job Info
             # Derive is_self_employed from occupation_type for backward compatibility
             # with admin form and legacy boolean field.
-            occupation = job.get("occupation_type")
             job_info = CustomerJobInfo(
                 customer_id=customer.id,
                 occupation_type=occupation,
                 is_self_employed=occupation in ("independent", "business_owner"),
                 role=job.get("role"),
+                start_date=start_date_val,
                 salary=job.get("salary"),
+                payment_frequency=job.get("payment_frequency"),
                 other_incomes=financial.get("other_income"),
                 other_incomes_source=financial.get("other_income_source"),
                 payment_bank=job.get("payment_bank"),
@@ -141,6 +163,101 @@ class LoanSubmissionService:
                     type=acc.get("account_type"),
                 )
                 self.session.add(cust_acc)
+        else:
+            # Update existing customer details with new submission data if provided
+            if customer.detail:
+                if identity.get("first_name"): customer.detail.first_name = identity.get("first_name")
+                if identity.get("last_name"): customer.detail.last_name = identity.get("last_name")
+                if identity.get("email"): customer.detail.email = identity.get("email")
+                if profile.get("marital_status"): customer.detail.marital_status = profile.get("marital_status")
+                if profile.get("education_level"): customer.detail.education_level = profile.get("education_level")
+                if profile.get("housing_type"): customer.detail.housing_possession_type = profile.get("housing_type")
+                if move_in_date_val: customer.detail.move_in_date = move_in_date_val
+                self.session.add(customer.detail)
+
+            if customer.job_info:
+                if occupation:
+                    customer.job_info.occupation_type = occupation
+                    customer.job_info.is_self_employed = occupation in ("independent", "business_owner")
+                if job.get("role"): customer.job_info.role = job.get("role")
+                if start_date_val: customer.job_info.start_date = start_date_val
+                if job.get("salary") is not None: customer.job_info.salary = job.get("salary")
+                if job.get("payment_frequency"): customer.job_info.payment_frequency = job.get("payment_frequency")
+                if job.get("payment_bank"): customer.job_info.payment_bank = job.get("payment_bank")
+                if financial.get("other_income") is not None: customer.job_info.other_incomes = financial.get("other_income")
+                if financial.get("other_income_source"): customer.job_info.other_incomes_source = financial.get("other_income_source")
+                if job.get("supervisor_name"): customer.job_info.supervisor_name = job.get("supervisor_name")
+                self.session.add(customer.job_info)
+            elif occupation or job.get("role"):
+                job_info = CustomerJobInfo(
+                    customer_id=customer.id,
+                    occupation_type=occupation,
+                    is_self_employed=occupation in ("independent", "business_owner") if occupation else False,
+                    role=job.get("role"),
+                    start_date=start_date_val,
+                    salary=job.get("salary"),
+                    payment_frequency=job.get("payment_frequency"),
+                    other_incomes=financial.get("other_income"),
+                    other_incomes_source=financial.get("other_income_source"),
+                    payment_bank=job.get("payment_bank"),
+                    supervisor_name=job.get("supervisor_name"),
+                )
+                self.session.add(job_info)
+
+            # Update or create Financial Info
+            if customer.financial_info:
+                if profile.get("housing_monthly_payment") is not None:
+                    customer.financial_info.monthly_housing_payment = profile.get("housing_monthly_payment")
+                if profile.get("housing_type"):
+                    customer.financial_info.housing_type = profile.get("housing_type")
+                if financial.get("other_income") is not None:
+                    customer.financial_info.other_incomes = financial.get("other_income")
+                self.session.add(customer.financial_info)
+            elif profile.get("housing_monthly_payment") is not None or profile.get("housing_type"):
+                financial_info = CustomerFinancialInfo(
+                    customer_id=customer.id,
+                    other_incomes=financial.get("other_income"),
+                    monthly_housing_payment=profile.get("housing_monthly_payment"),
+                    housing_type=profile.get("housing_type"),
+                )
+                self.session.add(financial_info)
+
+            if job.get("company_name"):
+                if customer.company:
+                    customer.company.name = job.get("company_name")
+                    if job.get("company_rnc"): customer.company.rnc = job.get("company_rnc")
+                    self.session.add(customer.company)
+                else:
+                    company = Company(
+                        customer_id=customer.id,
+                        name=job.get("company_name"),
+                        rnc=job.get("company_rnc"),
+                    )
+                    self.session.add(company)
+
+        # 1b. Mobile phone persistence
+        raw_mobile = identity.get("mobile_phone")
+        if raw_mobile:
+            clean_mobile = re.sub(r"\D", "", str(raw_mobile))
+            if clean_mobile:
+                phone_stmt = select(Phone).where(
+                    Phone.phoneable_type == "Customer",
+                    Phone.phoneable_id == customer.id,
+                    Phone.type == "mobile"
+                )
+                existing_mobile = self.session.exec(phone_stmt).first()
+                if not existing_mobile:
+                    new_phone = Phone(
+                        number=clean_mobile,
+                        type="mobile",
+                        country_area="+1",
+                        phoneable_type="Customer",
+                        phoneable_id=customer.id
+                    )
+                    self.session.add(new_phone)
+                else:
+                    existing_mobile.number = clean_mobile
+                    self.session.add(existing_mobile)
 
         # 2. Create Loan Application
         loan_app = LoanApplication(
@@ -156,6 +273,7 @@ class LoanSubmissionService:
             loan_application_id=loan_app.id,
             amount=loan_req.get("amount") or 0.0,
             term=loan_req.get("term_months") or 0,
+            frequency=loan_req.get("payment_frequency") or loan_req.get("frequency") or "monthly",
             purpose=loan_req.get("purpose"),
             customer_comment=loan_req.get("notes"),
         )

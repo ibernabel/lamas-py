@@ -26,6 +26,7 @@ export function EmploymentStep({ onNext, onBack }: EmploymentStepProps) {
       "job.company_name",
       "job.role",
       "job.salary",
+      "job.payment_frequency",
       "job.payment_bank",
       "job.employment_start_date",
     ]);
@@ -54,14 +55,14 @@ export function EmploymentStep({ onNext, onBack }: EmploymentStepProps) {
             <Label htmlFor="occupation-type">Tipo de Ocupación</Label>
             <select
               id="occupation-type"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               {...register("job.occupation_type")}
             >
-              <option value="">Seleccione...</option>
-              <option value="employed">Empleado Privado / Público</option>
-              <option value="independent">Profesional Independiente</option>
-              <option value="business_owner">Dueño de Empresa / Negocio</option>
-              <option value="other">Otro</option>
+              <option value="" className="bg-background text-foreground">Seleccione...</option>
+              <option value="employed" className="bg-background text-foreground">Empleado Privado / Público</option>
+              <option value="independent" className="bg-background text-foreground">Profesional Independiente</option>
+              <option value="business_owner" className="bg-background text-foreground">Dueño de Empresa / Negocio</option>
+              <option value="other" className="bg-background text-foreground">Otro</option>
             </select>
             {errors.job?.occupation_type && (
               <p className="text-xs text-destructive">{errors.job.occupation_type.message}</p>
@@ -127,17 +128,17 @@ export function EmploymentStep({ onNext, onBack }: EmploymentStepProps) {
             <Label htmlFor="payment-bank">Banco donde recibe la Nómina</Label>
             <select
               id="payment-bank"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               {...register("job.payment_bank")}
             >
-              <option value="">Seleccione...</option>
-              <option value="BANRESERVAS">Banreservas</option>
-              <option value="POPULAR">Banco Popular Dominicano</option>
-              <option value="BHD">Banco BHD</option>
-              <option value="SCOTIABANK">Scotiabank</option>
-              <option value="SANTA_CRUZ">Banco Santa Cruz</option>
-              <option value="PROMERICA">Banco Promerica</option>
-              <option value="OTHER">Otro Banco / Efectivo</option>
+              <option value="" className="bg-background text-foreground">Seleccione...</option>
+              <option value="BANRESERVAS" className="bg-background text-foreground">Banreservas</option>
+              <option value="POPULAR" className="bg-background text-foreground">Banco Popular Dominicano</option>
+              <option value="BHD" className="bg-background text-foreground">Banco BHD</option>
+              <option value="SCOTIABANK" className="bg-background text-foreground">Scotiabank</option>
+              <option value="SANTA_CRUZ" className="bg-background text-foreground">Banco Santa Cruz</option>
+              <option value="PROMERICA" className="bg-background text-foreground">Banco Promerica</option>
+              <option value="OTHER" className="bg-background text-foreground">Otro Banco / Efectivo</option>
             </select>
             {errors.job?.payment_bank && (
               <p className="text-xs text-destructive">{errors.job.payment_bank.message}</p>
@@ -145,18 +146,38 @@ export function EmploymentStep({ onNext, onBack }: EmploymentStepProps) {
           </div>
         </div>
 
-        {/* Start Date */}
-        <div className="space-y-2">
-          <Label htmlFor="employment-start-date">Fecha de Ingreso Laboral</Label>
-          <Input
-            id="employment-start-date"
-            type="date"
-            {...register("job.employment_start_date")}
-            className={errors.job?.employment_start_date ? "border-destructive" : ""}
-          />
-          {errors.job?.employment_start_date && (
-            <p className="text-xs text-destructive">{errors.job.employment_start_date.message}</p>
-          )}
+        {/* Payment Frequency & Start Date */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="payment-frequency">Frecuencia de Cobro / Pago</Label>
+            <select
+              id="payment-frequency"
+              className="flex h-10 w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              {...register("job.payment_frequency")}
+            >
+              <option value="" className="bg-background text-foreground">Seleccione...</option>
+              <option value="fortnightly" className="bg-background text-foreground">Quincenal</option>
+              <option value="monthly" className="bg-background text-foreground">Mensual</option>
+              <option value="weekly" className="bg-background text-foreground">Semanal</option>
+              <option value="daily" className="bg-background text-foreground">Diario</option>
+            </select>
+            {errors.job?.payment_frequency && (
+              <p className="text-xs text-destructive">{errors.job.payment_frequency.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="employment-start-date">Fecha de Ingreso Laboral</Label>
+            <Input
+              id="employment-start-date"
+              type="date"
+              {...register("job.employment_start_date")}
+              className={errors.job?.employment_start_date ? "border-destructive" : ""}
+            />
+            {errors.job?.employment_start_date && (
+              <p className="text-xs text-destructive">{errors.job.employment_start_date.message}</p>
+            )}
+          </div>
         </div>
       </div>
 

@@ -123,6 +123,8 @@ class LoanApplicationListItem(BaseModel):
     is_archived: bool
     is_new: bool
     amount: float | None = None   # Pulled from detail for convenience
+    term: int | None = None       # Loan term in months
+    purpose: str | None = None    # Loan purpose
     customer_name: str | None = None
     customer_nid: str | None = None
     company_name: str | None = None

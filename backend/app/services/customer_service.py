@@ -73,15 +73,42 @@ async def validate_nid(session: Session, nid: str) -> NIDValidationResponse:
     existing_customer = session.exec(statement).first()
 
     customer_data = None
-    if existing_customer and existing_customer.detail:
+    if existing_customer:
         detail = existing_customer.detail
+        job_info = existing_customer.job_info
+        company = existing_customer.company
+
+        # Query mobile phone or primary phone
+        phone_stmt = select(Phone).where(
+            Phone.phoneable_type == "Customer",
+            Phone.phoneable_id == existing_customer.id,
+            Phone.type == "mobile"
+        )
+        mobile_phone_record = session.exec(phone_stmt).first()
+        if not mobile_phone_record:
+            any_phone_stmt = select(Phone).where(
+                Phone.phoneable_type == "Customer",
+                Phone.phoneable_id == existing_customer.id
+            )
+            mobile_phone_record = session.exec(any_phone_stmt).first()
+
+        financial_info = existing_customer.financial_info
         customer_data = {
-            "first_name": detail.first_name or "",
-            "last_name": detail.last_name or "",
-            "email": detail.email or "",
-            "marital_status": detail.marital_status,
-            "housing_type": detail.housing_type,
-            "education_level": detail.education_level,
+            "first_name": (detail.first_name if detail else "") or "",
+            "last_name": (detail.last_name if detail else "") or "",
+            "email": (detail.email if detail else "") or "",
+            "mobile_phone": mobile_phone_record.number if mobile_phone_record else "",
+            "marital_status": detail.marital_status if detail else None,
+            "housing_type": (detail.housing_possession_type or detail.housing_type) if detail else None,
+            "housing_monthly_payment": financial_info.monthly_housing_payment if (financial_info and financial_info.monthly_housing_payment is not None) else None,
+            "education_level": detail.education_level if detail else None,
+            "occupation_type": job_info.occupation_type if job_info else None,
+            "role": (job_info.role if job_info else "") or "",
+            "company_name": (company.name if company else "") or "",
+            "salary": job_info.salary if job_info else None,
+            "payment_bank": (job_info.payment_bank if job_info else "") or "",
+            "payment_frequency": job_info.payment_frequency if job_info else None,
+            "employment_start_date": str(job_info.start_date) if (job_info and job_info.start_date) else "",
         }
 
     return NIDValidationResponse(

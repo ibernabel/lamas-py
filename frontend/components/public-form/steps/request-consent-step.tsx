@@ -42,6 +42,7 @@ export function RequestConsentStep({ onBack, onSubmit, isSubmitting }: RequestCo
     const isStepValid = await trigger([
       "loan_request.amount",
       "loan_request.term_months",
+      "loan_request.payment_frequency",
       "loan_request.purpose",
       "legal_consent.privacy_consent_accepted",
       "legal_consent.bureau_authorization_accepted",
@@ -69,7 +70,7 @@ export function RequestConsentStep({ onBack, onSubmit, isSubmitting }: RequestCo
           Paso 5: Solicitud y Autorización Legal (Ley 172-13)
         </h2>
         <p className="text-sm text-muted-foreground">
-          Especifique el monto deseado, adjunte documentos y firme la autorización legal.
+          Especifique el monto deseado, plazo, frecuencia de pago, adjunte documentos y firme la autorización legal.
         </p>
       </div>
 
@@ -94,17 +95,17 @@ export function RequestConsentStep({ onBack, onSubmit, isSubmitting }: RequestCo
             <Label htmlFor="loan-term">Plazo (Meses)</Label>
             <select
               id="loan-term"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               {...register("loan_request.term_months", { valueAsNumber: true })}
             >
-              <option value="">Seleccione el plazo...</option>
-              <option value="6">6 meses</option>
-              <option value="12">12 meses</option>
-              <option value="18">18 meses</option>
-              <option value="24">24 meses</option>
-              <option value="36">36 meses</option>
-              <option value="48">48 meses</option>
-              <option value="60">60 meses</option>
+              <option value="" className="bg-background text-foreground">Seleccione el plazo...</option>
+              <option value="6" className="bg-background text-foreground">6 meses</option>
+              <option value="12" className="bg-background text-foreground">12 meses</option>
+              <option value="18" className="bg-background text-foreground">18 meses</option>
+              <option value="24" className="bg-background text-foreground">24 meses</option>
+              <option value="36" className="bg-background text-foreground">36 meses</option>
+              <option value="48" className="bg-background text-foreground">48 meses</option>
+              <option value="60" className="bg-background text-foreground">60 meses</option>
             </select>
             {errors.loan_request?.term_months && (
               <p className="text-xs text-destructive">{errors.loan_request.term_months.message}</p>
@@ -112,25 +113,45 @@ export function RequestConsentStep({ onBack, onSubmit, isSubmitting }: RequestCo
           </div>
         </div>
 
-        {/* Loan Purpose */}
-        <div className="space-y-2">
-          <Label htmlFor="loan-purpose">Propósito del Préstamo</Label>
-          <select
-            id="loan-purpose"
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            {...register("loan_request.purpose")}
-          >
-            <option value="">Seleccione...</option>
-            <option value="RENOVATION">Remodelación o Vivienda</option>
-            <option value="DEBT_CONSOLIDATION">Consolidación de Deudas</option>
-            <option value="VEHICLE">Compra de Vehículo</option>
-            <option value="BUSINESS">Inversión en Negocio</option>
-            <option value="MEDICAL">Gastos Médicos / Salud</option>
-            <option value="PERSONAL">Uso Personal / Viaje</option>
-          </select>
-          {errors.loan_request?.purpose && (
-            <p className="text-xs text-destructive">{errors.loan_request.purpose.message}</p>
-          )}
+        {/* Payment Frequency & Purpose */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="loan-payment-frequency">Frecuencia de Pago del Préstamo</Label>
+            <select
+              id="loan-payment-frequency"
+              className="flex h-10 w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              {...register("loan_request.payment_frequency")}
+            >
+              <option value="" className="bg-background text-foreground">Seleccione la frecuencia...</option>
+              <option value="monthly" className="bg-background text-foreground">Mensual</option>
+              <option value="fortnightly" className="bg-background text-foreground">Quincenal</option>
+              <option value="weekly" className="bg-background text-foreground">Semanal</option>
+              <option value="daily" className="bg-background text-foreground">Diario</option>
+            </select>
+            {errors.loan_request?.payment_frequency && (
+              <p className="text-xs text-destructive">{errors.loan_request.payment_frequency.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="loan-purpose">Propósito del Préstamo</Label>
+            <select
+              id="loan-purpose"
+              className="flex h-10 w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              {...register("loan_request.purpose")}
+            >
+              <option value="" className="bg-background text-foreground">Seleccione...</option>
+              <option value="RENOVATION" className="bg-background text-foreground">Remodelación o Vivienda</option>
+              <option value="DEBT_CONSOLIDATION" className="bg-background text-foreground">Consolidación de Deudas</option>
+              <option value="VEHICLE" className="bg-background text-foreground">Compra de Vehículo</option>
+              <option value="BUSINESS" className="bg-background text-foreground">Inversión en Negocio</option>
+              <option value="MEDICAL" className="bg-background text-foreground">Gastos Médicos / Salud</option>
+              <option value="PERSONAL" className="bg-background text-foreground">Uso Personal / Viaje</option>
+            </select>
+            {errors.loan_request?.purpose && (
+              <p className="text-xs text-destructive">{errors.loan_request.purpose.message}</p>
+            )}
+          </div>
         </div>
 
         {/* Dropzone Upload Component */}

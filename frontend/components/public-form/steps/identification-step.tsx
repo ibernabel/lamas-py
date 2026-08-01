@@ -70,9 +70,20 @@ export function IdentificationStep({ onNext }: IdentificationStepProps) {
           if (cust.first_name) setValue("identity.first_name", cust.first_name, { shouldValidate: true });
           if (cust.last_name) setValue("identity.last_name", cust.last_name, { shouldValidate: true });
           if (cust.email) setValue("identity.email", cust.email, { shouldValidate: true });
-          if (cust.marital_status) setValue("profile.marital_status", cust.marital_status);
-          if (cust.housing_type) setValue("profile.housing_type", cust.housing_type);
-          if (cust.education_level) setValue("profile.education_level", cust.education_level);
+          if (cust.mobile_phone) setValue("identity.mobile_phone", cust.mobile_phone, { shouldValidate: true });
+          if (cust.marital_status) setValue("profile.marital_status", cust.marital_status, { shouldValidate: true });
+          if (cust.housing_type) setValue("profile.housing_type", cust.housing_type, { shouldValidate: true });
+          if (cust.housing_monthly_payment !== undefined && cust.housing_monthly_payment !== null) {
+            setValue("profile.housing_monthly_payment", cust.housing_monthly_payment, { shouldValidate: true });
+          }
+          if (cust.education_level) setValue("profile.education_level", cust.education_level, { shouldValidate: true });
+          if (cust.occupation_type) setValue("job.occupation_type", cust.occupation_type, { shouldValidate: true });
+          if (cust.role) setValue("job.role", cust.role, { shouldValidate: true });
+          if (cust.company_name) setValue("job.company_name", cust.company_name, { shouldValidate: true });
+          if (cust.salary) setValue("job.salary", cust.salary, { shouldValidate: true });
+          if (cust.payment_bank) setValue("job.payment_bank", cust.payment_bank, { shouldValidate: true });
+          if (cust.payment_frequency) setValue("job.payment_frequency", cust.payment_frequency, { shouldValidate: true });
+          if (cust.employment_start_date) setValue("job.employment_start_date", cust.employment_start_date, { shouldValidate: true });
         } else {
           // Valid NID for new customer
           setNidStatus("valid");

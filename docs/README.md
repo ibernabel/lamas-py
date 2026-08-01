@@ -57,6 +57,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [Fix: Corrección de 19 Pruebas Unitarias de Vitest en Frontend](./fixes/fix_2026_07_31_frontend_vitest_unit_tests.md) - 2026-07-31
 - [**Fix: Crash en Backend (NameError: logging) y Autenticación NextAuth v5**](./fixes/fix_2026_07_31_authentication_crash_and_nextauth_id.md) - 2026-07-31
 - [**Fix: Ordenamiento Descendente de Tablas por ID y Fecha (Más Reciente Primero)**](./fixes/fix_2026_07_31_table_sorting_desc_id.md) - 2026-07-31
+- [**Fix: Persistencia del Formulario Público /solicitar, Frecuencia de Pago e Internacionalización Zod**](./fixes/fix_2026_07_31_solicitar_persistence_and_zod_validations.md) - 2026-07-31
 
 ### Knowledges & Issues
 

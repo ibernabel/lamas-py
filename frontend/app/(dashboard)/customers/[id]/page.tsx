@@ -59,6 +59,52 @@ function DetailSkeleton() {
   );
 }
 
+const PAYMENT_FREQUENCY_LABELS: Record<string, string> = {
+  monthly: "Mensual",
+  fortnightly: "Quincenal",
+  "bi-weekly": "Quincenal",
+  weekly: "Semanal",
+  daily: "Diario",
+};
+
+const HOUSING_POSSESSION_LABELS: Record<string, string> = {
+  owned: "Propia (Pagada)",
+  rented: "Alquilada",
+  mortgaged: "Propia (Hipotecada)",
+  family: "Familiar",
+  other: "Otro",
+};
+
+const OCCUPATION_TYPE_LABELS: Record<string, string> = {
+  employed: "Empleado(a)",
+  independent: "Independiente / Freelance",
+  business_owner: "Empresario / Dueño de Negocio",
+  unemployed: "Desempleado(a)",
+  retired: "Pensionado(a) / Jubilado(a)",
+  other: "Otro",
+};
+
+const MARITAL_STATUS_LABELS: Record<string, string> = {
+  single: "Soltero(a)",
+  married: "Casado(a)",
+  divorced: "Divorciado(a)",
+  widowed: "Viudo(a)",
+  common_law: "Unión Libre",
+  other: "Otro",
+};
+
+const EDUCATION_LEVEL_LABELS: Record<string, string> = {
+  primary: "Primaria",
+  secondary: "Secundaria",
+  high_school: "Bachillerato",
+  technical: "Técnico Superior",
+  bachelor: "Universitario / Licenciatura",
+  postgraduate: "Postgrado",
+  master: "Maestría",
+  doctorate: "Doctorado",
+  other: "Otro",
+};
+
 // ── Page component ─────────────────────────────────────────────────────────
 
 export default function CustomerDetailPage() {
@@ -94,6 +140,9 @@ export default function CustomerDetailPage() {
   const fullName = customer.detail
     ? `${customer.detail.first_name} ${customer.detail.last_name}`
     : `${t("customers.title")} #${customer.id}`;
+
+  const mobilePhone = customer.phones?.find(p => p.type === "mobile")?.number || customer.phones?.[0]?.number;
+  const homePhone = customer.phones?.find(p => p.type === "home")?.number;
 
   return (
     <div className="space-y-6">
@@ -168,30 +217,30 @@ export default function CustomerDetailPage() {
                   <InfoRow label="Nombre Completo" value={`${customer.detail?.first_name ?? ""} ${customer.detail?.last_name ?? ""}`} />
                   <InfoRow label="Cédula de Identidad" value={formatNid(customer.nid)} />
                   <InfoRow label="Fecha de Nacimiento" value={customer.detail?.birthday} />
-                  <InfoRow 
-                    label="Celular" 
-                    value={customer.phones.find(p => p.type === "mobile")?.number} 
-                  />
-                  <InfoRow 
-                    label="Teléfono Residencia" 
-                    value={customer.phones.find(p => p.type === "home")?.number} 
-                  />
+                  <InfoRow label="Celular" value={mobilePhone} />
+                  {homePhone && <InfoRow label="Teléfono Residencia" value={homePhone} />}
                   <InfoRow label="Email" value={customer.detail?.email} />
-                  <InfoRow label="Estado Civil" value={customer.detail?.marital_status} className="capitalize" />
+                  <InfoRow 
+                    label="Estado Civil" 
+                    value={customer.detail?.marital_status ? MARITAL_STATUS_LABELS[customer.detail.marital_status] || customer.detail.marital_status : null} 
+                  />
                   <InfoRow label="Nacionalidad" value={customer.detail?.nationality} />
                   <InfoRow 
                     label="Género"
                     value={
-                      customer.detail?.gender === "M"
+                      customer.detail?.gender === "M" || customer.detail?.gender === "male"
                         ? "Masculino"
-                        : customer.detail?.gender === "F"
+                        : customer.detail?.gender === "F" || customer.detail?.gender === "female"
                         ? "Femenino"
-                        : customer.detail?.gender === "O"
+                        : customer.detail?.gender === "O" || customer.detail?.gender === "other"
                         ? "Otro"
                         : null
                     }
                   />
-                  <InfoRow label="Nivel Educativo" value={customer.detail?.education_level} />
+                  <InfoRow 
+                    label="Nivel Educativo" 
+                    value={customer.detail?.education_level ? EDUCATION_LEVEL_LABELS[customer.detail.education_level] || customer.detail.education_level : null} 
+                  />
                 </CardContent>
               </Card>
 
@@ -214,8 +263,16 @@ export default function CustomerDetailPage() {
                       </div>
                     ) : null} 
                   />
-                  <InfoRow label="Tipo de Vivienda" value={customer.detail?.housing_type} />
-                  <InfoRow label="Condición de Posesión" value={customer.detail?.housing_possession_type} />
+                  <InfoRow 
+                    label="Condición de Posesión" 
+                    value={customer.detail?.housing_possession_type ? HOUSING_POSSESSION_LABELS[customer.detail.housing_possession_type] || customer.detail.housing_possession_type : null} 
+                  />
+                  {customer.financial_info?.monthly_housing_payment ? (
+                    <InfoRow 
+                      label="Pago Mensual Alquiler" 
+                      value={`RD$ ${customer.financial_info.monthly_housing_payment.toLocaleString()}`} 
+                    />
+                  ) : null}
                   <InfoRow label="Reside Desde" value={customer.detail?.move_in_date} />
                   <InfoRow label="Medio de Transporte" value={customer.detail?.mode_of_transport} />
                   
@@ -238,6 +295,10 @@ export default function CustomerDetailPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-0">
+                  <InfoRow 
+                    label="Tipo de Ocupación" 
+                    value={customer.job_info?.occupation_type ? OCCUPATION_TYPE_LABELS[customer.job_info.occupation_type] || customer.job_info.occupation_type : null} 
+                  />
                   <InfoRow label="Trabajador Independiente" value={customer.job_info?.is_self_employed ? "Sí" : "No"} />
                   <InfoRow label="Empresa / Institución" value={customer.company?.name} />
                   <InfoRow 
@@ -249,7 +310,10 @@ export default function CustomerDetailPage() {
                   <InfoRow label="Fecha de Ingreso" value={customer.job_info?.start_date} />
                   <InfoRow label="Salario Mensual" value={customer.job_info?.salary ? `RD$ ${customer.job_info.salary.toLocaleString()}` : null} />
                   <InfoRow label="Tipo de Pago" value={customer.job_info?.payment_type} />
-                  <InfoRow label="Frecuencia de Pago" value={customer.job_info?.payment_frequency} />
+                  <InfoRow 
+                    label="Frecuencia de Pago" 
+                    value={customer.job_info?.payment_frequency ? PAYMENT_FREQUENCY_LABELS[customer.job_info.payment_frequency] || customer.job_info.payment_frequency : null} 
+                  />
                   <InfoRow label="Banco Nómina" value={customer.job_info?.payment_bank} />
                   <InfoRow label="Otros Ingresos" value={customer.job_info?.other_incomes} />
                   <InfoRow label="Fuente Otros Ingresos" value={customer.job_info?.other_incomes_source} />

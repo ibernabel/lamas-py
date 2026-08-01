@@ -316,6 +316,8 @@ async def list_loan_applications(
             is_archived=loan.is_archived,
             is_new=loan.is_new,
             amount=detail.amount if detail else None,
+            term=detail.term if detail else None,
+            purpose=detail.purpose if detail else None,
             customer_name=customer_name,
             customer_nid=customer.nid if customer else None,
             company_name=company_name,

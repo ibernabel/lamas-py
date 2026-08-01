@@ -53,7 +53,6 @@ export default function SolicitarPage() {
         housing_type: undefined,
         housing_monthly_payment: undefined,
         time_at_residence_months: undefined,
-        dependents_count: undefined,
         education_level: undefined,
       },
       job: {
@@ -62,6 +61,7 @@ export default function SolicitarPage() {
         company_rnc: "",
         role: "",
         salary: undefined,
+        payment_frequency: undefined,
         payment_bank: "",
         employment_start_date: "",
       },
@@ -75,6 +75,7 @@ export default function SolicitarPage() {
       loan_request: {
         amount: undefined,
         term_months: undefined,
+        payment_frequency: undefined,
         purpose: "",
         is_debt_consolidation: false,
       },

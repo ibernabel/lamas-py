@@ -31,6 +31,20 @@ import { DocumentsSection } from "@/components/documents/DocumentsSection";
 import { useCustomer } from "@/hooks/use-customers";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
+const PURPOSE_LABELS: Record<string, string> = {
+  RENOVATION: "Remodelación o Vivienda",
+  DEBT_CONSOLIDATION: "Consolidación de Deudas",
+  VEHICLE: "Compra de Vehículo",
+  BUSINESS: "Inversión en Negocio",
+  MEDICAL: "Gastos Médicos / Salud",
+  PERSONAL: "Uso Personal / Viaje",
+};
+
+function formatPurpose(purpose: string | null | undefined): string {
+  if (!purpose) return "—";
+  return PURPOSE_LABELS[purpose] || purpose;
+}
+
 export default function LoanDetailPage() {
   const { id } = useParams();
   const loanId = parseInt(id as string);
@@ -151,8 +165,8 @@ export default function LoanDetailPage() {
               <div className="space-y-4">
                 <div>
                   <h4 className="text-sm font-semibold mb-1">{t("loans.purpose")}</h4>
-                  <p className="text-sm text-muted-foreground italic">
-                    {loan.detail?.purpose || t("common.noData")}
+                  <p className="text-sm text-muted-foreground font-medium">
+                    {formatPurpose(loan.detail?.purpose)}
                   </p>
                 </div>
                 <div>

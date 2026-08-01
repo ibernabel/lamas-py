@@ -23,6 +23,8 @@ def test_full_loan_submit_and_hitl_workflow(client: TestClient, auth_headers: di
             "company_name": "Empresa Test SRL",
             "role": "Gerente",
             "salary": 75000.0,
+            "occupation_type": "employed",
+            "employment_start_date": "2020-05-15",
         },
         "financial": {
             "other_income": 10000.0,
@@ -30,7 +32,7 @@ def test_full_loan_submit_and_hitl_workflow(client: TestClient, auth_headers: di
         "loan_request": {
             "amount": 250000.0,
             "term_months": 36,
-            "purpose": "VEHICLE_PURCHASE",
+            "purpose": "VEHICLE",
             "notes": "Compra de vehículo usadof",
         },
         "legal_consent": {
@@ -68,7 +70,14 @@ def test_full_loan_submit_and_hitl_workflow(client: TestClient, auth_headers: di
     customer_id = resp_data["customer_id"]
     core_task_id = resp_data["core_task_id"]
 
-    # 3. Verify LegalConsent and ShadowRisk saved in DB
+    # 3. Verify Phone, LegalConsent, ShadowRisk, and JobInfo saved in DB
+    from app.models.phone import Phone
+    phone_record = session.exec(
+        select(Phone).where(Phone.phoneable_type == "Customer", Phone.phoneable_id == customer_id)
+    ).first()
+    assert phone_record is not None
+    assert phone_record.number == "8095551122"
+
     legal_record = session.exec(select(LegalConsent).where(LegalConsent.loan_application_id == loan_id)).first()
     assert legal_record is not None
     assert legal_record.privacy_consent_accepted is True
