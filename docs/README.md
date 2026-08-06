@@ -37,6 +37,8 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [**Formateo de Cédula (000-0000000-0) e Entradas Flexibles**](./implementation/2026-07-31-nid-mask-formatting-and-flexible-inputs.md) - ✅ (2026-07-31)
 - [**Validación Local de Cédula JCE, Autocompletado y Limpieza de Valores por Defecto**](./implementation/2026-07-31-local-nid-validation-autofill-and-defaults-cleanup.md) - ✅ (2026-07-31)
 - [**Inicialización & Retrofit ASD Framework v2 (Software Domain)**](./implementation/2026-08-05-project-init-asd-v2-migration.md) - ✅ (2026-08-05)
+- [**Configuración de Engineering Skills (Matt Pocock Pattern)**](./implementation/2026-08-06-setup-matt-pocock-skills.md) - ✅ (2026-08-06)
+
 
 ### Decisions & Architecture (ADRs)
 

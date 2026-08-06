@@ -39,3 +39,18 @@ docs/
 
 - `/post-session-doc`: Documentación y auditoría al concluir una sesión de trabajo en LAMaS (`.agents/workflows/post-session-doc.md`).
 - `/sync-repo`: Sincronización del repositorio con Git y convenciones de commit.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues using the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical label vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout (`CONTEXT.md` + `docs/decisions/`). See `docs/agents/domain.md`.
+
