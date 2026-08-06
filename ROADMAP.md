@@ -11,6 +11,14 @@ Migration of LAMaS (Loan Applications Management System) from Laravel to:
 
 ---
 
+## Domain Model
+
+- **Domain:** Loan Applications Management System (LAMaS) — Microloans & Credit Processing
+- **Bounded Contexts:** Customer Management, Loan Origination & Applications, Document Management, Credit Assessment & Scoring (CreditGraph AI), Settings & i18n
+- **Ubiquitous Language:** Customer, LoanApplication, CreditGraph, NID (Cédula), Guarantor, Payment Frequency, SoliPres
+
+---
+
 ## Quick Links
 
 | Document                                                                            | Description                          | Status        |

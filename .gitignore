@@ -79,3 +79,14 @@ COMMIT_MSG*.md
 COMMIT_MESSAGE*.md
 
 backend/uploads/
+# Added by project-init ASD v2
+vendor/
+*.pem
+*.key
+Thumbs.db
+desktop.ini
+.env.*.local
+.env.production
+.env.staging
+.nuxt/
+.astro/

@@ -36,6 +36,7 @@ Documentation for the LAMaS (Loan Applications Management System) migration proj
 - [**Loans Table Structure Redesign (7 Cols, Mini Subtexts & Edit)**](./implementation/2026-07-31-loans-table-structure-redesign.md) - ✅ (2026-07-31)
 - [**Formateo de Cédula (000-0000000-0) e Entradas Flexibles**](./implementation/2026-07-31-nid-mask-formatting-and-flexible-inputs.md) - ✅ (2026-07-31)
 - [**Validación Local de Cédula JCE, Autocompletado y Limpieza de Valores por Defecto**](./implementation/2026-07-31-local-nid-validation-autofill-and-defaults-cleanup.md) - ✅ (2026-07-31)
+- [**Inicialización & Retrofit ASD Framework v2 (Software Domain)**](./implementation/2026-08-05-project-init-asd-v2-migration.md) - ✅ (2026-08-05)
 
 ### Decisions & Architecture (ADRs)
 
